@@ -5,9 +5,9 @@ author: jmprieur
 level: 200
 client: .NET native (WPF)
 service: ASP.NET Core 2.0
-endpoint: AAD V1
+endpoint: AAD V2
 ---
-# Calling a ASP.NET Core Web API from a WPF application using Azure AD
+# Calling a ASP.NET Core Web API from a WPF application using Azure AD V2
 
 ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/497/badge)
 
@@ -15,7 +15,8 @@ endpoint: AAD V1
 
 ### Scenario
 
-You expose a Web API and you want to protect it so that only authenticated user can access it.
+You expose a Web API and you want to protect it so that only authenticated user can access it. You want to enable authenticated users with both work and school accounts
+or Microsoft personal accounts (formerly live account) to use your Web API.
 
 ### Overview
 
@@ -24,7 +25,8 @@ The .Net application uses the Active Directory Authentication Library (ADAL.Net)
 
 ![Topology](./ReadmeFiles/topology.png)
 
-> This sample has been updated to ASP.NET Core 2.0.  Looking for previous versions of this code sample? Check out the tags on the [releases](../../releases) GitHub page.
+> This sample is very similar to the [active-directory-dotnet-native-aspnetcore](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) sample except that that one is for the Azure AD V1 endpoint
+> and the token is acquired using ADAL.NET, whereas this sample is for the V2 endpoint, and the token is acquired using MSAL.NET. The Web API was also modified to accept both V1 and V2 tokens.
 
 ### User experience with this sample
 
@@ -53,7 +55,7 @@ Next time a user runs the application, the user is signed-in with the same ident
 From your shell or command line:
 
 ```Shell
-git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore.git
+git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git
 ```
 
 > Given that the name of the sample is pretty long, and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
@@ -62,50 +64,19 @@ git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnet
 
 There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
 
-- either follow the steps in the paragraphs below ([Step 2](#step-2--register-the-sample-with-your-azure-active-directory-tenant) and [Step 3](#step-3--configure-the-sample-to-use-your-azure-ad-tenant))
-- or use PowerShell scripts that:
-  - **automatically** create for you the Azure AD applications and related objects (passwords, permissions, dependencies)
-  - modify the Visual Studio projects' configuration files.
+#### Register the TodoListService web API
 
-If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
-
-#### First step: choose the Azure AD tenant where you want to create your applications
-
-As a first step you'll need to:
-
-1. Sign in to the [Azure portal](https://portal.azure.com).
-1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
-1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
-
-> In the next steps, you might need the tenant name (or directory name) or the tenant ID (or directory ID). These are presented in the **Properties**
-  of the Azure Active Directory window respectively as *Name* and *Directory ID*
-
-#### Register the service app (TodoListService)
-
-1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
-1. Enter a friendly name for the application, for example 'TodoListService' and select 'Web app / API' as the *Application Type*.
-1. For the *sign-on URL*, enter the base URL for the sample, which is by default `https://localhost:44351/`.
-1. Click on **Create** to create the application.
-1. From the Azure portal, note the following information:
-    - The Tenant domain: See the App ID URI base URL. For example: contoso.onmicrosoft.com
-    - The Tenant ID: See the *Endpoints* window (button next to *New application registration*). Record the GUID from any of the endpoint URLs. For example: da41245a5-11b3-996c-00a8-4d99re19f292. Alternatively you can also find the Tenant ID in the Properties of the Azure Active Directory object (this Tenant ID is the value of the **Directory ID** property)
-    - The Application ID (Client ID): See the *Properties* window. For example: ba74781c2-53c2-442a-97c2-3d60re42f403
+> TODO Update this
 
 #### Register the TodoListClient app
 
-1. Sign in to the [Azure portal](https://portal.azure.com).
-1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
-1. Enter a friendly name for the application, for example 'TodoListClient' and select 'Native' as the *Application Type*.
-1. For the **Redirect URI**, enter `https://TodoListClient`. Click on **Create** to create the application.
-1. While still in the Azure portal, choose your application, click on Settings, and choose **Properties**.
-1. Find the Application ID value and copy it to the clipboard.
-1. Configure Permissions for your application - in the Settings menu, choose the 'Required permissions' section, click on **Add**, then **Select an API**, and type "TodoListService" in the text box. Then, click on  **Select Permissions** and select 'Access TodoListService'.
+> TODO Update this
 
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
-In the steps below, ClientID is the same as Application ID or AppId.
-
 #### Configure the TodoListService C# project
+
+> TODO Update this
 
 1. Open the solution in Visual Studio.
 2. In the TodoListService project, open the `appsettings.json` file.
@@ -199,7 +170,60 @@ namespace TodoListService.Controllers
 ```
 
 This code gets the todo list items associated with their owner, which is the identity of the user using the Web API. It also adds todo list items associated with the same user.
-There is no persistence as this would be beyond the scope of this sample
+There is no persistence as implementing token persistance on the service side would be beyond the scope of this sample
+
+The code of the `Configure` method in `AzureAdServiceCollectionExtension` was also modified to accept tokens coming from the V2 endpoint:
+
+```CSharp
+public void Configure(string name, JwtBearerOptions options)
+{
+    options.Audience = _azureOptions.ClientId;
+    options.Authority = $"{_azureOptions.Instance}common/v2.0/";
+
+    // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
+    // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
+    options.TokenValidationParameters.ValidateIssuer = true;
+    options.TokenValidationParameters.IssuerValidator = ValidateIssuer;
+}
+
+/// <summary>
+/// Validate the issuer.
+/// </summary>
+/// <param name="issuer">Issuer to validate (will be tenanted)</param>
+/// <param name="securityToken">Received Security Token</param>
+/// <param name="validationParameters">Token Validation parameters</param>
+/// <remarks>The issuer is considered as valid if it has the same http scheme and authority as the
+/// authority from the configuration file, has a tenant Id, and optionnally v2.0 (this web api
+/// accepts both V1 and V2 tokens)</remarks>
+/// <returns>The <c>issuer</c> if it's valid, or otherwise <c>null</c></returns>
+private string ValidateIssuer(string issuer, SecurityToken securityToken, TokenValidationParameters validationParameters)
+{
+    Uri uri = new Uri(issuer);
+    Uri authorityUri = new Uri(_azureOptions.Instance);
+    string[] parts = uri.AbsolutePath.Split('/');
+    if (parts.Length >= 2)
+    {
+        Guid tenantId;
+        if (uri.Scheme != authorityUri.Scheme || uri.Authority != authorityUri.Authority)
+        {
+            return null;
+        }
+        if (!Guid.TryParse(parts[1], out tenantId))
+        {
+            return null;
+        }
+        if (parts.Length> 2 && parts[2] != "v2.0")
+        {
+            return null;
+        }
+        return issuer;
+    }
+    else
+    {
+        return null;
+    }
+}
+```
 
 #### Change the App URL
 
@@ -218,7 +242,6 @@ This project has one WebApp / Web API projects. To deploy it to Azure Web Sites,
 - create an Azure Web Site
 - publish the Web App / Web APIs to the web site, and
 - update its client(s) to call the web site instead of IIS Express.
-
 
 ### Create and Publish the `TodoListService` to an Azure Web Site
 
@@ -251,7 +274,7 @@ Also, if you increase the instance count of the web site, requests will be distr
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/adal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`adal` `dotnet`].
+Make sure that your questions or comments are tagged with [`msal` `dotnet`].
 
 If you find a bug in the sample, please raise the issue on [GitHub Issues](../../issues).
 
@@ -267,12 +290,10 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 To understand better how the client code acquires a token, see ADAL.NET's conceptual documentation:
 
-- [Recommended pattern to acquire a token](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/AcquireTokenSilentAsync-using-a-cached-token#recommended-pattern-to-acquire-a-token)
-- [Acquiring tokens interactively in public client applications](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Acquiring-tokens-interactively---Public-client-application-flows)
-- [Customizing Token cache serialization](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Token-cache-serialization)
+- [Recommended pattern to acquire a token](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/AcquireTokenSilentAsync-using-a-cached-token#recommended-call-pattern-in-public-client-applications)
+- [Acquiring tokens interactively in public client applications](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-interactively)
+- [Customizing Token cache serialization](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/token-cache-serialization)
 
 ### Other documentation / samples
-
-The scenarios involving Azure Active directory with ASP.NET Core are described in ASP.Net Core | Security | Authentication | [Azure Active Directory](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/)
 
 For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](https://go.microsoft.com/fwlink/?LinkId=394414).
