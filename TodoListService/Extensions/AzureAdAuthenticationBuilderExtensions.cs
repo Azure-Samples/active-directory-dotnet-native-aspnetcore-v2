@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.Authentication
             public void Configure(string name, JwtBearerOptions options)
             {
                 options.Audience = _azureOptions.ClientId;
-                options.Authority = $"{_azureOptions.Instance}common/v2.0/";
+                options.Authority = $"{_azureOptions.Instance}{_azureOptions.TenantId}/v2.0/";
 
                 // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
                 // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
