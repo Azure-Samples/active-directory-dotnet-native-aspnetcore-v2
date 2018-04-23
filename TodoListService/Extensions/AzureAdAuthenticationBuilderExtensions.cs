@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.Authentication
                 // If you want to use the V2 endpoint (that is authority = $"{_azureOptions.Instance}common/v2.0/") 
                 // you'd also want to validate which tenants your Web API accept
                 // in that case you'd have to implement a IssuerValidator and uncomment the following line.
-                // options.TokenValidationParameters.IssuerValidator = ValidateIssuer;
+                options.TokenValidationParameters.IssuerValidator = ValidateIssuer;
             }
 
             /// <summary>
