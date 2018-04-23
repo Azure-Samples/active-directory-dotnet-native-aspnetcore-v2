@@ -48,7 +48,7 @@ Next time a user runs the application, the user is signed-in with the same ident
 - Install .NET Core for Windows by following the instructions at [dot.net/core](https://dot.net/core), which will include [Visual Studio 2017](https://aka.ms/vsdownload).
 - An Internet connection
 - An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/en-us/documentation/articles/active-directory-howto-tenant/)
-- A user account in your Azure AD tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now. (See [Quickstart: Add new users to Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/add-users-azure-active-directory)
+- A user account in your Azure AD tenant, or a Microsoft personal account
 
 ### Step 1:  Clone or download this repository
 
@@ -64,34 +64,68 @@ git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnet
 
 There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
 
-#### Register the TodoListService web API
+#### Navigate to the Application registration portal
 
-> TODO Update this
+Sign in in [apps.dev.microsoft.com/](apps.dev.microsoft.com/). From there, you can add converged applications
 
-#### Register the TodoListClient app
+#### Register the TodoListClient-v2 app
 
-> TODO Update this
+1. In the [application registration portal](apps.dev.microsoft.com), click **Add an app**
+1. In the *Register your application* page, provide a name for your application for instance `TodoListClient-v2`
+1. Press the **Create** button
+1. In the registration page for your application, copy the *application ID* to the clipboard you will need it to configure the code for your application
+1. Press the **Save** button at the bottom of the page.
+1. In the *Platforms* section, click on the **Add Platform** button and then on **Native application**
+1. Click on the My applications link at the top of the page to get back to the list of applications in the app registration portal
+
+#### Register the TodoListService-v2 web API
+
+1. In the [application registration portal](apps.dev.microsoft.com), click **Add an app**
+1. In the *Register your application* page, provide a name for your application for instance `TodoListService-v2`
+1. Press the **Create** button
+1. In the registration page for your application, copy the *application ID* to the clipboard you will need it to configure the code for your application
+1. In the *Platforms* section, click on the **Add Platform** button and then on **Web API**
+1. Copy the scope proposed by default to access your web api as a user. It's in the form ``api://<Application ID>/access_as_user``
+1. In the *Web API platform*, in the *Pre-authorized applications* section click on **Add application**
+1. In the *application ID* field, paste the application ID of the client application as pasted from the registration
+1. In the *Scope* field, click on the **Select** combo box and select the scope for this Web API `api://<Application ID>/access_as_user`
+1. Press the **Save** button at the bottom of the page.
 
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
+#### Choose which users account to sign in
+
+By default the sample is configured to enable users to sign in with any work and school accounts (AAD) or Microsoft Personal accounts (formerly live account).
+This is because `ida:Tenant` has the value of `common`.
+
+##### Important note
+
+`common` is **not** a proper tenant. It's just a **convention** to express that the accepted tenants are any Work and School organizations, or Personal Microsoft account (consumer accounts).
+Accepted tenants can have the following values:
+
+Value | Meaning
+----- | --------
+`common` | users can sign in with any Work and School account, or Microsoft Personal account
+`organizations` |  users can sign in with any Work and School account
+`consumers` |  users can sign in with a Microsoft Personal account
+a GUID or domain name | users can only sign in with an account for a specific organization described by its tenant ID (GUID) or domain name
+
 #### Configure the TodoListService C# project
 
-> TODO Update this
-
 1. Open the solution in Visual Studio.
-2. In the TodoListService project, open the `appsettings.json` file.
-3. Find the `Domain` property and replace the value with your AAD tenant domain, for example, contoso.onmicrosoft.com.
-4. Find the `TenantId` property and replace the value with the Tenant ID you registered earlier,
-5. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the Service application, that you registered earlier.
+1. In the TodoListService project, open the `appsettings.json` file.
+1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the Service application, that you registered earlier.
+1. [Optional] if you want to limit sign-in to users in your organization, also update
+- The `Domain` property, replacing the existing value with your AAD tenant domain, for example, contoso.onmicrosoft.com.
+- The `TenantId` property replacing the existing value with the Tenant ID.
 
 #### Configure the TodoListClient C# project
 
 1. In the TodoListClient project, open `App.config`.
-2. Find the app key `ida:Tenant` and replace the value with your AAD Tenant ID (GUID). Alternatively you can also use your AAD tenant Name (for example, contoso.onmicrosoft.com).
-3. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the TodoListClient from the Azure portal.
-4. Find the app key `ida:RedirectUri` and replace the value with the Redirect URI for the TodoListClient from the Azure portal, for example `https://TodoListClient`.
-5. Find the app key `todo:TodoListResourceId` and replace the value with the ApplicationID (Client ID) of the Service application (a GUID)
-6. If you changed the default value, find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
+1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the TodoListClient-v2 app copied from the app registration page.
+1. Find the app key `todo:TodoListScope` and replace the value with the scope of the TodoListService-v2 application copied from the app registration (of the form ``api://<Application ID of service>/access_as_user``)
+1. [Optional] If you want your application to work only in your organization (only in your tenant) you'll also need to Find the app key `ida:Tenant` and replace the value with your AAD Tenant ID (GUID). Alternatively you can also use your AAD tenant Name (for example, contoso.onmicrosoft.com)
+1. [Optional] If you changed the default URL for your service application, find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
 
 ### Step 4: Run the sample
 
@@ -170,7 +204,7 @@ namespace TodoListService.Controllers
 ```
 
 This code gets the todo list items associated with their owner, which is the identity of the user using the Web API. It also adds todo list items associated with the same user.
-There is no persistence as implementing token persistance on the service side would be beyond the scope of this sample
+There is no persistence as implementing token persistence on the service side would be beyond the scope of this sample
 
 The code of the `Configure` method in `AzureAdServiceCollectionExtension` was also modified to accept tokens coming from the V2 endpoint:
 
@@ -178,7 +212,7 @@ The code of the `Configure` method in `AzureAdServiceCollectionExtension` was al
 public void Configure(string name, JwtBearerOptions options)
 {
     options.Audience = _azureOptions.ClientId;
-    options.Authority = $"{_azureOptions.Instance}common/v2.0/";
+    options.Authority = $"{_azureOptions.Instance}{_azureOptions.Tenant}/v2.0/";
 
     // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
     // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
@@ -295,5 +329,7 @@ To understand better how the client code acquires a token, see ADAL.NET's concep
 - [Customizing Token cache serialization](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/token-cache-serialization)
 
 ### Other documentation / samples
+
+This sample is for the Azure AD V2 enpoint the same as [Calling a ASP.NET Core Web API from a WPF application using Azure AD](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) which is for the Azure AD V1 endpoint.
 
 For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](https://go.microsoft.com/fwlink/?LinkId=394414).

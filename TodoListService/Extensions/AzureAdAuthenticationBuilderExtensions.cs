@@ -31,11 +31,15 @@ namespace Microsoft.AspNetCore.Authentication
             public void Configure(string name, JwtBearerOptions options)
             {
                 options.Audience = _azureOptions.ClientId;
-                options.Authority = $"{_azureOptions.Instance}common/v2.0/";
+                options.Authority = $"{_azureOptions.Instance}{_azureOptions.TenantId}/v2.0/";
 
                 // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
                 // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
                 options.TokenValidationParameters.ValidateIssuer = true;
+
+                // If you want to use the V2 endpoint (that is authority = $"{_azureOptions.Instance}common/v2.0/") 
+                // you'd also want to validate which tenants your Web API accept
+                // in that case you'd have to implement a IssuerValidator and uncomment the following line.
                 options.TokenValidationParameters.IssuerValidator = ValidateIssuer;
             }
 
