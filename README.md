@@ -66,7 +66,7 @@ There are two projects in this sample. Each needs to be separately registered in
 
 #### Navigate to the Application registration portal
 
-Sign in in [apps.dev.microsoft.com/](apps.dev.microsoft.com/). From there, you can add converged applications
+Sign in to [application registration portal](apps.dev.microsoft.com/). From there, you can add converged applications.
 
 #### Register the TodoListClient-v2 app
 
@@ -87,7 +87,7 @@ Sign in in [apps.dev.microsoft.com/](apps.dev.microsoft.com/). From there, you c
 1. In the *Platforms* section, click on the **Add Platform** button and then on **Web API**
 1. Copy the scope proposed by default to access your web api as a user. It's in the form ``api://<Application ID>/access_as_user``
 1. In the *Web API platform*, in the *Pre-authorized applications* section click on **Add application**
-1. In the *application ID* field, paste the application ID of the client application as pasted from the registration
+1. In the *application ID* field, paste the application ID of the `TodoListClient-v2` application as pasted from the registration
 1. In the *Scope* field, click on the **Select** combo box and select the scope for this Web API `api://<Application ID>/access_as_user`
 1. Press the **Save** button at the bottom of the page.
 
@@ -113,8 +113,8 @@ a GUID or domain name | users can only sign in with an account for a specific or
 #### Configure the TodoListService C# project
 
 1. Open the solution in Visual Studio.
-1. In the TodoListService project, open the `appsettings.json` file.
-1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the Service application, that you registered earlier.
+1. In the *TodoListService* project, open the `appsettings.json` file.
+1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the *TodoListService-v2* application, that you registered earlier.
 1. [Optional] if you want to limit sign-in to users in your organization, also update
 - The `Domain` property, replacing the existing value with your AAD tenant domain, for example, contoso.onmicrosoft.com.
 - The `TenantId` property replacing the existing value with the Tenant ID.
@@ -122,7 +122,7 @@ a GUID or domain name | users can only sign in with an account for a specific or
 #### Configure the TodoListClient C# project
 
 1. In the TodoListClient project, open `App.config`.
-1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the TodoListClient-v2 app copied from the app registration page.
+1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the *TodoListClient-v2* app copied from the app registration page.
 1. Find the app key `todo:TodoListScope` and replace the value with the scope of the TodoListService-v2 application copied from the app registration (of the form ``api://<Application ID of service>/access_as_user``)
 1. [Optional] If you want your application to work only in your organization (only in your tenant) you'll also need to Find the app key `ida:Tenant` and replace the value with your AAD Tenant ID (GUID). Alternatively you can also use your AAD tenant Name (for example, contoso.onmicrosoft.com)
 1. [Optional] If you changed the default URL for your service application, find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
