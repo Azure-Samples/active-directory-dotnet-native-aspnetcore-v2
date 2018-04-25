@@ -36,7 +36,7 @@ The WPF application (TodoListClient) enables a user to:
 
 - Sign in. The first time a user signs in, a consent screen is presented letting the user consent for the application accessing the TodoList Service and the Azure Active Directory. 
 - When the user has signed-in, the user sees the list of to-do items exposed by Web API for the signed-in identity
-- The user can add more to-do items (y clicking on *Add item* button.
+- The user can add more to-do items by clicking on *Add item* button.
 
 Next time a user runs the application, the user is signed-in with the same identity as the application maintains a cache on disk. Users can clear the cache (which will also have the effect of signing them out)
 
