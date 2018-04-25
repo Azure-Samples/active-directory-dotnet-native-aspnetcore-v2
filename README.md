@@ -21,21 +21,22 @@ or Microsoft personal accounts (formerly live account) to use your Web API.
 ### Overview
 
 This sample presents a Web API running on ASP.NET Core 2.0, protected by Azure AD OAuth Bearer Authentication. The Web API is exercised by a .NET Desktop WPF application.
-The .Net application uses the Active Directory Authentication Library (ADAL.Net) to obtain a JWT access token through the [OAuth 2.0](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The access token is sent to the ASP.NET Core Web API, which authenticates the user using the ASP.NET JWT Bearer Authentication middleware.
+The .Net application uses the Active Directory Authentication Library [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) to obtain a JWT access token through the [OAuth 2.0](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The access token is sent to the ASP.NET Core Web API, which authenticates the user using the ASP.NET JWT Bearer Authentication middleware.
 
 ![Topology](./ReadmeFiles/topology.png)
 
 > This sample is very similar to the [active-directory-dotnet-native-aspnetcore](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) sample except that that one is for the Azure AD V1 endpoint
-> and the token is acquired using ADAL.NET, whereas this sample is for the V2 endpoint, and the token is acquired using MSAL.NET. The Web API was also modified to accept both V1 and V2 tokens.
+> and the token is acquired using [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet), whereas this sample is for the V2 endpoint, and the token is acquired using MSAL.NET. The Web API was also modified to accept both V1 and V2 tokens.
 
 ### User experience with this sample
 
-The Web API (TodoListService) maintains an in-memory collection of to-do items per authenticated user. Several applications signed-in under the same identity share the same to-do list.
+The Web API (TodoListService) maintains an in-memory collection of to-do items per authenticated user. Several applications signed-in under the same identities share the same to-do list.
 
 The WPF application (TodoListClient) enables a user to:
 
-- Sign in. The first time a user signs it, a consent screen is presented letting him/her consent for the application accessing the TodoList Service and the Azure Active Directory. When s/he has signed-in, the user sees the list of to-do items exposed by Web API for the signed-in identity
-- add more to-do items (buy clicking on Add item).
+- Sign in. The first time a user signs in, a consent screen is presented letting the user consent for the application accessing the TodoList Service and the Azure Active Directory. 
+- When the user has signed-in, the user sees the list of to-do items exposed by Web API for the signed-in identity
+- The user can add more to-do items (y clicking on *Add item* button.
 
 Next time a user runs the application, the user is signed-in with the same identity as the application maintains a cache on disk. Users can clear the cache (which will also have the effect of signing them out)
 
@@ -66,7 +67,7 @@ There are two projects in this sample. Each needs to be separately registered in
 
 #### Navigate to the Application registration portal
 
-Sign in in [apps.dev.microsoft.com/](apps.dev.microsoft.com/). From there, you can add converged applications
+Sign in to [application registration portal](apps.dev.microsoft.com/). From there, you can add converged applications.
 
 #### Register the TodoListClient-v2 app
 
@@ -87,7 +88,7 @@ Sign in in [apps.dev.microsoft.com/](apps.dev.microsoft.com/). From there, you c
 1. In the *Platforms* section, click on the **Add Platform** button and then on **Web API**
 1. Copy the scope proposed by default to access your web api as a user. It's in the form ``api://<Application ID>/access_as_user``
 1. In the *Web API platform*, in the *Pre-authorized applications* section click on **Add application**
-1. In the *application ID* field, paste the application ID of the client application as pasted from the registration
+1. In the *application ID* field, paste the application ID of the `TodoListClient-v2` application as pasted from the registration
 1. In the *Scope* field, click on the **Select** combo box and select the scope for this Web API `api://<Application ID>/access_as_user`
 1. Press the **Save** button at the bottom of the page.
 
@@ -109,20 +110,21 @@ Value | Meaning
 `organizations` |  users can sign in with any Work and School account
 `consumers` |  users can sign in with a Microsoft Personal account
 a GUID or domain name | users can only sign in with an account for a specific organization described by its tenant ID (GUID) or domain name
+ |
 
 #### Configure the TodoListService C# project
 
 1. Open the solution in Visual Studio.
-1. In the TodoListService project, open the `appsettings.json` file.
-1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the Service application, that you registered earlier.
-1. [Optional] if you want to limit sign-in to users in your organization, also update
+1. In the *TodoListService* project, open the `appsettings.json` file.
+1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the *TodoListService-v2* application, that you registered earlier.
+1. [Optional] if you want to limit sign-in to users in your organization, also update the following
 - The `Domain` property, replacing the existing value with your AAD tenant domain, for example, contoso.onmicrosoft.com.
 - The `TenantId` property replacing the existing value with the Tenant ID.
 
 #### Configure the TodoListClient C# project
 
 1. In the TodoListClient project, open `App.config`.
-1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the TodoListClient-v2 app copied from the app registration page.
+1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the *TodoListClient-v2* app copied from the app registration page.
 1. Find the app key `todo:TodoListScope` and replace the value with the scope of the TodoListService-v2 application copied from the app registration (of the form ``api://<Application ID of service>/access_as_user``)
 1. [Optional] If you want your application to work only in your organization (only in your tenant) you'll also need to Find the app key `ida:Tenant` and replace the value with your AAD Tenant ID (GUID). Alternatively you can also use your AAD tenant Name (for example, contoso.onmicrosoft.com)
 1. [Optional] If you changed the default URL for your service application, find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
@@ -133,11 +135,11 @@ Clean the solution, rebuild the solution, and run it.  You might want to go into
 
 When you start the Web API, you'll get an empty web page. This is expected.
 
-Explore the sample by signing in into the TodoList client, adding items to the To Do list, removing the user account (clearing the cache), and starting again.  As explained, if you stop the application without removing the user account, the next time you run the application, you won't be prompted to sign in again - that is because the sample implements a persistent cache for ADAL, and remembers the tokens from the previous run.
+Explore the sample by signing in into the TodoList client, adding items to the To Do list, removing the user account (clearing the cache), and starting again.  As explained, if you stop the application without removing the user account, the next time you run the application, you won't be prompted to sign in again - that is because the sample implements a persistent cache for MSAL, and remembers the tokens from the previous run.
 
-NOTE: Remember, the To Do list is stored in memory in this TodoListService sample. Each time you run the TodoListService API, your To Do list will get emptied.
+NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` sample. Each time you run the TodoListService API, your To-Do list will get emptied.
 
-## How was the code created?
+## How was the code created ?
 
 ### Code for the service
 
@@ -166,8 +168,7 @@ namespace TodoListService.Models
 }
 ```
 
-Under the `Controllers` folder, rename the file `ValuesController.cs` to `TodoListController.cs`.
-Make sure the content is the following:
+Under the `Controllers` folder, rename the file `ValuesController.cs` to `TodoListController.cs` and copy the following content in this file:
 
 ```CSharp
 using Microsoft.AspNetCore.Authorization;
@@ -206,20 +207,17 @@ namespace TodoListService.Controllers
 This code gets the todo list items associated with their owner, which is the identity of the user using the Web API. It also adds todo list items associated with the same user.
 There is no persistence as implementing token persistence on the service side would be beyond the scope of this sample
 
-The code of the `Configure` method in `AzureAdServiceCollectionExtension` was also modified to accept tokens coming from the V2 endpoint:
+Make the following changes in the `AzureAdServiceCollectionExtension.cs` file.
 
 ```CSharp
-public void Configure(string name, JwtBearerOptions options)
-{
-    options.Audience = _azureOptions.ClientId;
-    options.Authority = $"{_azureOptions.Instance}{_azureOptions.Tenant}/v2.0/";
+using Microsoft.IdentityModel.Tokens;
+```
 
-    // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
-    // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
-    options.TokenValidationParameters.ValidateIssuer = true;
-    options.TokenValidationParameters.IssuerValidator = ValidateIssuer;
-}
+```Text
+The code of the overloaded `Configure` method is also modified to accept tokens coming from the V2 endpoint:
+```
 
+```CSharp
 /// <summary>
 /// Validate the issuer.
 /// </summary>
@@ -227,7 +225,7 @@ public void Configure(string name, JwtBearerOptions options)
 /// <param name="securityToken">Received Security Token</param>
 /// <param name="validationParameters">Token Validation parameters</param>
 /// <remarks>The issuer is considered as valid if it has the same http scheme and authority as the
-/// authority from the configuration file, has a tenant Id, and optionnally v2.0 (this web api
+/// authority from the configuration file, has a tenant Id, and optionally v2.0 (this web api
 /// accepts both V1 and V2 tokens)</remarks>
 /// <returns>The <c>issuer</c> if it's valid, or otherwise <c>null</c></returns>
 private string ValidateIssuer(string issuer, SecurityToken securityToken, TokenValidationParameters validationParameters)
@@ -257,6 +255,18 @@ private string ValidateIssuer(string issuer, SecurityToken securityToken, TokenV
         return null;
     }
 }
+
+public void Configure(string name, JwtBearerOptions options)
+{
+    options.Audience = _azureOptions.ClientId;
+    options.Authority = $"{_azureOptions.Instance}{_azureOptions.TenantId}/v2.0/";
+
+    // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
+    // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
+    options.TokenValidationParameters.ValidateIssuer = true;
+    options.TokenValidationParameters.IssuerValidator = ValidateIssuer;
+}
+
 ```
 
 #### Change the App URL
@@ -301,12 +311,12 @@ This project has one WebApp / Web API projects. To deploy it to Azure Web Sites,
    for example, [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net).
 3. Run the client! If you are trying multiple different client types (for example, .Net, Windows Store, Android, iOS) you can have them all call this one published web API.
 
-> NOTE: Remember, the To Do list is stored in memory in this TodoListService sample. Azure Web Sites will spin down your web site if it is inactive, and your To Do list will get emptied.
+> NOTE: Remember, the To-Do list is stored in memory in this TodoListService sample. Azure Web Sites will spin down your web site if it is inactive, and your To Do list will get emptied.
 Also, if you increase the instance count of the web site, requests will be distributed among the instances. To Do will, therefore, not be the same on each instance.
 
 ## Community Help and Support
 
-Use [Stack Overflow](http://stackoverflow.com/questions/tagged/adal) to get support from the community.
+Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
 Make sure that your questions or comments are tagged with [`msal` `dotnet`].
 
@@ -320,16 +330,15 @@ If you'd like to contribute to this sample, see [CONTRIBUTING.MD](/CONTRIBUTING.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-## More information
+For more information, visit the following links:
 
-To understand better how the client code acquires a token, see ADAL.NET's conceptual documentation:
+- To learn more about the code, visit [Conceptual documentation for MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki#conceptual-documentation) and in particular:
+  - [Acquiring tokens with authorization codes on web apps](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-with-authorization-codes-on-web-apps)
+  - [Customizing Token cache serialization](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/token-cache-serialization)
 
-- [Recommended pattern to acquire a token](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/AcquireTokenSilentAsync-using-a-cached-token#recommended-call-pattern-in-public-client-applications)
-- [Acquiring tokens interactively in public client applications](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-interactively)
-- [Customizing Token cache serialization](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/token-cache-serialization)
+- Articles about the Azure AD V2 endpoint [http://aka.ms/aaddevv2](http://aka.ms/aaddevv2), with a focus on:
+  - [Azure Active Directory v2.0 and OAuth 2.0 On-Behalf-Of flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols-oauth-on-behalf-of)
 
-### Other documentation / samples
-
-This sample is for the Azure AD V2 enpoint the same as [Calling a ASP.NET Core Web API from a WPF application using Azure AD](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) which is for the Azure AD V1 endpoint.
-
-For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](https://go.microsoft.com/fwlink/?LinkId=394414).
+- [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-2.1&tabs=visual-studio%2Caspnetcore2x)
+  - [AuthenticationBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationbuilder?view=aspnetcore-2.0)
+  - [Azure Active Directory with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.1)

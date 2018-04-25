@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.Authentication
             /// <param name="securityToken">Received Security Token</param>
             /// <param name="validationParameters">Token Validation parameters</param>
             /// <remarks>The issuer is considered as valid if it has the same http scheme and authority as the
-            /// authority from the configuration file, has a tenant Id, and optionnally v2.0 (this web api
+            /// authority from the configuration file, has a tenant Id, and optionally v2.0 (this web api
             /// accepts both V1 and V2 tokens)</remarks>
             /// <returns>The <c>issuer</c> if it's valid, or otherwise <c>null</c></returns>
             private string ValidateIssuer(string issuer, SecurityToken securityToken, TokenValidationParameters validationParameters)
