@@ -63,21 +63,21 @@ namespace Microsoft.AspNetCore.Authentication
                     Guid tenantId;
                     if (uri.Scheme != authorityUri.Scheme || uri.Authority != authorityUri.Authority)
                     {
-                        return null;
+                        throw new SecurityTokenInvalidIssuerException("Issuer has wrong authority");
                     }
                     if (!Guid.TryParse(parts[1], out tenantId))
                     {
-                        return null;
+                        throw new SecurityTokenInvalidIssuerException("Cannot find the tenant GUID for the issuer");
                     }
                     if (parts.Length> 2 && parts[2] != "v2.0")
                     {
-                        return null;
+                        throw new SecurityTokenInvalidIssuerException("Only accepted protocol versions are AAD v1.0 or V2.0");
                     }
                     return issuer;
                 }
                 else
                 {
-                    return null;
+                    throw new SecurityTokenInvalidIssuerException("Unknown issuer");
                 }
             }
 
