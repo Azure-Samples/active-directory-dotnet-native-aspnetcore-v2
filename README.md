@@ -230,30 +230,30 @@ The code of the overloaded `Configure` method is also modified to accept tokens 
 /// <returns>The <c>issuer</c> if it's valid, or otherwise <c>null</c></returns>
 private string ValidateIssuer(string issuer, SecurityToken securityToken, TokenValidationParameters validationParameters)
 {
-    Uri uri = new Uri(issuer);
-    Uri authorityUri = new Uri(_azureOptions.Instance);
-    string[] parts = uri.AbsolutePath.Split('/');
-    if (parts.Length >= 2)
-    {
-        Guid tenantId;
-        if (uri.Scheme != authorityUri.Scheme || uri.Authority != authorityUri.Authority)
-        {
-            return null;
-        }
-        if (!Guid.TryParse(parts[1], out tenantId))
-        {
-            return null;
-        }
-        if (parts.Length> 2 && parts[2] != "v2.0")
-        {
-            return null;
-        }
-        return issuer;
-    }
-    else
-    {
-        return null;
-    }
+ Uri uri = new Uri(issuer);
+ Uri authorityUri = new Uri(_azureOptions.Instance);
+ string[] parts = uri.AbsolutePath.Split('/');
+ if (parts.Length >= 2)
+ {
+  Guid tenantId;
+  if (uri.Scheme != authorityUri.Scheme || uri.Authority != authorityUri.Authority)
+  {
+   throw new SecurityTokenInvalidIssuerException("Issuer has wrong authority");
+  }
+  if (!Guid.TryParse(parts[1], out tenantId))
+  {
+   throw new SecurityTokenInvalidIssuerException("Cannot find the tenant GUID for the issuer");
+  }
+  if (parts.Length> 2 && parts[2] != "v2.0")
+  {
+   throw new SecurityTokenInvalidIssuerException("Only accepted protocol versions are AAD v1.0 or V2.0");
+  }
+  return issuer;
+ }
+ else
+ {
+  throw new SecurityTokenInvalidIssuerException("Unknown issuer");
+ }
 }
 
 public void Configure(string name, JwtBearerOptions options)
