@@ -141,7 +141,8 @@ namespace TodoListClient
             }
             else
             {
-                MessageBox.Show("An error occurred : " + response.ReasonPhrase);
+                string failureDescription = await response.Content.ReadAsStringAsync();
+                MessageBox.Show($"{response.ReasonPhrase}\n {failureDescription}", "An error occurred while getting /api/todolist", MessageBoxButton.OK);
             }
         }
 
@@ -212,7 +213,8 @@ namespace TodoListClient
             }
             else
             {
-                MessageBox.Show("An error occurred : " + response.ReasonPhrase);
+                string failureDescription = await response.Content.ReadAsStringAsync();
+                MessageBox.Show($"{response.ReasonPhrase}\n {failureDescription}", "An error occurred while posting to /api/todolist", MessageBoxButton.OK);
             }
         }
 
@@ -226,9 +228,10 @@ namespace TodoListClient
                 TodoList.ItemsSource = string.Empty;
 
                 // clear the cache
-                while(accounts.Any())
+                while (accounts.Any())
                 {
                     await app.RemoveAsync(accounts.First());
+                    accounts = await app.GetAccountsAsync();
                 }
                 // Also clear cookies from the browser control.
                 SignInButton.Content = signInString;
