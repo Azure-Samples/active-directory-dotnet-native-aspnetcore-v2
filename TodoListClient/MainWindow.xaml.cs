@@ -85,7 +85,8 @@ namespace TodoListClient
 
         private async Task GetTodoList(bool isAppStarting)
         {
-            if (!app.Users.Any())
+            var accounts = await app.GetAccountsAsync();
+            if (!accounts.Any())
             {
                 SignInButton.Content = signInString;
                 return;
@@ -96,9 +97,9 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await app.AcquireTokenSilentAsync(scopes, app.Users.FirstOrDefault());
+                result = await app.AcquireTokenSilentAsync(scopes, accounts.FirstOrDefault());
                 SignInButton.Content = clearCacheString;
-                this.SetUserName(result.User);
+                this.SetUserName(result.Account);
             }
             // There is no access token in the cache, so prompt the user to sign-in.
             catch (MsalUiRequiredException)
@@ -146,7 +147,9 @@ namespace TodoListClient
 
         private async void AddTodoItem(object sender, RoutedEventArgs e)
         {
-            if (!app.Users.Any())
+            var accounts = await app.GetAccountsAsync();
+
+            if (!accounts.Any())
             {
                 MessageBox.Show("Please sign in first");
                 return;
@@ -163,8 +166,8 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await app.AcquireTokenSilentAsync(scopes, app.Users.FirstOrDefault());
-                this.SetUserName(result.User);
+                result = await app.AcquireTokenSilentAsync(scopes, accounts.FirstOrDefault());
+                this.SetUserName(result.Account);
                 UserName.Content = Properties.Resources.UserNotSignedIn;
             }
             // There is no access token in the cache, so prompt the user to sign-in.
@@ -215,15 +218,17 @@ namespace TodoListClient
 
         private async void SignIn(object sender = null, RoutedEventArgs args = null)
         {
+            var accounts = await app.GetAccountsAsync();
+
             // If there is already a token in the cache, clear the cache and update the label on the button.
             if (SignInButton.Content.ToString() == clearCacheString)
             {
                 TodoList.ItemsSource = string.Empty;
 
                 // clear the cache
-                while(app.Users.Any())
+                while(accounts.Any())
                 {
-                    app.Remove(app.Users.First());
+                    await app.RemoveAsync(accounts.First());
                 }
                 // Also clear cookies from the browser control.
                 SignInButton.Content = signInString;
@@ -239,9 +244,9 @@ namespace TodoListClient
             {
                 // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
                 // would re-sign-in the same user
-                result = await app.AcquireTokenAsync(scopes, app.Users.FirstOrDefault(), UIBehavior.SelectAccount, string.Empty);
+                result = await app.AcquireTokenAsync(scopes, accounts.FirstOrDefault(), UIBehavior.SelectAccount, string.Empty);
                 SignInButton.Content = clearCacheString;
-                SetUserName(result.User);
+                SetUserName(result.Account);
                 GetTodoList();
             }
             catch (MsalException ex)
@@ -270,13 +275,13 @@ namespace TodoListClient
         }
 
         // Set user name to text box
-        private void SetUserName(IUser userInfo)
+        private void SetUserName(IAccount userInfo)
         {
             string userName = null;
 
             if (userInfo != null)
             {
-                userName = userInfo.DisplayableId;
+                userName = userInfo.Username;
             }
 
             if (userName == null)
