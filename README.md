@@ -28,7 +28,7 @@ The .Net application uses the Active Directory Authentication Library [MSAL.NET]
 ![Topology](./ReadmeFiles/topology.png)
 
 > This sample is very similar to the [active-directory-dotnet-native-aspnetcore](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) sample except that that one is for the Azure AD V1 endpoint
-> and the token is acquired using [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet), whereas this sample is for the V2 endpoint, and the token is acquired using MSAL.NET. The Web API was also modified to accept both V1 and V2 tokens.
+> and the token is acquired using [ADAL.NET](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet), whereas this sample is for the V2 endpoint, and the token is acquired using MSAL.NET. The Web API was also modified to accept both V1 and V2 tokens.
 
 ### User experience with this sample
 
