@@ -7,7 +7,7 @@ client: .NET native (WPF)
 service: ASP.NET Core 2.0
 endpoint: AAD V2
 ---
-# Calling a ASP.NET Core Web API from a WPF application using Azure AD V2
+# Calling an ASP.NET Core Web API from a WPF application using Azure AD V2
 
 ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/497/badge)
 
