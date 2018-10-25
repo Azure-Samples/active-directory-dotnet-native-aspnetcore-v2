@@ -3,7 +3,9 @@
     "Title": "A WPF application that calls a Web API running on ASP.NET Core 2.0 protected by Azure AD using OAuth 2.0 access tokens. ",
     "Level": 200,
     "Client": ".NET Desktop (WPF)",
-    "Service": "ASP.NET Core Web API"
+    "Service": "ASP.NET Core Web API",
+    "RepositoryUrl": "active-directory-dotnet-native-aspnetcore-v2",
+    "Endpoint": "AAD v2.0"
   },
 
   /*
@@ -13,17 +15,17 @@
     {
       "Id": "service",
       "Name": "TodoListService",
-      "IsPublicClient": false,
+      "Kind": "WebApi",
       "HomePage": "https://localhost:44351/"
     },
     {
       "Id": "client",
       "Name": "TodoListClient",
-      "IsPublicClient": true,
+      "Kind": "Desktop",
       "RequiredResourcesAccess": [
         {
           "Resource": "service",
-          "DelegatedPermissions": [ "user_impersonation" ]
+          "DelegatedPermissions": [ "access_as_user" ]
         }
       ]
     }
