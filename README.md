@@ -3,9 +3,9 @@ services: active-directory
 platforms: dotnet
 author: jmprieur
 level: 200
-client: .NET native (WPF)
-service: ASP.NET Core 2.0
-endpoint: AAD V2
+client: .NET Desktop (WPF)
+service: ASP.NET Core Web API
+endpoint: AAD v2.0
 ---
 # Calling an ASP.NET Core Web API from a WPF application using Azure AD V2
 
@@ -67,32 +67,56 @@ git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnet
 
 There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
 
-#### Navigate to the Application registration portal
+#### Choose the Azure AD tenant where you want to create your applications
 
-Sign in to [application registration portal](apps.dev.microsoft.com/). From there, you can add converged applications.
+As a first step you'll need to:
 
-#### Register the TodoListClient-v2 app
+1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
+1. If your account gives you access to more than one tenant, select your account in the top right corner, and set your portal session to the desired Azure AD tenant
+   (using **Switch Directory**).
+1. In the left-hand navigation pane, select the **Azure Active Directory** service, and then select **App registrations (Preview)**.
 
-1. In the [application registration portal](apps.dev.microsoft.com), click **Add an app**
-1. In the *Register your application* page, provide a name for your application for instance `TodoListClient-v2`
-1. Press the **Create** button
-1. In the registration page for your application, copy the *application ID* to the clipboard you will need it to configure the code for your application
-1. Press the **Save** button at the bottom of the page.
-1. In the *Platforms* section, click on the **Add Platform** button and then on **Native application**
-1. Click on the My applications link at the top of the page to get back to the list of applications in the app registration portal
+#### Register the service app (TodoListService)
 
-#### Register the TodoListService-v2 web API
+1. In **App registrations (Preview)** page, select **New registration**.
+1. When the **Register an application page** appears, enter your application's registration information:
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListService`.
+   - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
+   - In the Redirect URI (optional) section, select **Web** in the combo-box.
+   - For the *Redirect URI*, enter the base URL for the sample. By default, this sample uses `https://localhost:44351/`.
+    - Select **Register** to create the application.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
+1. In the list of pages for the app, select on **Expose an API**
+   - Select **Add a scope**
+   - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
+   - Enter the following parameters
+     - for **Scope name** use `access_as_user`
+     - Keep **Admmins and users** for **Who can consent**
+     - in **Admin consent display name** type `Access TodoListService as a user`
+     - in **Admin consent description** type `Accesses the TodoListService Web API as a user`
+     - in **User consent display name** type `Access TodoListService as a user`
+     - in **User consent description** type `Accesses the TodoListService Web API as a user`
+     - Keep **State** as **Enabled**
+     - Select **Add scope**
 
-1. In the [application registration portal](apps.dev.microsoft.com), click **Add an app**
-1. In the *Register your application* page, provide a name for your application for instance `TodoListService-v2`
-1. Press the **Create** button
-1. In the registration page for your application, copy the *application ID* to the clipboard you will need it to configure the code for your application
-1. In the *Platforms* section, click on the **Add Platform** button and then on **Web API**
-1. Copy the scope proposed by default to access your web api as a user. It's in the form ``api://<Application ID>/access_as_user``
-1. In the *Web API platform*, in the *Pre-authorized applications* section click on **Add application**
-1. In the *application ID* field, paste the application ID of the `TodoListClient-v2` application as pasted from the registration
-1. In the *Scope* field, click on the **Select** combo box and select the scope for this Web API `api://<Application ID>/access_as_user`
-1. Press the **Save** button at the bottom of the page.
+#### Register the client app (TodoListClient)
+
+1. In **App registrations (Preview)** page, select **New registration**.
+1. When the **Register an application page** appears, enter your application's registration information:
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListClient`.
+   - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
+    - Select **Register** to create the application.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
+1. In the list of pages for the app, select **Authentication**.
+   - In the **Redirect URLs** | **Suggested Redirect URLs for public clients (mobile, desktop)** section, check **urn:ietf:wg:oauth:2.0:oob**
+ 1. Select **Save**.
+1. click on **API permissions**
+   - click the **Add a permission** button and then,
+   - Ensure that the **My APIs** tab is selected
+   - In the list of APIs, select the API `TodoListService`.
+   - In the **Delegated permissions** section, ensure that the right permissions are checked: **access_as_user**. Use the search box if necessary.
+   - Select the **Add permissions** button
+
 
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
@@ -292,19 +316,20 @@ This project has one WebApp / Web API projects. To deploy it to Azure Web Sites,
 ### Create and Publish the `TodoListService` to an Azure Web Site
 
 1. Sign in to the [Azure portal](https://portal.azure.com).
-2. Click New in the top left-hand corner, select Web + Mobile --> Web App, select the hosting plan and region, and give your web site a name, for example, `TodoListService-contoso.azurewebsites.net`.  Click Create Web Site.
-3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile and save it.  Other deployment mechanisms, such as from source control, can also be used.
-4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select Publish.  Click Import, and import the publish profile that you downloaded.
-5. On the Connection tab, update the Destination URL so that it is https, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Click Next.
-6. On the Settings tab, make sure Enable Organizational Authentication is NOT selected.  Click Publish.
+2. Click **Create a resource** in the top left-hand corner, select **Web + Mobile** --> **Web App**, select the hosting plan and region, and give your web site a name, for example, `TodoListService-contoso.azurewebsites.net`.  Click Create Web Site.
+3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile by clicking **Get publish profile** and save it.  Other deployment mechanisms, such as from source control, can also be used.
+4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select **Publish**.  Click **Import Profile** on the bottom bar, and import the publish profile that you downloaded earlier.
+5. Click on **Settings** and in the `Connection tab`, update the Destination URL so that it is https, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Click Next.
+6. On the Settings tab, make sure `Enable Organizational Authentication` is NOT selected.  Click **Save**. Click on **Publish** on the main screen.
 7. Visual Studio will publish the project and automatically open a browser to the URL of the project.  If you see the default web page of the project, the publication was successful.
 
 ### Update the Active Directory tenant application registration for `TodoListService`
 
 1. Navigate to the [Azure portal](https://portal.azure.com).
-2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant containing the `TodoListService` application.
-3. On the applications tab, select the `TodoListService` application.
-4. From the Settings -> Properties and Settings -> Reply URLs menus, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Save the configuration.
+1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant containing the `TodoListService` application.
+1. On the applications tab, select the `TodoListService` application.
+1. From the *Settings -> Properties* menu, update the **Home page URL**, to the address of your service, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Save the configuration.
+1. Add the same URL in the list of values of the *Settings -> Reply URLs* menu
 
 ### Update the `TodoListClient` to call the `TodoListService` running in Azure Web Sites
 
@@ -333,6 +358,10 @@ If you'd like to contribute to this sample, see [CONTRIBUTING.MD](/CONTRIBUTING.
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 For more information, visit the following links:
+- To lean more about the application registration, visit:
+  - [Quickstart: Register an application with the Microsoft identity platform (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
+  - [Quickstart: Configure a client application to access web APIs (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis)
+  - [Quickstart: Quickstart: Configure an application to expose web APIs (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis)
 
 - To learn more about the code, visit [Conceptual documentation for MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki#conceptual-documentation) and in particular:
   - [Acquiring tokens with authorization codes on web apps](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-with-authorization-codes-on-web-apps)
