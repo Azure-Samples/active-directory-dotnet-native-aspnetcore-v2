@@ -77,13 +77,13 @@ namespace TodoListClient
             {
                 lock (FileLock)
                 {
-                    // reflect changesgs in the persistent store
+                    // reflect changes in the persistent store
                     File.WriteAllBytes(CacheFilePath,
                                        ProtectedData.Protect(args.TokenCache.Serialize(), 
                                                              null, 
                                                              DataProtectionScope.CurrentUser)
                                       );
-                    // once the write operationtakes place restore the HasStateChanged bit to filse
+                    // once the write operation takes place restore the HasStateChanged bit to false
                     args.TokenCache.HasStateChanged = false;
                 }
             }
