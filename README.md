@@ -85,7 +85,7 @@ As a first step you'll need to:
    - In the Redirect URI (optional) section, select **Web** in the combo-box.
    - For the *Redirect URI*, enter the base URL for the sample. By default, this sample uses `https://localhost:44351/`.
     - Select **Register** to create the application.
-1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ClientId` in TodoListService\appsettings.json).
 1. In the list of pages for the app, select on **Expose an API**
    - Select **Add a scope**
    - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
@@ -106,7 +106,7 @@ As a first step you'll need to:
    - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListClient`.
    - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
     - Select **Register** to create the application.
-1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ida:ClientId` in TodoListClient\App.Config).
 1. In the list of pages for the app, select **Authentication**.
    - In the **Redirect URLs** | **Suggested Redirect URLs for public clients (mobile, desktop)** section, check **urn:ietf:wg:oauth:2.0:oob**
  1. Select **Save**.
@@ -151,7 +151,7 @@ a GUID or domain name | users can only sign in with an account for a specific or
 
 1. In the TodoListClient project, open `App.config`.
 1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the *TodoListClient-v2* app copied from the app registration page.
-1. Find the app key `todo:TodoListScope` and replace the value with the scope of the TodoListService-v2 application copied from the app registration (of the form ``api://<Application ID of service>/access_as_user``)
+1. Find the app key `todo:TodoListScope` and replace the value with the scope of the TodoListService-v2 application copied from the app registration in the **Expose an API** tab (of the form ``api://<Application ID of service>/access_as_user`` if you followed the instructions above)
 1. [Optional] If you want your application to work only in your organization (only in your tenant) you'll also need to Find the app key `ida:Tenant` and replace the value with your AAD Tenant ID (GUID). Alternatively you can also use your AAD tenant Name (for example, contoso.onmicrosoft.com)
 1. [Optional] If you changed the default URL for your service application, find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
 
@@ -159,7 +159,10 @@ a GUID or domain name | users can only sign in with an account for a specific or
 
 Clean the solution, rebuild the solution, and run it.  You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
 
-When you start the Web API, you'll get an empty web page. This is expected.
+When you start the Web API from Visual Studio, depending on the browser you use, you'll get:
+- an empty web page (case with Edge)
+- or an error HTTP 401 (case with Chrome)
+This is expected as you are not authenticated. The WPF application will be authenticated, so it will be able to access the Web API. 
 
 Explore the sample by signing in into the TodoList client, adding items to the To Do list, removing the user account (clearing the cache), and starting again.  As explained, if you stop the application without removing the user account, the next time you run the application, you won't be prompted to sign in again - that is because the sample implements a persistent cache for MSAL, and remembers the tokens from the previous run.
 
