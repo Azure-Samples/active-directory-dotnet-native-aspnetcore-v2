@@ -18,7 +18,7 @@ endpoint: AAD v2.0
 You expose a Web API and you want to protect it so that only authenticated user can access it. You want to enable authenticated users with both work and school accounts
 or Microsoft personal accounts (formerly live account) to use your Web API.
 
-An on demand video was created for the Build 2018 event, featuring this scenario and this sample. See the video [Building Web API Solutions with Authentication](https://channel9.msdn.com/Events/Build/2018/THR5000), and the associated [PowerPoint deck](http://video.ch9.ms/sessions/c1f9c808-82bc-480a-a930-b340097f6cc1/BuildWebAPISolutionswithAuthentication.pptx)
+An on-demand video was created for the Build 2018 event, featuring this scenario and this sample. See the video [Building Web API Solutions with Authentication](https://channel9.msdn.com/Events/Build/2018/THR5000), and the associated [PowerPoint deck](http://video.ch9.ms/sessions/c1f9c808-82bc-480a-a930-b340097f6cc1/BuildWebAPISolutionswithAuthentication.pptx)
 
 ### Overview
 
@@ -36,7 +36,7 @@ The Web API (TodoListService) maintains an in-memory collection of to-do items p
 
 The WPF application (TodoListClient) enables a user to:
 
-- Sign in. The first time a user signs in, a consent screen is presented letting the user consent for the application accessing the TodoList Service and the Azure Active Directory. 
+- Sign in. The first time a user signs in, a consent screen is presented letting the user consent for the application accessing the TodoList Service and the Azure Active Directory.
 - When the user has signed-in, the user sees the list of to-do items exposed by Web API for the signed-in identity
 - The user can add more to-do items by clicking on *Add item* button.
 
@@ -59,6 +59,7 @@ From your shell or command line:
 
 ```Shell
 git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git
+cd "1. Desktop app calls Web API"
 ```
 
 > Given that the name of the sample is pretty long, and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
@@ -72,7 +73,7 @@ There are two projects in this sample. Each needs to be separately registered in
 As a first step you'll need to:
 
 1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
-1. If your account gives you access to more than one tenant, select your account in the top right corner, and set your portal session to the desired Azure AD tenant
+1. If your account gives you access to more than one tenant, select your account in the top-right corner, and set your portal session to the desired Azure AD tenant
    (using **Switch Directory**).
 1. In the left-hand navigation pane, select the **Azure Active Directory** service, and then select **App registrations (Preview)**.
 
@@ -84,14 +85,15 @@ As a first step you'll need to:
    - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
    - In the Redirect URI (optional) section, select **Web** in the combo-box.
    - For the *Redirect URI*, enter the base URL for the sample. By default, this sample uses `https://localhost:44351/`.
-    - Select **Register** to create the application.
+   - Select **Register** to create the application.
+
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ClientId` in TodoListService\appsettings.json).
 1. In the list of pages for the app, select on **Expose an API**
    - Select **Add a scope**
    - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
    - Enter the following parameters
      - for **Scope name** use `access_as_user`
-     - Keep **Admmins and users** for **Who can consent**
+     - Keep **Admins and users** for **Who can consent**
      - in **Admin consent display name** type `Access TodoListService as a user`
      - in **Admin consent description** type `Accesses the TodoListService Web API as a user`
      - in **User consent display name** type `Access TodoListService as a user`
@@ -105,18 +107,17 @@ As a first step you'll need to:
 1. When the **Register an application page** appears, enter your application's registration information:
    - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListClient`.
    - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
-    - Select **Register** to create the application.
+   - Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ida:ClientId` in TodoListClient\App.Config).
 1. In the list of pages for the app, select **Authentication**.
    - In the **Redirect URLs** | **Suggested Redirect URLs for public clients (mobile, desktop)** section, check **urn:ietf:wg:oauth:2.0:oob**
- 1. Select **Save**.
+1. Select **Save**.
 1. click on **API permissions**
    - click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected
    - In the list of APIs, select the API `TodoListService`.
    - In the **Delegated permissions** section, ensure that the right permissions are checked: **access_as_user**. Use the search box if necessary.
    - Select the **Add permissions** button
-
 
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
@@ -136,7 +137,6 @@ Value | Meaning
 `organizations` |  users can sign in with any Work and School account
 `consumers` |  users can sign in with a Microsoft Personal account
 a GUID or domain name | users can only sign in with an account for a specific organization described by its tenant ID (GUID) or domain name
- |
 
 #### Configure the TodoListService C# project
 
@@ -160,15 +160,17 @@ a GUID or domain name | users can only sign in with an account for a specific or
 Clean the solution, rebuild the solution, and run it.  You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
 
 When you start the Web API from Visual Studio, depending on the browser you use, you'll get:
-- an empty web page (case with Edge)
-- or an error HTTP 401 (case with Chrome)
-This is expected as you are not authenticated. The WPF application will be authenticated, so it will be able to access the Web API. 
 
-Explore the sample by signing in into the TodoList client, adding items to the To Do list, removing the user account (clearing the cache), and starting again.  As explained, if you stop the application without removing the user account, the next time you run the application, you won't be prompted to sign in again - that is because the sample implements a persistent cache for MSAL, and remembers the tokens from the previous run.
+- an empty web page (case with Microsoft Edge)
+- or an error HTTP 401 (case with Chrome)
+
+This behavior is expected as you are not authenticated. The WPF application will be authenticated, so it will be able to access the Web API.
+
+Explore the sample by signing in into the TodoList client, adding items to the To Do list, removing the user account (clearing the cache), and starting again.  As explained, if you stop the application without removing the user account, the next time you run the application, you won't be prompted to sign in again. That is because the sample implements a persistent cache for MSAL, and remembers the tokens from the previous run.
 
 NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` sample. Each time you run the TodoListService API, your To-Do list will get emptied.
 
-## How was the code created ?
+## How was the code created
 
 ### Code for the service
 
@@ -236,66 +238,120 @@ namespace TodoListService.Controllers
 This code gets the todo list items associated with their owner, which is the identity of the user using the Web API. It also adds todo list items associated with the same user.
 There is no persistence as implementing token persistence on the service side would be beyond the scope of this sample
 
-Make the following changes in the `AzureAdServiceCollectionExtension.cs` file.
+#### Add a AadIssuerValidator file under a new Extensions folder
+
+1. Create a new folder named `Extensions`
+2. Add a new file named `AadIssuerValidator.cs`with the following content:
 
 ```CSharp
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+
+namespace Microsoft.AspNetCore.Authentication
+{
+    public static class AadIssuerValidator
+    {
+        /// <summary>
+        /// Validate the issuer for multi-tenant applications of various audience (Work and School account, or Work and School accounts +
+        /// Personal accounts)
+        /// </summary>
+        /// <param name="issuer">Issuer to validate (will be tenanted)</param>
+        /// <param name="securityToken">Received Security Token</param>
+        /// <param name="validationParameters">Token Validation parameters</param>
+        /// <remarks>The issuer is considered as valid if it has the same http scheme and authority as the
+        /// authority from the configuration file, has a tenant Id, and optionally v2.0 (this web api
+        /// accepts both V1 and V2 tokens).
+        /// Authority aliasing is also taken into account</remarks>
+        /// <returns>The <c>issuer</c> if it's valid, or otherwise <c>SecurityTokenInvalidIssuerException</c> is thrown</returns>
+        public static string ValidateAadIssuer(string issuer, SecurityToken securityToken, TokenValidationParameters validationParameters)
+        {
+            JwtSecurityToken jwtToken = securityToken as JwtSecurityToken;
+            if (jwtToken == null)
+            {
+                throw new SecurityTokenInvalidIssuerException("Expecting a JWT Token from Azure Active Directory.");
+            }
+
+            // Extracting the tenant ID
+            string tenantId = jwtToken.Claims.FirstOrDefault(c => c.Type == "tid")?.Value;
+            if (jwtToken == null)
+            {
+                throw new SecurityTokenInvalidIssuerException("Expecting a tid claim from Azure Active Directory.");
+            }
+
+            // Build the valid tenanted issuers
+            List<string> allValidIssuers = new List<string>();
+
+            IEnumerable<string> validIssuers = validationParameters.ValidIssuers;
+            if (validIssuers != null)
+            {
+                allValidIssuers.AddRange(validIssuers.Select(i => TenantedIssuer(i, tenantId)));
+            }
+
+            string validIssuer = validationParameters.ValidIssuer;
+            if (validIssuer != null)
+            {
+                allValidIssuers.Add(TenantedIssuer(validIssuer, tenantId));
+            }
+
+            // Consider the aliases (https://login.microsoftonline.com (v2.0 tokens) => https://sts.windows.net (v1.0 tokens) )
+            allValidIssuers.AddRange(allValidIssuers.Select(i => i.Replace("https://login.microsoftonline.com", "https://sts.windows.net")).ToArray());
+
+            // Consider tokens provided both by v1.0 and v2.0 issuers
+            allValidIssuers.AddRange(allValidIssuers.Select(i => i.Replace("/v2.0", "/")).ToArray());
+
+            if (!allValidIssuers.Contains(issuer))
+            {
+                throw new SecurityTokenInvalidIssuerException("Issuer does not match the valid issuers");
+            }
+            else
+            {
+                return issuer;
+            }
+        }
+
+        private static string TenantedIssuer(string i, string tenantId)
+        {
+            return i.Replace("{tenantid}", tenantId);
+        }
+    }
+}
 ```
 
-```Text
-The code of the overloaded `Configure` method is also modified to accept tokens coming from the V2 endpoint:
-```
+This code validates that the issuer of the token sent, by its client, to the Web API, can be trusted. This code enables both v1.0 and v2.0 tokens.
+
+#### Modify the startup.cs file so that the Web API becomes v2.0 multi-tenant app
+
+Make the following changes in the `Startup.cs` file.
+
+Add a using for `Microsoft.AspNetCore.Authentication.JwtBearer`
 
 ```CSharp
-/// <summary>
-/// Validate the issuer.
-/// </summary>
-/// <param name="issuer">Issuer to validate (will be tenanted)</param>
-/// <param name="securityToken">Received Security Token</param>
-/// <param name="validationParameters">Token Validation parameters</param>
-/// <remarks>The issuer is considered as valid if it has the same http scheme and authority as the
-/// authority from the configuration file, has a tenant Id, and optionally v2.0 (this web api
-/// accepts both V1 and V2 tokens)</remarks>
-/// <returns>The <c>issuer</c> if it's valid, or otherwise <c>null</c></returns>
-private string ValidateIssuer(string issuer, SecurityToken securityToken, TokenValidationParameters validationParameters)
-{
- Uri uri = new Uri(issuer);
- Uri authorityUri = new Uri(_azureOptions.Instance);
- string[] parts = uri.AbsolutePath.Split('/');
- if (parts.Length >= 2)
- {
-  Guid tenantId;
-  if (uri.Scheme != authorityUri.Scheme || uri.Authority != authorityUri.Authority)
-  {
-   throw new SecurityTokenInvalidIssuerException("Issuer has wrong authority");
-  }
-  if (!Guid.TryParse(parts[1], out tenantId))
-  {
-   throw new SecurityTokenInvalidIssuerException("Cannot find the tenant GUID for the issuer");
-  }
-  if (parts.Length> 2 && parts[2] != "v2.0")
-  {
-   throw new SecurityTokenInvalidIssuerException("Only accepted protocol versions are AAD v1.0 or V2.0");
-  }
-  return issuer;
- }
- else
- {
-  throw new SecurityTokenInvalidIssuerException("Unknown issuer");
- }
-}
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+```
 
-public void Configure(string name, JwtBearerOptions options)
+After:
+
+```CSharp
+ .AddAzureAdBearer(options => Configuration.Bind("AzureAd", options));
+```
+
+Insert the following code
+
+```CSharp
+services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
 {
-    options.Audience = _azureOptions.ClientId;
-    options.Authority = $"{_azureOptions.Instance}{_azureOptions.TenantId}/v2.0/";
+    // This is an Azure AD v2.0 Web API
+    options.Authority += "/v2.0";
+
+    // The valid audiences are both the Client ID (options.Audience) and api://{ClientID}
+    options.TokenValidationParameters.ValidAudiences = new string[] { options.Audience, $"api://{options.Audience}" };
 
     // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
     // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
-    options.TokenValidationParameters.ValidateIssuer = true;
-    options.TokenValidationParameters.IssuerValidator = ValidateIssuer;
-}
-
+    options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ValidateAadIssuer;
+});
 ```
 
 #### Change the App URL
@@ -305,12 +361,12 @@ If you're using Visual Studio 2017
 1. Edit the TodoListService's properties (right click on `TodoListService.csproj`, and choose **Properties**)
 1. In the Debug tab:
     1. Check the **Launch browser** field to `https://localhost:44351/api/todolist`
-    1. Change the **App URL** field to be `https://localhost:44351` as this is the URL registered in the Azure AD application representing the Web API.
+    1. Change the **App URL** field to be `https://localhost:44351` as this URL is the URL registered in the Azure AD application representing the Web API.
     1. Check the **Enable SSL** field
 
 ## How to deploy this sample to Azure
 
-This project has one WebApp / Web API projects. To deploy it to Azure Web Sites, you'll need to:
+This project has one WebApp / Web API project. To deploy it to Azure Web Sites, you'll need to:
 
 - create an Azure Web Site
 - publish the Web App / Web APIs to the web site, and
@@ -361,7 +417,9 @@ If you'd like to contribute to this sample, see [CONTRIBUTING.MD](/CONTRIBUTING.
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 For more information, visit the following links:
+
 - To lean more about the application registration, visit:
+
   - [Quickstart: Register an application with the Microsoft identity platform (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
   - [Quickstart: Configure a client application to access web APIs (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis)
   - [Quickstart: Quickstart: Configure an application to expose web APIs (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis)
