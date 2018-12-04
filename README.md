@@ -25,11 +25,8 @@ This repository contains a progressive tutorial made of two parts:
 
 Sub folder                    | Description
 ----------------------------- | -----------
-[1. Desktop app calls Web API](./1.%20Desktop%20app%20calls%20Web API/Readme.md) | Presents an ASP.NET Core 2.1 Web API protected by Azure AD OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) ![Topology](./1. Desktop app calls Web API/ReadmeFiles/topology.png)
-[2. Web API now calls Microsoft Graph](./2.%20Web%20API%20now%20calls%20Microsoft Graph/Readme.md)  | Presents an increment where the Web API now calls Microsoft Graph using the on-behalf of flow
-
-> The first part of this sample is  similar to the [active-directory-dotnet-native-aspnetcore](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) sample except that that one is for the Azure AD V1 endpoint
-> and the token is acquired using [ADAL.NET](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet), whereas this sample is for the V2 endpoint, and the token is acquired using [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet). The Web API was also modified to accept both V1 and V2 tokens.
+[1. Desktop app calls Web API](1.%20Desktop%20app%20calls%20Web%20API/README.md) | Presents an ASP.NET Core 2.1 Web API protected by Azure Active Directory OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) ![Topology](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/topology.png)
+[2. Web API now calls Microsoft Graph](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md)  | Presents an increment where the Web API now calls Microsoft Graph using the on-behalf of flow
 
 ### User experience with this sample
 
@@ -43,7 +40,9 @@ The WPF application (TodoListClient) enables a user to:
 
 Next time a user runs the application, the user is signed-in with the same identity as the application maintains a cache on disk. Users can clear the cache (which will also have the effect of signing them out)
 
-![TodoList Client](./1. Desktop app calls Web API/ReadmeFiles/todolist-client.png)
+![TodoList Client](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/todolist-client.png)
+
+The second step of the tutorials modifies the Web API so that the todo-items also mention the identity of the user adding them.
 
 ## How to run this sample
 
@@ -81,6 +80,9 @@ If you'd like to contribute to this sample, see [CONTRIBUTING.MD](/CONTRIBUTING.
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## More information
+
+> The first part of this sample is  similar to the [active-directory-dotnet-native-aspnetcore](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) sample except that that one is for the Azure AD V1 endpoint
+> and the token is acquired using [ADAL.NET](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet), whereas this sample is for the V2 endpoint, and the token is acquired using [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet). The Web API was also modified to accept both V1 and V2 tokens.
 
 For more information, visit the following links:
 
