@@ -25,8 +25,8 @@ This repository contains a progressive tutorial made of two parts:
 
 Sub folder                    | Description
 ----------------------------- | -----------
-[1. Desktop app calls Web API](./1. Desktop app calls Web API/Readme.md) | Presents an ASP.NET Core 2.1 Web API protected by Azure AD OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) ![Topology](./1. Desktop app calls Web API/ReadmeFiles/topology.png)
-[2. Web API now calls Microsoft Graph](./2. Web API now calls Microsoft Graph/Readme.md)  | Presents an increment where the Web API now calls Microsoft Graph using the on-behalf of flow
+[1. Desktop app calls Web API](./1.%20Desktop%20app%20calls%20Web API/Readme.md) | Presents an ASP.NET Core 2.1 Web API protected by Azure AD OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) ![Topology](./1. Desktop app calls Web API/ReadmeFiles/topology.png)
+[2. Web API now calls Microsoft Graph](./2.%20Web%20API%20now%20calls%20Microsoft Graph/Readme.md)  | Presents an increment where the Web API now calls Microsoft Graph using the on-behalf of flow
 
 > The first part of this sample is  similar to the [active-directory-dotnet-native-aspnetcore](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) sample except that that one is for the Azure AD V1 endpoint
 > and the token is acquired using [ADAL.NET](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet), whereas this sample is for the V2 endpoint, and the token is acquired using [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet). The Web API was also modified to accept both V1 and V2 tokens.
