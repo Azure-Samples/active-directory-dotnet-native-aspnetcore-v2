@@ -252,7 +252,7 @@ Function ConfigureApplications
    Write-Host "- For 'service'"
    Write-Host "  - Navigate to '$servicePortalUrl'"
    Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
-   Write-Host "  - Still in the Manifest page and change 'accessTokenAcceptedVersion' to 2 "
+   Write-Host "  - Still in the Manifest page, change 'accessTokenAcceptedVersion' to 2 "
    Write-Host "- For 'client'"
    Write-Host "  - Navigate to '$clientPortalUrl'"
    Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
