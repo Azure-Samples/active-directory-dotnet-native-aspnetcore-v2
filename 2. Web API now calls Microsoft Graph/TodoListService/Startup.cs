@@ -45,8 +45,17 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(AzureADDefaults.BearerAuthenticationScheme)
+            services.AddAuthentication(AzureADDefaults.JwtBearerAuthenticationScheme)
                 .AddAzureADBearer(options => Configuration.Bind("AzureAd", options));
+
+            services
+              .AddTokenAcquisition()
+              .AddDistributedMemoryCache()
+              .AddSession()
+              .AddSessionBasedTokenCache()
+              ;
+
+            // Added
             services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
             {
 			    // This is an Azure AD v2.0 Web API
@@ -59,7 +68,15 @@ namespace TodoListService
                 // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
                 options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ValidateAadIssuer;
 
-
+                // When an access token for our own Web API is validated, we add it to MSAL.NET's cache so that it can
+                // be used from the controllers.
+                options.Events = new JwtBearerEvents();
+                options.Events.OnTokenValidated = async context =>
+                {
+                    var _tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
+                    context.Success();
+                    _tokenAcquisition.AddAccountToCacheFromJwt(context, new string[] { "user.read" });
+                };
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -67,6 +84,8 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseSession();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
