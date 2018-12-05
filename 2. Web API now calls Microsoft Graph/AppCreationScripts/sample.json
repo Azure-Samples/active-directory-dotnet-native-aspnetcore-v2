@@ -77,6 +77,10 @@
         {
           "key": "ClientId",
           "value": "service.AppId"
+        },
+        {
+          "key": "ClientSecret",
+          "value": "service.AppKey"
         }
       ]
     },

@@ -7,7 +7,7 @@ client: .NET Desktop (WPF)
 service: ASP.NET Core Web API
 endpoint: AAD v2.0
 ---
-# Calling an ASP.NET Core Web API from a WPF application using Azure AD V2
+# ASP.NET Core 2.1 Web API calling Microsoft Graph, itself called from a WPF application using Azure AD V2
 
 ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/497/badge)
 
@@ -59,7 +59,7 @@ From your shell or command line:
 
 ```Shell
 git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git
-cd "1. Desktop app calls Web API"
+cd "2. Web API now calls Microsoft Graph"
 ```
 
 or download and exact the repository .zip file.
@@ -101,8 +101,21 @@ As a first step you'll need to:
    - In the Redirect URI (optional) section, select **Web** in the combo-box.
    - For the *Redirect URI*, enter the base URL for the sample. By default, this sample uses `https://localhost:44351/`.
    - Select **Register** to create the application.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
+1. From the **Certificates & secrets** page, in the **Client secrets** section, choose **New client secret**:
 
-1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ClientId` in TodoListService\appsettings.json).
+   - Type a key description (of instance `app secret`),
+   - Select a key duration of either **In 1 year**, **In 2 years**, or **Never Expires**.
+   - When you press the **Add** button, the key value will be displayed, copy, and save the value in a safe location.
+   - You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
+     so record it as soon as it is visible from the Azure portal.
+1. In the list of pages for the app, select **API permissions**
+   - Click the **Add a permission** button and then,
+   - Ensure that the **Microsoft APIs** tab is selected
+   - In the *Commonly used Microsoft APIs* section, click on **Microsoft Graph**
+   - In the **Delegated permissions** section, ensure that the right permissions are checked: **User.Read**. Use the search box if necessary.
+   - Select the **Add permissions** button
+
 1. In the list of pages for the app, select **Expose an API**
    - Select **Add a scope**
    - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
@@ -140,6 +153,19 @@ As a first step you'll need to:
    - In the **Delegated permissions** section, ensure that the right permissions are checked: **access_as_user**. Use the search box if necessary.
    - Select the **Add permissions** button
 
+
+<!-- REWORD -->
+#### Configure authorized client applications for service (TodoListService (active-directory-dotnet-native-aspnetcore-v2))
+
+For the middle tier web API (`TodoListService (active-directory-dotnet-native-aspnetcore-v2)`) to be able to call the downstream web APIs, the user must grant the middle tier permission to do so in the form of consent.
+However, since the middle tier has no interactive UI of its own, you need to explicitly bind the client app registration in Azure AD, with the registration for the web API.
+This binding merges the consent required by both the client and middle tier into a single dialog, which will be presented to the user by the client.
+You can do so by adding the "Client ID" of the client app, to the manifest of the web API in the `knownClientApplications` property. Here's how:
+
+1. In the [Azure portal](https://portal.azure.com), navigate to your `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` app registration, and in the *Expose an API* section, click on **Add a client application**.
+   Client IDs of the client applications (`TodoListClient (active-directory-dotnet-native-aspnetcore-v2)`) as elements of the array.
+1. Click **Add application**
+
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
 #### Choose which users account to sign in
@@ -164,6 +190,7 @@ a GUID or domain name | users can only sign in with an account for a specific or
 1. Open the solution in Visual Studio.
 1. In the *TodoListService* project, open the `appsettings.json` file.
 1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the *TodoListService-v2* application, that you registered earlier.
+1. Find the `ClientSecret` property and replace the existing value with the key you saved during the creation of the `TodoListService-v2` app, in the Azure portal.
 1. [Optional] if you want to limit sign-in to users in your organization, also update the following properties:
 - `Domain`, replacing the existing value with your AAD tenant domain, for example, contoso.onmicrosoft.com.
 - `TenantId`, replacing the existing value with the Tenant ID.
