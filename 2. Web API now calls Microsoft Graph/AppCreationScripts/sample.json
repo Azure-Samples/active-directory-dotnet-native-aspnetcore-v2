@@ -29,10 +29,13 @@
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
         },
         {
+          "Comment": "If you changed the signInAudience to 'AzureADandPersonalMicrosoftAccount, remove the GUID in the knownClientApplications"
+        },
+        {
           "Comment": "Still in the Manifest page, change 'accessTokenAcceptedVersion' to 2 "
         },
         {
-          "Comment": "Navigate to the API Permisions page as a tenant admin and select 'Grant admin consent for {tenant}'"
+          "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
         }
       ]
     },
@@ -90,10 +93,10 @@
       "SettingKind": "XML",
       "SettingFile": "\\..\\TodoListClient\\App.Config",
       "Mappings": [
-        {
-          "key": "ida:Tenant",
-          "value": "$tenantName"
-        },
+        //{
+        //  "key": "ida:Tenant",
+        //  "value": "$tenantName"
+        //},
         {
           "key": "ida:ClientId",
           "value": ".AppId"

@@ -72,7 +72,7 @@ namespace TodoListService.Controllers
             // call to the downstream API (Microsoft Graph) has completed.
             try
             {
-                ownerName = CallGraphAPIOnBehalfOfUser().Result;
+                ownerName = CallGraphAPIOnBehalfOfUser().GetAwaiter().GetResult();
                 string title = string.IsNullOrWhiteSpace(ownerName) ? Todo.Title : $"{Todo.Title} ({ownerName})";
                 todoStore.Add(new TodoItem { Owner = owner, Title = title });
             }
@@ -97,9 +97,17 @@ namespace TodoListService.Controllers
             string[] scopes = new string[] { "user.read" };
 
             // we use MSAL.NET to get a token to call the API On Behalf Of the current user
-            string accessToken = await tokenAcquisition.GetAccessTokenOnBehalfOfUser(HttpContext, scopes);
-            dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
-            return me.userPrincipalName;
+            try
+            {
+                string accessToken = await tokenAcquisition.GetAccessTokenOnBehalfOfUser(HttpContext, scopes);
+                dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
+                return me.userPrincipalName;
+            }
+            catch (MsalUiRequiredException ex)
+            {
+                tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(HttpContext, scopes, ex);
+                return string.Empty;
+            }
         }
 
         private static async Task<dynamic> CallGraphApiOnBehalfOfUser(string accessToken)

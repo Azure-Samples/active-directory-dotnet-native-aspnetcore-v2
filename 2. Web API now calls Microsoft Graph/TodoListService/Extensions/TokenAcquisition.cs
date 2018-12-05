@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Identity.Client;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -212,7 +214,7 @@ namespace Microsoft.AspNetCore.Authentication
         /// }
         /// </code>
         /// </example>
-        public void AddAccountToCacheFromJwt(OpenIdConnect.TokenValidatedContext tokenValidatedContext, IEnumerable<string> scopes=null)
+        public void AddAccountToCacheFromJwt(OpenIdConnect.TokenValidatedContext tokenValidatedContext, IEnumerable<string> scopes = null)
         {
             if (tokenValidatedContext == null)
                 throw new ArgumentNullException(nameof(tokenValidatedContext));
@@ -314,8 +316,12 @@ namespace Microsoft.AspNetCore.Authentication
 
                 var application = CreateApplication(httpContext, principal, properties, null);
 
-                // .Result to make sure that the cache is filled-in before the controller tries to get access tokens
-                AuthenticationResult result = application.AcquireTokenOnBehalfOfAsync(scopes.Except(scopesRequestedByMsalNet), userAssertion).Result;
+                // Synchronous call to make sure that the cache is filled-in before the controller tries to get access tokens
+                AuthenticationResult result = application.AcquireTokenOnBehalfOfAsync(scopes.Except(scopesRequestedByMsalNet), userAssertion).GetAwaiter().GetResult();
+            }
+            catch (MsalUiRequiredException ex)
+            {
+                ReplyForbiddenWithWwwAuthenticateHeader(httpContext, scopes, ex);
             }
             catch (MsalException ex)
             {
@@ -324,6 +330,34 @@ namespace Microsoft.AspNetCore.Authentication
             }
         }
 
+        /// <summary>
+        /// Used in Web APIs (which therefore cannot have an interaction with the user). 
+        /// Replies to the client through the HttpReponse by sending a 403 (forbidden) and populating wwwAuthenticateHeaders so that
+        /// the client can trigger an iteraction with the user so that the user consents to more scopes
+        /// </summary>
+        /// <param name="httpContext">HttpContext</param>
+        /// <param name="scopes">Scopes to consent to</param>
+        /// <param name="msalSeviceException"><see cref="MsalUiRequiredException"/> triggering the challenge</param>
 
+        public void ReplyForbiddenWithWwwAuthenticateHeader(HttpContext httpContext, IEnumerable<string> scopes, MsalUiRequiredException msalSeviceException)
+        {
+            // A user interaction is required, but we are in a Web API, and therefore, we need to report back to the client through an wwww-Authenticate header https://tools.ietf.org/html/rfc6750#section-3.1
+
+            IDictionary<string, string> parameters = new Dictionary<string, string>()
+                {
+                    { "clientId", _azureAdOptions.ClientId },
+                    { "claims", msalSeviceException.Claims },
+                    { "scopes", string.Join(",", scopes) }
+                };
+
+            string parameterString = string.Join(", ", parameters.Select(p => $"{p.Key}=\"{p.Value}\""));
+            string scheme = "Bearer";
+            StringValues v = new StringValues($"{scheme} {parameterString}");
+
+            //  StringValues v = new StringValues(new string[] { $"Bearer clientId=\"{jwtToken.Audiences.First()}\", claims=\"{ex.Claims}\", scopes=\" {string.Join(",", scopes)}\"" });
+            var httpResponse = httpContext.Response;
+            httpResponse.StatusCode = (int)HttpStatusCode.Forbidden;
+            httpResponse.Headers.Add(HeaderNames.WWWAuthenticate, v);
+        }
     }
 }

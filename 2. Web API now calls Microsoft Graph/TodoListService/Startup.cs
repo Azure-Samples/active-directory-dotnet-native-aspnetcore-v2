@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Client;
 
 namespace TodoListService
 {
@@ -58,10 +59,10 @@ namespace TodoListService
             // Added
             services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
             {
-			    // This is an Azure AD v2.0 Web API
+                // This is an Azure AD v2.0 Web API
                 options.Authority += "/v2.0";
-				
-				// The valid audiences are both the Client ID (options.Audience) and api://{ClientID}
+
+                // The valid audiences are both the Client ID (options.Audience) and api://{ClientID}
                 options.TokenValidationParameters.ValidAudiences = new string[] { options.Audience, $"api://{options.Audience}" };
 
                 // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
@@ -74,8 +75,11 @@ namespace TodoListService
                 options.Events.OnTokenValidated = async context =>
                 {
                     var _tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
+                    var scopes = new string[] { "user.read" };
                     context.Success();
-                    _tokenAcquisition.AddAccountToCacheFromJwt(context, new string[] { "user.read" });
+
+                    // Adds the token to the cache, and also handles the incremental consent and claim challenges
+                    _tokenAcquisition.AddAccountToCacheFromJwt(context, scopes);
                 };
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

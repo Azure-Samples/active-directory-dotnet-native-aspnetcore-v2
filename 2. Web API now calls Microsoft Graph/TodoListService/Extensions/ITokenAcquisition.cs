@@ -100,5 +100,14 @@ namespace Microsoft.AspNetCore.Authentication
         /// </example>
         void AddAccountToCacheFromJwt(OpenIdConnect.TokenValidatedContext tokenValidationContext, IEnumerable<string> scopes = null);
 
+        /// <summary>
+        /// Used in Web APIs (which therefore cannot have an interaction with the user). 
+        /// Replies to the client through the HttpReponse by sending a 403 (forbidden) and populating wwwAuthenticateHeaders so that
+        /// the client can trigger an iteraction with the user so that the user consents to more scopes
+        /// </summary>
+        /// <param name="httpContext">HttpContext</param>
+        /// <param name="scopes">Scopes to consent to</param>
+        /// <param name="msalSeviceException"><see cref="MsalUiRequiredException"/> triggering the challenge</param>
+        void ReplyForbiddenWithWwwAuthenticateHeader(HttpContext httpContext, IEnumerable<string> scopes, MsalUiRequiredException msalSeviceException);
     }
 }
