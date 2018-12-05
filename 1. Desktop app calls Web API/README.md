@@ -77,6 +77,7 @@ There are two projects in this sample. Each needs to be separately registered in
 
 If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
 Then, after you ran the scripts, as those don't create yet apps for Azure AD v2.0, be sure to follow the manual steps:
+
 - edit the manifest of both applications to ensure `"signInAudience": "AzureADandPersonalMicrosoftAccount"`
 - edit the manifest of the server application to ensure: `"accessTokenAcceptedVersion": 2` and `"signInAudience": "AzureADandPersonalMicrosoftAccount"`
 
@@ -130,7 +131,7 @@ As a first step you'll need to:
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ida:ClientId` in TodoListClient\App.Config).
 1. In the list of pages for the app, select **Authentication**.
    - In the **Redirect URLs** | **Suggested Redirect URLs for public clients (mobile, desktop)** section, check **urn:ietf:wg:oauth:2.0:oob**
- 1. Select **Save**.
+   - Select **Save**.
 1. In the list of pages for the app, select **API permissions**
    - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected
@@ -374,10 +375,11 @@ services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationSche
 ```
 
 This code makes sure that:
-- the tokens are validated with Azure AD v2.0 (the ASP.NET Core 2.1 template is for the moment an Azure AD v1.0 template) 
+
+- the tokens are validated with Azure AD v2.0 (the ASP.NET Core 2.1 template is for the moment an Azure AD v1.0 template)
 - the valid audiences are both the ClientID of our Web API (default value of `options.Audience` with the ASP.NET Core template
   and api://{ClientID}
-- the issuer is validated (for the multi-tenant case) 
+- the issuer is validated (for the multi-tenant case)
 
 #### Change the App URL
 
