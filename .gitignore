@@ -184,3 +184,4 @@ FakesAssemblies/
 
 .vs/
 artifacts/
+/1. Desktop app calls Web API/AppCreationScripts/createdApps.html

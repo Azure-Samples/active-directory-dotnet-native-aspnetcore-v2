@@ -25,7 +25,7 @@
       "RequiredResourcesAccess": [
         {
           "Resource": "service",
-          "DelegatedPermissions": [ "access_as_user" ]
+          "DelegatedPermissions": [ "user_impersonation" ]
         }
       ]
     }
@@ -72,12 +72,8 @@
           "value": ".AppId"
         },
         {
-          "key": "ida:RedirectUri",
-          "value": ".ReplyUrls"
-        },
-        {
-          "key": "todo:TodoListResourceId",
-          "value": "service.AppId"
+          "key": "todo:TodoListScope",
+          "value": "service.Scope"
         },
         {
           "key": "todo:TodoListBaseAddress",

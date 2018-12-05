@@ -62,18 +62,32 @@ git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnet
 cd "1. Desktop app calls Web API"
 ```
 
-> Given that the name of the sample is pretty long, and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
+or download and exact the repository .zip file.
+
+> Given that the name of the sample is pretty long, and so are the name of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
 ### Step 2:  Register the sample with your Azure Active Directory tenant
 
 There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
+
+- either follow the steps in the paragraphs below ([Step 2](#step-2--register-the-sample-with-your-azure-active-directory-tenant) and [Step 3](#step-3--configure-the-sample-to-use-your-azure-ad-tenant))
+- or use PowerShell scripts that:
+  - **automatically** create for you the Azure AD applications and related objects (passwords, permissions, dependencies)
+  - modify the Visual Studio projects' configuration files.
+
+If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
+Then, after you ran the scripts, as those don't create yet apps for the v2.0 endpoint:
+- edit the manifest of both applications to ensure `"signInAudience": "AzureADandPersonalMicrosoftAccount"`
+- edit the manifest of the server application to ensure: `"accessTokenAcceptedVersion": 2`
+
+To get directly to the portal, you can navigate to the links in the AppCreationScripts\createdApps.html file
 
 #### Choose the Azure AD tenant where you want to create your applications
 
 As a first step you'll need to:
 
 1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
-1. If your account gives you access to more than one tenant, select your account in the top-right corner, and set your portal session to the desired Azure AD tenant
+1. If your account gives you access to more than one tenant, select your account in the top right corner, and set your portal session to the desired Azure AD tenant
    (using **Switch Directory**).
 1. In the left-hand navigation pane, select the **Azure Active Directory** service, and then select **App registrations (Preview)**.
 
@@ -111,9 +125,9 @@ As a first step you'll need to:
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ida:ClientId` in TodoListClient\App.Config).
 1. In the list of pages for the app, select **Authentication**.
    - In the **Redirect URLs** | **Suggested Redirect URLs for public clients (mobile, desktop)** section, check **urn:ietf:wg:oauth:2.0:oob**
-1. Select **Save**.
-1. click on **API permissions**
-   - click the **Add a permission** button and then,
+ 1. Select **Save**.
+1. In the list of pages for the app, select **API permissions**
+   - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected
    - In the list of APIs, select the API `TodoListService`.
    - In the **Delegated permissions** section, ensure that the right permissions are checked: **access_as_user**. Use the search box if necessary.
