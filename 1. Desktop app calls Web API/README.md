@@ -88,7 +88,7 @@ To get directly to the portal, you can navigate to the links in the [AppCreation
 As a first step you'll need to:
 
 1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
-1. If your account gives you access to more than one tenant, select your account in the top right corner, and set your portal session to the desired Azure AD tenant
+1. If your account gives you access to more than one tenant, select your account in the top-right corner, and set your portal session to the desired Azure AD tenant
    (using **Switch Directory**).
 1. In the left-hand navigation pane, select the **Azure Active Directory** service, and then select **App registrations (Preview)**.
 
@@ -118,6 +118,7 @@ As a first step you'll need to:
 1. In the list of pages, select **Manifest**
    - in the manifest, search for "accessTokenAcceptedVersion", and replace **null** by **2**. This property lets Azure AD know that the
      Web API accepts v2.0 tokens
+   - Select **Save**
 
 > Important: it's up to the Web API to decide which generation of token (v1.0 or v2.0) it accepts.
 
@@ -163,9 +164,9 @@ a GUID or domain name | users can only sign in with an account for a specific or
 1. Open the solution in Visual Studio.
 1. In the *TodoListService* project, open the `appsettings.json` file.
 1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the *TodoListService-v2* application, that you registered earlier.
-1. [Optional] if you want to limit sign-in to users in your organization, also update the following
-- The `Domain` property, replacing the existing value with your AAD tenant domain, for example, contoso.onmicrosoft.com.
-- The `TenantId` property replacing the existing value with the Tenant ID.
+1. [Optional] if you want to limit sign-in to users in your organization, also update the following properties:
+- `Domain`, replacing the existing value with your AAD tenant domain, for example, contoso.onmicrosoft.com.
+- `TenantId`, replacing the existing value with the Tenant ID.
 
 #### Configure the TodoListClient C# project
 
@@ -190,9 +191,23 @@ Explore the sample by signing in into the TodoList client, adding items to the T
 
 NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` sample. Each time you run the TodoListService API, your To-Do list will get emptied.
 
+### Troubleshooting
+
+#### the Web API needs to accept v2.0 tokens to sign-in Microsoft personal accounts
+
+The following makes sense, but could happen in migration scenarios where you had an existing Web API, or created the Web API with v1.0 PowerShell scripts:
+
+If `ida:Tenant` is set to `common` or `consumers` in the TodoListClient's **App.Config** and you get the following errors:
+
+- `'The provided value for the input parameter 'scope' is not valid. The scope 'api://{ServiceClientId}/access_as_user offline_access openid profile' is not configured correctly'` when signing-in with a Microsoft personal account
+
+- `'Resource 'api://{ServiceClientId}'  (TodoListService-v2) has a configured token version of '1' and is not supported over the /common or /consumers endpoints.'` when signing-in with a Work and School account
+
+Then you need to set the  `accessTokenAcceptedVersion` property of the Web API to 2 in the manifest.
+
 ## How was the code created
 
-### Code for the service
+### Code for the Web API (TodoListService)
 
 The code for the service was created in the following way:
 
@@ -339,7 +354,7 @@ namespace Microsoft.AspNetCore.Authentication
 }
 ```
 
-This code validates that the issuer of the token sent, by its client, to the Web API, can be trusted. This code enables both v1.0 and v2.0 tokens.
+This code validates that the issuer of the token sent, by its client, to the Web API, can be trusted. This code enables your Web API to accept both v1.0 and v2.0 tokens, which might be useful if you want to migrate your existing Web API from v1.0 to v2.0
 
 #### Modify the startup.cs file so that the Web API becomes v2.0 multi-tenant app
 
