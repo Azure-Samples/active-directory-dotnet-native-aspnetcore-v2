@@ -14,18 +14,31 @@
   "AADApps": [
     {
       "Id": "service",
-      "Name": "TodoListService",
+      "Name": "TodoListService (active-directory-dotnet-native-aspnetcore-v2)",
       "Kind": "WebApi",
-      "HomePage": "https://localhost:44351/"
+      "HomePage": "https://localhost:44351/",
+      "ManualSteps": [
+        {
+          "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
+        },
+        {
+          "Comment": "Still in the Manifest page, change 'accessTokenAcceptedVersion' to 2 "
+        }
+      ]
     },
     {
       "Id": "client",
-      "Name": "TodoListClient",
+      "Name": "TodoListClient (active-directory-dotnet-native-aspnetcore-v2)",
       "Kind": "Desktop",
       "RequiredResourcesAccess": [
         {
           "Resource": "service",
           "DelegatedPermissions": [ "user_impersonation" ]
+        }
+      ],
+      "ManualSteps": [
+        {
+          "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
         }
       ]
     }

@@ -170,8 +170,8 @@ Function ConfigureApplications
     $user = Get-AzureADUser -ObjectId $creds.Account.Id
 
    # Create the service AAD application
-   Write-Host "Creating the AAD application (TodoListService)"
-   $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListService" `
+   Write-Host "Creating the AAD application (TodoListService (active-directory-dotnet-native-aspnetcore-v2))"
+   $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListService (active-directory-dotnet-native-aspnetcore-v2)" `
                                                    -HomePage "https://localhost:44351/" `
                                                    -AvailableToOtherTenants $True `
                                                    -PublicClient $False
@@ -189,16 +189,16 @@ Function ConfigureApplications
     Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($serviceServicePrincipal.DisplayName)'"
    }
 
-   Write-Host "Done creating the service application (TodoListService)"
+   Write-Host "Done creating the service application (TodoListService (active-directory-dotnet-native-aspnetcore-v2))"
 
    # URL of the AAD application in the Azure portal
    # Future? $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId+"/isMSAApp/"
    $servicePortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId+"/isMSAApp/"
-   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListService</a></td></tr>" -Path createdApps.html
+   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListService (active-directory-dotnet-native-aspnetcore-v2)</a></td></tr>" -Path createdApps.html
 
    # Create the client AAD application
-   Write-Host "Creating the AAD application (TodoListClient)"
-   $clientAadApplication = New-AzureADApplication -DisplayName "TodoListClient" `
+   Write-Host "Creating the AAD application (TodoListClient (active-directory-dotnet-native-aspnetcore-v2))"
+   $clientAadApplication = New-AzureADApplication -DisplayName "TodoListClient (active-directory-dotnet-native-aspnetcore-v2)" `
                                                   -ReplyUrls "urn:ietf:wg:oauth:2.0:oob" `
                                                   -AvailableToOtherTenants $True `
                                                   -PublicClient $True
@@ -214,18 +214,18 @@ Function ConfigureApplications
     Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($clientServicePrincipal.DisplayName)'"
    }
 
-   Write-Host "Done creating the client application (TodoListClient)"
+   Write-Host "Done creating the client application (TodoListClient (active-directory-dotnet-native-aspnetcore-v2))"
 
    # URL of the AAD application in the Azure portal
    # Future? $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId+"/isMSAApp/"
    $clientPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId+"/isMSAApp/"
-   Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListClient</a></td></tr>" -Path createdApps.html
+   Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListClient (active-directory-dotnet-native-aspnetcore-v2)</a></td></tr>" -Path createdApps.html
 
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
 
    # Add Required Resources Access (from 'client' to 'service')
    Write-Host "Getting access from 'client' to 'service'"
-   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService" `
+   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService (active-directory-dotnet-native-aspnetcore-v2)" `
                                                 -requiredDelegatedPermissions "user_impersonation";
 
    $requiredResourcesAccess.Add($requiredPermissions)
@@ -247,6 +247,15 @@ Function ConfigureApplications
    ReplaceSetting -configFilePath $configFile -key "ida:ClientId" -newValue $clientAadApplication.AppId
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListScope" -newValue ("api://"+$serviceAadApplication.AppId+"/user_impersonation")
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListBaseAddress" -newValue $serviceAadApplication.HomePage
+   Write-Host ""
+   Write-Host "IMPORTANT: Think of completing the following manual step(s) in the Azure portal":
+   Write-Host "- For 'service'"
+   Write-Host "  - Navigate to '$servicePortalUrl'"
+   Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
+   Write-Host "  - Still in the Manifest page and change 'accessTokenAcceptedVersion' to 2 "
+   Write-Host "- For 'client'"
+   Write-Host "  - Navigate to '$clientPortalUrl'"
+   Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
 
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
 }
