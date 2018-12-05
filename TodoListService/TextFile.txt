@@ -1,9 +1,0 @@
-﻿Until V2 apps are present in Ibiza, the Web API needs to be provisionned
-See https://stackoverflow.com/questions/45631145/how-to-allow-non-admin-users-to-authenticate-via-oauth2-0-for-tenants-where-user/45643173#45643173
-
-which translates in:
-https://login.windows.net/common/oauth2/authorize?response_type=code&client_id={0}&resource={1}&redirect_uri={2}&prompt=admin_consent 
-where client id and resource= the client id of the web api
-
-for instance:
-https://login.windows.net/common/oauth2/authorize?response_type=code&client_id=a88bb933-319c-41b5-9f04-eff36d985612&resource=a88bb933-319c-41b5-9f04-eff36d985612&redirect_uri=https://localhost:44351&prompt=admin_consent
