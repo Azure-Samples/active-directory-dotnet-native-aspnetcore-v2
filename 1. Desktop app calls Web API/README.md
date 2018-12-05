@@ -76,11 +76,11 @@ There are two projects in this sample. Each needs to be separately registered in
   - modify the Visual Studio projects' configuration files.
 
 If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
-Then, after you ran the scripts, as those don't create yet apps for the v2.0 endpoint:
+Then, after you ran the scripts, as those don't create yet apps for Azure AD v2.0, be sure to follow the manual steps:
 - edit the manifest of both applications to ensure `"signInAudience": "AzureADandPersonalMicrosoftAccount"`
-- edit the manifest of the server application to ensure: `"accessTokenAcceptedVersion": 2`
+- edit the manifest of the server application to ensure: `"accessTokenAcceptedVersion": 2` and `"signInAudience": "AzureADandPersonalMicrosoftAccount"`
 
-To get directly to the portal, you can navigate to the links in the AppCreationScripts\createdApps.html file
+To get directly to the portal, you can navigate to the links in the [AppCreationScripts\createdApps.html](AppCreationScripts\createdApps.html) file created by the scripts
 
 #### Choose the Azure AD tenant where you want to create your applications
 
@@ -102,7 +102,7 @@ As a first step you'll need to:
    - Select **Register** to create the application.
 
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ClientId` in TodoListService\appsettings.json).
-1. In the list of pages for the app, select on **Expose an API**
+1. In the list of pages for the app, select **Expose an API**
    - Select **Add a scope**
    - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
    - Enter the following parameters
@@ -114,6 +114,11 @@ As a first step you'll need to:
      - in **User consent description** type `Accesses the TodoListService Web API as a user`
      - Keep **State** as **Enabled**
      - Select **Add scope**
+1. In the list of pages, select **Manifest**
+   - in the manifest, search for "accessTokenAcceptedVersion", and replace **null** by **2**. This property lets Azure AD know that the
+     Web API accepts v2.0 tokens
+
+> Important: it's up to the Web API to decide which generation of token (v1.0 or v2.0) it accepts.
 
 #### Register the client app (TodoListClient)
 
@@ -368,9 +373,18 @@ services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationSche
 });
 ```
 
+This code makes sure that:
+- the tokens are validated with Azure AD v2.0 (the ASP.NET Core 2.1 template is for the moment an Azure AD v1.0 template) 
+- the valid audiences are both the ClientID of our Web API (default value of `options.Audience` with the ASP.NET Core template
+  and api://{ClientID}
+- the issuer is validated (for the multi-tenant case) 
+
 #### Change the App URL
 
-If you're using Visual Studio 2017
+You want to change the launch URL and application URL to match the application
+registration:
+
+If you're using Visual Studio 2017:
 
 1. Edit the TodoListService's properties (right click on `TodoListService.csproj`, and choose **Properties**)
 1. In the Debug tab:
@@ -386,7 +400,7 @@ This project has one WebApp / Web API project. To deploy it to Azure Web Sites, 
 - publish the Web App / Web APIs to the web site, and
 - update its client(s) to call the web site instead of IIS Express.
 
-### Create and Publish the `TodoListService` to an Azure Web Site
+### Create and publish the `TodoListService` to an Azure Web Site
 
 1. Sign in to the [Azure portal](https://portal.azure.com).
 2. Click **Create a resource** in the top left-hand corner, select **Web + Mobile** --> **Web App**, select the hosting plan and region, and give your web site a name, for example, `TodoListService-contoso.azurewebsites.net`.  Click Create Web Site.
