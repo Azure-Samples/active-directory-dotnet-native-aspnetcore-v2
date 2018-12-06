@@ -15,7 +15,7 @@ endpoint: AAD v2.0
 
 ### Scenario
 
-You expose a Web API and you want to protect it so that only authenticated users can access it. You want to enable authenticated users with both work and school accounts or Microsoft personal accounts (formerly live account) to use your Web API.
+You expose a Web API and you want to protect it so that only authenticated users can access it. You want to enable apps authenticating users with both work and school accounts or Microsoft personal accounts (formerly live account) to use your Web API.
 
 Later you enrich your Web API by enabling it to call another Web API such as the Microsoft Graph
 
@@ -25,16 +25,20 @@ This repository contains a progressive tutorial made of two parts:
 
 Sub folder                    | Description
 ----------------------------- | -----------
-[1. Desktop app calls Web API](1.%20Desktop%20app%20calls%20Web%20API/README.md) | Presents an ASP.NET Core 2.1 Web API protected by Azure Active Directory OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) ![Topology](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/topology.png)
-[2. Web API now calls Microsoft Graph](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md)  | Presents an increment where the Web API now calls Microsoft Graph using the on-behalf of flow
+[1. Desktop app calls Web API](1.%20Desktop%20app%20calls%20Web%20API/README.md) | This first part, presents an ASP.NET Core 2.1 Web API protected by Azure Active Directory OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) </p> ![Topology](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/topology.png)
+[2. Web API now calls Microsoft Graph](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md)  | This second part presents an increment where the Web API now calls Microsoft Graph on-behalf of the user signed-in in the desktop application. In this part, the Web API uses the Microsoft Authentication Library for .NET (MSAL.NET) to acquire a token for Microsoft Graph using the [on-behalf-of](https://aka.ms/msal-net-on-behalf-of) flow </p>  ![Topology](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/ReadmeFiles/topology.png)
+
+It's also possible to jump directly to the second part.
 
 ### User experience with this sample
+
+#### In the first part of the tutorial
 
 The Web API (TodoListService) maintains an in-memory collection of to-do items per authenticated user. Several applications signed-in under the same identities share the same to-do list.
 
 The WPF application (TodoListClient) enables a user to:
 
-- Sign in. The first time a user signs in, a consent screen is presented letting the user consent for the application accessing the TodoList Service and Azure Active Directory.
+- Sign in. The first time a user signs in, a consent screen is presented letting the user consent for the application accessing the TodoList Service.
 - When the user has signed-in, the user sees the list of to-do items exposed by Web API for the signed-in identity
 - The user can add more to-do items by clicking on *Add item* button.
 
@@ -42,7 +46,11 @@ Next time a user runs the application, the user is signed-in with the same ident
 
 ![TodoList Client](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/todolist-client.png)
 
-The second step of the tutorials modifies the Web API so that the todo-items also mention the identity of the user adding them.
+#### In the second part of the tutorial
+
+The second phase of the tutorials modifies the Web API so that the todo-items also mention the identity of the user adding them.
+
+![TodoList Client with user name](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/ReadmeFiles/todolist-client.png)
 
 ## How to run this sample
 
@@ -58,10 +66,14 @@ The second step of the tutorials modifies the Web API so that the todo-items als
 From your shell or command line:
 
 ```Shell
-git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git
+git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git aspnetcore-webapi
+cd aspnetcore-webapi
 ```
 
 > Given that the name of the sample is pretty long, that it has sub-folders and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
+
+- Start by the first part [1. Desktop app calls Web API](1.%20Desktop%20app%20calls%20Web%20API/README.md) where you will learn how to protect a Web API with the Azure AD v2.0 endpoint.
+- or if you are interested in the Web API calling another downstream Web API using the on-behalf-of flow, go directly to [2. Web API now calls Microsoft Graph](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md)
 
 ## Community Help and Support
 
@@ -79,25 +91,8 @@ If you'd like to contribute to this sample, see [CONTRIBUTING.MD](/CONTRIBUTING.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-## More information
+## Other samples and documentation
 
-> The first part of this sample is  similar to the [active-directory-dotnet-native-aspnetcore](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) sample except that that one is for the Azure AD V1 endpoint
-> and the token is acquired using [ADAL.NET](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet), whereas this sample is for the V2 endpoint, and the token is acquired using [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet). The Web API was also modified to accept both V1 and V2 tokens.
-
-For more information, visit the following links:
-
-- To lean more about the application registration, visit:
-
-  - [Quickstart: Register an application with the Microsoft identity platform (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
-  - [Quickstart: Configure a client application to access web APIs (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis)
-  - [Quickstart: Quickstart: Configure an application to expose web APIs (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis)
-
-- To learn more about the code, visit [Conceptual documentation for MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki#conceptual-documentation) and in particular:
-  - [Customizing Token cache serialization](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/token-cache-serialization)
-
-- Articles about the Azure AD V2 endpoint [http://aka.ms/aaddevv2](http://aka.ms/aaddevv2), with a focus on:
-  - [Azure Active Directory v2.0 and OAuth 2.0 On-Behalf-Of flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols-oauth-on-behalf-of)
-
-- [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-2.1&tabs=visual-studio%2Caspnetcore2x)
-  - [AuthenticationBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationbuilder?view=aspnetcore-2.0)
-  - [Azure Active Directory with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.1)
+- Other samples for Azure AD v2.0 are available from [https://aka.ms/aaddevsamplesv2](https://aka.ms/aaddevsamplesv2)
+- The conceptual documentation for MSAL.NET is available from [https://aka.ms/msalnet](https://aka.ms/msalnet)
+- the documentation for Azure AD v2.0 is available from [https://aka.ms/aadv2](https://aka.ms/aadv2)

@@ -141,9 +141,39 @@ namespace TodoListClient
             }
             else
             {
-                string failureDescription = await response.Content.ReadAsStringAsync();
-                MessageBox.Show($"{response.ReasonPhrase}\n {failureDescription}", "An error occurred while getting /api/todolist", MessageBoxButton.OK);
-            }
+                if (response.StatusCode == System.Net.HttpStatusCode.Forbidden && response.Headers.WwwAuthenticate.Any())
+                {
+                    await HandleChallengeFromWebApi(response, result.Account);
+                }
+                else
+                {
+                    string failureDescription = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show($"{response.ReasonPhrase}\n {failureDescription}", "An error occurred while getting /api/todolist", MessageBoxButton.OK);
+                }
+           }
+        }
+
+        /// <summary>
+        /// When the Web API needs consent, it can sent a 403 with information in the WWW-Authenticate header in 
+        /// order to challenge the user
+        /// </summary>
+        /// <param name="response">HttpResonse received from the service</param>
+        /// <returns></returns>
+        private async Task HandleChallengeFromWebApi(HttpResponseMessage response, IAccount account)
+        {
+            const string msaTenantId = "9188040d-6c67-4c5b-b112-36a304b66dad";
+
+            AuthenticationHeaderValue bearer = response.Headers.WwwAuthenticate.FirstOrDefault(v => v.Scheme == "Bearer");
+            IEnumerable<string> parameters = bearer.Parameter.Split(',').Select(v => v.Trim());
+            string clientId = parameters.FirstOrDefault(p => p.StartsWith("clientId="))?.Substring("clientId=".Length)?.Trim('"');
+            string claims = parameters.FirstOrDefault(p => p.StartsWith("claims="))?.Substring("claims=".Length)?.Trim('"');
+            string scopes = parameters.FirstOrDefault(p => p.StartsWith("scopes="))?.Substring("scopes=".Length)?.Trim('"');
+
+            PublicClientApplication pca = new PublicClientApplication(clientId);
+            string loginHint = account?.Username;
+            string domainHint = account?.HomeAccountId.TenantId == msaTenantId ? "consumers" : "organizations";
+            string extraQueryParameters = $"claims={claims}&domainHint={domainHint}";
+            await pca.AcquireTokenAsync(new string[] { scopes }, loginHint, UIBehavior.SelectAccount,extraQueryParameters, new string[] { }, pca.Authority);
         }
 
         private async void AddTodoItem(object sender, RoutedEventArgs e)

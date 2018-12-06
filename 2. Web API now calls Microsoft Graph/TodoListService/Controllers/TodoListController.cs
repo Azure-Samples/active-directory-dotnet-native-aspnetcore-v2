@@ -21,20 +21,36 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+#define ENABLE_OBO
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using TodoListService.Models;
 
 namespace TodoListService.Controllers
 {
-   [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     public class TodoListController : Controller
     {
+        public TodoListController(ITokenAcquisition tokenAcquisition)
+        {
+            this.tokenAcquisition = tokenAcquisition;
+        }
+        ITokenAcquisition tokenAcquisition;
+
         static ConcurrentBag<TodoItem> todoStore = new ConcurrentBag<TodoItem>();
 
         // GET: api/values
@@ -47,10 +63,71 @@ namespace TodoListService.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]TodoItem Todo)
+        public async void Post([FromBody]TodoItem Todo)
         {
             string owner = (User.FindFirst(ClaimTypes.NameIdentifier))?.Value;
-            todoStore.Add(new TodoItem { Owner = owner, Title = Todo.Title });
+            string ownerName = string.Empty;
+#if ENABLE_OBO
+            // This is a synchronous call, so that the clients know, when they call Get, that the 
+            // call to the downstream API (Microsoft Graph) has completed.
+            try
+            {
+                ownerName = CallGraphAPIOnBehalfOfUser().GetAwaiter().GetResult();
+                string title = string.IsNullOrWhiteSpace(ownerName) ? Todo.Title : $"{Todo.Title} ({ownerName})";
+                todoStore.Add(new TodoItem { Owner = owner, Title = title });
+            }
+            catch (MsalException ex)
+            {
+                this.HttpContext.Response.ContentType = "text/plain";
+                HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n"+ex.ErrorCode + "\n"+ ex.Message);
+            }
+            catch (Exception ex)
+            {
+                this.HttpContext.Response.ContentType = "text/plain";
+                HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await HttpContext.Response.WriteAsync("An error occurred while calling the downstream API\n" + ex.Message);
+            }
+#endif
+
+        }
+
+        public async Task<string> CallGraphAPIOnBehalfOfUser()
+        {
+            string[] scopes = new string[] { "user.read" };
+
+            // we use MSAL.NET to get a token to call the API On Behalf Of the current user
+            try
+            {
+                string accessToken = await tokenAcquisition.GetAccessTokenOnBehalfOfUser(HttpContext, scopes);
+                dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
+                return me.userPrincipalName;
+            }
+            catch (MsalUiRequiredException ex)
+            {
+                tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(HttpContext, scopes, ex);
+                return string.Empty;
+            }
+        }
+
+        private static async Task<dynamic> CallGraphApiOnBehalfOfUser(string accessToken)
+        {
+            //
+            // Call the Graph API and retrieve the user's profile.
+            //
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            HttpResponseMessage response = await client.GetAsync("https://graph.microsoft.com/v1.0/me");
+            string content = await response.Content.ReadAsStringAsync();
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                dynamic me = JsonConvert.DeserializeObject(content);
+                return me;
+            }
+            else
+            {
+                throw new Exception(content);
+            }
         }
     }
 }

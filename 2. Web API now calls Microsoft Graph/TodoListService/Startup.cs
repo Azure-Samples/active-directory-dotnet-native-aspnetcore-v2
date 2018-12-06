@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Client;
 
 namespace TodoListService
 {
@@ -45,21 +46,41 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(AzureADDefaults.BearerAuthenticationScheme)
+            services.AddAuthentication(AzureADDefaults.JwtBearerAuthenticationScheme)
                 .AddAzureADBearer(options => Configuration.Bind("AzureAd", options));
+
+            services
+              .AddTokenAcquisition()
+              .AddDistributedMemoryCache()
+              .AddSession()
+              .AddSessionBasedTokenCache()
+              ;
+
+            // Added
             services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
             {
-			    // This is an Azure AD v2.0 Web API
+                // This is an Azure AD v2.0 Web API
                 options.Authority += "/v2.0";
-				
-				// The valid audiences are both the Client ID (options.Audience) and api://{ClientID}
+
+                // The valid audiences are both the Client ID (options.Audience) and api://{ClientID}
                 options.TokenValidationParameters.ValidAudiences = new string[] { options.Audience, $"api://{options.Audience}" };
 
                 // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
                 // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
                 options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ValidateAadIssuer;
 
+                // When an access token for our own Web API is validated, we add it to MSAL.NET's cache so that it can
+                // be used from the controllers.
+                options.Events = new JwtBearerEvents();
+                options.Events.OnTokenValidated = async context =>
+                {
+                    var _tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
+                    var scopes = new string[] { "user.read" };
+                    context.Success();
 
+                    // Adds the token to the cache, and also handles the incremental consent and claim challenges
+                    _tokenAcquisition.AddAccountToCacheFromJwt(context, scopes);
+                };
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -67,6 +88,8 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseSession();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
