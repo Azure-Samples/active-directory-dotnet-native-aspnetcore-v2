@@ -32,10 +32,10 @@
           "Comment": "If you changed the signInAudience to 'AzureADandPersonalMicrosoftAccount, remove the GUID in the knownClientApplications"
         },
         {
-          "Comment": "Still in the Manifest page, change 'accessTokenAcceptedVersion' to 2 "
+          "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
         },
         {
-          "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
+          "Comment": "If you do not wish to grant admin consent to the Web API, navigate to the Authentication page and check the `urn:ietf:wg:oauth:2.0:oob` reply URI."
         }
       ]
     },
