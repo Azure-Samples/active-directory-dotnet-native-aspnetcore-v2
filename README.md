@@ -44,13 +44,13 @@ The WPF application (TodoListClient) enables a user to:
 
 Next time a user runs the application, the user is signed-in with the same identity as the application maintains a cache on disk. Users can clear the cache (which will also have the effect of signing them out)
 
-![TodoList Client](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/todolist-client.png)
+<img src="1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/todolist-client.png" alt="TodoList client" width="320px" />
 
 #### In the second part of the tutorial
 
 The second phase of the tutorials modifies the Web API so that the todo-items also mention the identity of the user adding them.
 
-![TodoList Client with user name](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/ReadmeFiles/todolist-client.png)
+<img src="2.%20Web%20API%20now%20calls%20Microsoft%20Graph/ReadmeFiles/todolist-client.png" alt="TodoList Client with user name" width="320" />
 
 ## How to run this sample
 
