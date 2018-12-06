@@ -25,8 +25,8 @@ This repository contains a progressive tutorial made of two parts:
 
 Sub folder                    | Description
 ----------------------------- | -----------
-[1. Desktop app calls Web API](1.%20Desktop%20app%20calls%20Web%20API/README.md) | This first part, presents an ASP.NET Core 2.1 Web API protected by Azure Active Directory OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) </p> ![Topology](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/topology.png)
-[2. Web API now calls Microsoft Graph](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md)  | This second part presents an increment where the Web API now calls Microsoft Graph on-behalf of the user signed-in in the desktop application. In this part, the Web API uses the Microsoft Authentication Library for .NET (MSAL.NET) to acquire a token for Microsoft Graph using the [on-behalf-of](https://aka.ms/msal-net-on-behalf-of) flow </p>  ![Topology](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/ReadmeFiles/topology.png)
+[1. Desktop app calls Web API](1.%20Desktop%20app%20calls%20Web%20API) | This first part, presents an ASP.NET Core 2.1 Web API protected by Azure Active Directory OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) </p> ![Topology](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/topology.png)
+[2. Web API now calls Microsoft Graph](2.%20Web%20API%20now%20calls%20Microsoft%20Graph)  | This second part presents an increment where the Web API now calls Microsoft Graph on-behalf of the user signed-in in the desktop application. In this part, the Web API uses the Microsoft Authentication Library for .NET (MSAL.NET) to acquire a token for Microsoft Graph using the [on-behalf-of](https://aka.ms/msal-net-on-behalf-of) flow </p>  ![Topology](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/ReadmeFiles/topology.png)
 
 > Note: Even if you'll probably get the most of this tutorial by going through the part in the proposed order, it's also possible to jump directly to the second part.
 
@@ -72,8 +72,8 @@ cd aspnetcore-webapi
 
 > Given that the name of the sample is pretty long, that it has sub-folders and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
-- Start by the first part [1. Desktop app calls Web API](1.%20Desktop%20app%20calls%20Web%20API/README.md) where you will learn how to protect a Web API with the Azure AD v2.0 endpoint.
-- or if you are interested in the Web API calling another downstream Web API using the on-behalf-of flow, go directly to [2. Web API now calls Microsoft Graph](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md)
+- Start by the first part [1. Desktop app calls Web API](1.%20Desktop%20app%20calls%20Web%20API) where you will learn how to protect a Web API with the Azure AD v2.0 endpoint.
+- or if you are interested in the Web API calling another downstream Web API using the on-behalf-of flow, go directly to [2. Web API now calls Microsoft Graph](2.%20Web%20API%20now%20calls%20Microsoft%20Graph)
 
 ## Community Help and Support
 
