@@ -149,7 +149,7 @@ namespace Microsoft.AspNetCore.Authentication
 
             // Use MSAL to get the right token to call the API
             var application = CreateApplication(context, context.User, null, AzureADDefaults.CookieScheme);
-            return await GetAccessTokenOnBehalfOfUser(application, context.User, scopes);
+            return await GetAccessTokenOnBehalfOfUser(context, application, context.User, scopes);
         }
 
 
@@ -252,10 +252,10 @@ namespace Microsoft.AspNetCore.Authentication
         /// </summary>
         /// <param name="claimsPrincipal">Claims principal for the user on behalf of whom to get a token 
         /// <param name="scopes">Scopes for the downstream API to call</param>
-        private async Task<string> GetAccessTokenOnBehalfOfUser(ConfidentialClientApplication application, ClaimsPrincipal claimsPrincipal, IEnumerable<string> scopes)
+        private async Task<string> GetAccessTokenOnBehalfOfUser(HttpContext httpContext, ConfidentialClientApplication application, ClaimsPrincipal claimsPrincipal, IEnumerable<string> scopes)
         {
             string accountIdentifier = claimsPrincipal.GetMsalAccountId();
-            return await GetAccessTokenOnBehalfOfUser(application, accountIdentifier, scopes);
+            return await GetAccessTokenOnBehalfOfUser(httpContext, application, accountIdentifier, scopes);
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace Microsoft.AspNetCore.Authentication
         /// <param name="accountIdentifier">User account identifier for which to acquire a token. 
         /// See <see cref="Microsoft.Identity.Client.AccountId.Identifier"/></param>
         /// <param name="scopes">Scopes for the downstream API to call</param>
-        private async Task<string> GetAccessTokenOnBehalfOfUser(ConfidentialClientApplication application, string accountIdentifier, IEnumerable<string> scopes)
+        private async Task<string> GetAccessTokenOnBehalfOfUser(HttpContext httpContext, ConfidentialClientApplication application, string accountIdentifier, IEnumerable<string> scopes)
         {
             if (accountIdentifier == null)
                 throw new ArgumentNullException(nameof(accountIdentifier));
@@ -281,6 +281,11 @@ namespace Microsoft.AspNetCore.Authentication
                 IAccount account = await application.GetAccountAsync(accountIdentifier);
                 result = await application.AcquireTokenSilentAsync(scopes.Except(scopesRequestedByMsalNet), account);
                 return result.AccessToken;
+            }
+            catch (MsalUiRequiredException ex)
+            {
+                ReplyForbiddenWithWwwAuthenticateHeader(httpContext, scopes, ex);
+                return null;
             }
             catch (MsalException ex)
             {
@@ -342,12 +347,21 @@ namespace Microsoft.AspNetCore.Authentication
         public void ReplyForbiddenWithWwwAuthenticateHeader(HttpContext httpContext, IEnumerable<string> scopes, MsalUiRequiredException msalSeviceException)
         {
             // A user interaction is required, but we are in a Web API, and therefore, we need to report back to the client through an wwww-Authenticate header https://tools.ietf.org/html/rfc6750#section-3.1
+            string proposedAction = "consent";
+            if (msalSeviceException.ErrorCode == MsalUiRequiredException.InvalidGrantError)
+            {
+                if (AcceptedTokenVersionIsNotTheSameAsTokenVersion(msalSeviceException))
+                {
+                    throw msalSeviceException;
+                }
+            }
 
             IDictionary<string, string> parameters = new Dictionary<string, string>()
                 {
                     { "clientId", _azureAdOptions.ClientId },
                     { "claims", msalSeviceException.Claims },
-                    { "scopes", string.Join(",", scopes) }
+                    { "scopes", string.Join(",", scopes) },
+                    { "proposedAction", proposedAction }
                 };
 
             string parameterString = string.Join(", ", parameters.Select(p => $"{p.Key}=\"{p.Value}\""));
@@ -356,8 +370,22 @@ namespace Microsoft.AspNetCore.Authentication
 
             //  StringValues v = new StringValues(new string[] { $"Bearer clientId=\"{jwtToken.Audiences.First()}\", claims=\"{ex.Claims}\", scopes=\" {string.Join(",", scopes)}\"" });
             var httpResponse = httpContext.Response;
+            var headers = httpResponse.Headers;
             httpResponse.StatusCode = (int)HttpStatusCode.Forbidden;
-            httpResponse.Headers.Add(HeaderNames.WWWAuthenticate, v);
+            if (headers.ContainsKey(HeaderNames.WWWAuthenticate))
+            {
+                headers.Remove(HeaderNames.WWWAuthenticate);
+            }
+            headers.Add(HeaderNames.WWWAuthenticate, v);
+        }
+
+        private static bool AcceptedTokenVersionIsNotTheSameAsTokenVersion(MsalUiRequiredException msalSeviceException)
+        {
+            // Normally app developers should not make decisions based on the internal AAD code
+            // however until the STS sends sub-error codes for this error, this is the only
+            // way to distinguish the case. 
+            // This is subject to change in the future
+            return (msalSeviceException.Message.Contains("AADSTS50013"));
         }
     }
 }

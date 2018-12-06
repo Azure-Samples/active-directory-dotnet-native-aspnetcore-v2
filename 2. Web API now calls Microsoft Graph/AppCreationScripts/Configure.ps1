@@ -279,11 +279,11 @@ Function ConfigureApplications
    Write-Host "Granted permissions."
 
    # Configure known client applications for service 
-   Write-Host "Configure known client applications for the 'service'"
-   $knowApplications = New-Object System.Collections.Generic.List[System.String]
-    $knowApplications.Add($clientAadApplication.AppId)
-   Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -KnownClientApplications $knowApplications
-   Write-Host "Configured."
+   # Write-Host "Configure known client applications for the 'service'"
+   # $knowApplications = New-Object System.Collections.Generic.List[System.String]
+   # $knowApplications.Add($clientAadApplication.AppId)
+   # Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -KnownClientApplications $knowApplications
+   # Write-Host "Configured."
 
 
    # Update config file for 'service'

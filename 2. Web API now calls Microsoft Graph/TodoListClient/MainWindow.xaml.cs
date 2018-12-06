@@ -27,11 +27,14 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 // The following using statements were added for this sample.
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -147,10 +150,25 @@ namespace TodoListClient
                 }
                 else
                 {
-                    string failureDescription = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show($"{response.ReasonPhrase}\n {failureDescription}", "An error occurred while getting /api/todolist", MessageBoxButton.OK);
+                    await DisplayErrorMessage(response);
                 }
-           }
+            }
+        }
+
+        private static async Task DisplayErrorMessage(HttpResponseMessage httpResponse)
+        {
+            string failureDescription = await httpResponse.Content.ReadAsStringAsync();
+            if (failureDescription.StartsWith("<!DOCTYPE html>"))
+            {
+                string path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                string errorFilePath = Path.Combine(path, "error.html");
+                File.WriteAllText(errorFilePath, failureDescription);
+                Process.Start(errorFilePath);
+            }
+            else
+            {
+                MessageBox.Show($"{httpResponse.ReasonPhrase}\n {failureDescription}", "An error occurred while getting /api/todolist", MessageBoxButton.OK);
+            }
         }
 
         /// <summary>
@@ -165,15 +183,32 @@ namespace TodoListClient
 
             AuthenticationHeaderValue bearer = response.Headers.WwwAuthenticate.FirstOrDefault(v => v.Scheme == "Bearer");
             IEnumerable<string> parameters = bearer.Parameter.Split(',').Select(v => v.Trim());
-            string clientId = parameters.FirstOrDefault(p => p.StartsWith("clientId="))?.Substring("clientId=".Length)?.Trim('"');
-            string claims = parameters.FirstOrDefault(p => p.StartsWith("claims="))?.Substring("claims=".Length)?.Trim('"');
-            string scopes = parameters.FirstOrDefault(p => p.StartsWith("scopes="))?.Substring("scopes=".Length)?.Trim('"');
+            string clientId = GetParameter(parameters, "clientId");
+            string claims = GetParameter(parameters, "claims");
+            string[] scopes = GetParameter(parameters, "scopes")?.Split(',');
+            string proposedAction = GetParameter(parameters, "proposedAction");
 
-            PublicClientApplication pca = new PublicClientApplication(clientId);
             string loginHint = account?.Username;
             string domainHint = account?.HomeAccountId.TenantId == msaTenantId ? "consumers" : "organizations";
             string extraQueryParameters = $"claims={claims}&domainHint={domainHint}";
-            await pca.AcquireTokenAsync(new string[] { scopes }, loginHint, UIBehavior.SelectAccount,extraQueryParameters, new string[] { }, pca.Authority);
+
+            if (proposedAction == "forceRefresh")
+            {
+                // Removes the account, but then re-signs-in
+                await app.RemoveAsync(account);
+                var res = await app.AcquireTokenAsync(scopes, loginHint, UIBehavior.Consent, extraQueryParameters, new string[] { }, app.Authority);
+            }
+            else if (proposedAction == "consent")
+            {
+                PublicClientApplication pca = new PublicClientApplication(clientId);
+                await pca.AcquireTokenAsync(scopes, loginHint, UIBehavior.Consent, extraQueryParameters, new string[] { }, pca.Authority);
+            }
+        }
+
+        private static string GetParameter(IEnumerable<string> parameters, string parameterName)
+        {
+            int offset = parameterName.Length + 1;
+            return parameters.FirstOrDefault(p => p.StartsWith($"{parameterName}="))?.Substring(offset)?.Trim('"');
         }
 
         private async void AddTodoItem(object sender, RoutedEventArgs e)
@@ -277,7 +312,7 @@ namespace TodoListClient
             {
                 // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
                 // would re-sign-in the same user
-                result = await app.AcquireTokenAsync(scopes, accounts.FirstOrDefault(), UIBehavior.SelectAccount, string.Empty);
+                result = await app.AcquireTokenAsync(scopes, accounts.FirstOrDefault(), UIBehavior.SelectAccount, string.Empty, new string[] { "user.read" }, app.Authority);
                 SignInButton.Content = clearCacheString;
                 SetUserName(result.Account);
                 GetTodoList();

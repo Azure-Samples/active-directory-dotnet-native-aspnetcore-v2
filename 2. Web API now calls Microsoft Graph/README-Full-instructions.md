@@ -2,14 +2,21 @@
 services: active-directory
 platforms: dotnet
 author: jmprieur
-level: 300
+level: 400
 client: .NET Desktop (WPF)
-service: ASP.NET Core Web API
+service: ASP.NET Core Web API, Microsoft Graph
 endpoint: AAD v2.0
 ---
-# Calling an ASP.NET Core Web API from a WPF application using Azure AD V2
+# ASP.NET Core 2.1 Web API calling Microsoft Graph, itself called from a WPF application using Azure AD V2
 
 ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/497/badge)
+
+> The sample in this folder is part of a multi-phase tutorial. This folder is about the second phase named **Web API now calls Microsoft Graph**.
+> The first phase is available from [1. Desktop app calls Web API](../1.%20Desktop%20app%20calls%20Web%20API).
+>
+> This article (README-Full-instructions.md) contains the full instructions on how to configure the sample. If you have gone through Phase 1 and have already configured your Web API rather switch to the instructions for an incremental configuration in [README.md](README.md)
+
+> At that time, the Azure AD v2.0 endpoint does not yet completely support the on-behalf-of flow for users signing-in with a Microsoft Personal account. Limitations are called out in the [Current limitations](#Current-limitations) section
 
 ## About this sample
 
@@ -25,6 +32,7 @@ endpoint: AAD v2.0
   - [Step 3:  Configure the sample to use your Azure AD tenant](#Step-3-Configure-the-sample-to-use-your-Azure-AD-tenant)
   - [Step 4:  Run the sample](#Step-4-Run-the-sample)
   - [Troubleshooting](#Troubleshooting)
+  - [Current limitations](#Current-limitations)
 - [How was the code created](#How-was-the-code-created)
 - [Community Help and Support](#Community-Help-and-Support)
 - [Contributing](#Contributing)
@@ -33,19 +41,14 @@ endpoint: AAD v2.0
 ### Scenario
 
 You expose a Web API and you want to protect it so that only authenticated user can access it. You want to enable authenticated users with both work and school accounts
-or Microsoft personal accounts (formerly live account) to use your Web API.
-
-An on-demand video was created for the Build 2018 event, featuring this scenario and this sample. See the video [Building Web API Solutions with Authentication](https://channel9.msdn.com/Events/Build/2018/THR5000), and the associated [PowerPoint deck](http://video.ch9.ms/sessions/c1f9c808-82bc-480a-a930-b340097f6cc1/BuildWebAPISolutionswithAuthentication.pptx)
+or Microsoft personal accounts (formerly live account) to use your Web API. Your API calls a downstream API (Microsoft Graph) to provide added value to its client apps.
 
 ### Overview
 
-This sample presents a Web API running on ASP.NET Core 2.2, protected by Azure AD OAuth Bearer Authentication. The Web API is exercised by a .NET Desktop WPF application.
-The .Net application uses the Active Directory Authentication Library [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) to obtain a JWT access token through the [OAuth 2.0](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The access token is sent to the ASP.NET Core Web API, which authenticates the user using the ASP.NET JWT Bearer Authentication middleware.
+This sample presents a Web API running on ASP.NET Core 2.2, protected by Azure AD OAuth Bearer Authentication. The Web API calls the Microsoft Graph, and is exercised by a .NET Desktop WPF application.
+Both applications uses the Active Directory Authentication Library [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) to obtain a JWT access token through the [OAuth 2.0](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The access token acquired by the desktop application (1) is sent to the ASP.NET Core Web API, which authenticates the user using the ASP.NET JWT Bearer Authentication middleware (2), then the Web API acquires another token to call the Microsoft Graph (3).
 
 ![Topology](./ReadmeFiles/topology.png)
-
-> This sample is very similar to the [active-directory-dotnet-native-aspnetcore](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) sample except that that one is for the Azure AD V1 endpoint
-> and the token is acquired using [ADAL.NET](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet), whereas this sample is for the V2 endpoint, and the token is acquired using [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet). The Web API was also modified to accept both V1 and V2 tokens.
 
 ### User experience when using this sample
 
@@ -55,7 +58,7 @@ The WPF application (TodoListClient) enables a user to:
 
 - Sign in. The first time a user signs in, a consent screen is presented letting the user consent for the application accessing the TodoList Service and the Azure Active Directory.
 - When the user has signed-in, the user sees the list of to-do items exposed by Web API for the signed-in identity
-- The user can add more to-do items by clicking on *Add item* button.
+- The user can add more to-do items by clicking on *Add item* button. As they add items, they see that these items appear with their user name between parenthesis
 
 Next time a user runs the application, the user is signed-in with the same identity as the application maintains a cache on disk. Users can clear the cache (which will also have the effect of signing them out)
 
@@ -76,7 +79,7 @@ From your shell or command line:
 
 ```Shell
 git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git aspnetcore-webapi
-cd "aspnetcore-webapi\1. Desktop app calls Web API"
+cd "aspnetcore-webapi\2. Web API now calls Microsoft Graph"
 ```
 
 or download and exact the repository .zip file.
@@ -118,13 +121,26 @@ If you want to register your apps manually, as a first step you'll need to:
 
 1. In **App registrations (Preview)** page, select **New registration**.
 1. When the **Register an application page** appears, enter your application's registration information:
-   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListService-v2`.
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListService`.
    - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
    - In the Redirect URI (optional) section, select **Web** in the combo-box.
    - For the *Redirect URI*, enter the base URL for the sample. By default, this sample uses `https://localhost:44351/`.
    - Select **Register** to create the application.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
+1. From the **Certificates & secrets** page, in the **Client secrets** section, choose **New client secret**:
 
-1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ClientId` in `TodoListService\appsettings.json`).
+   - Type a key description (of instance `app secret`),
+   - Select a key duration of either **In 1 year**, **In 2 years**, or **Never Expires**.
+   - When you press the **Add** button, the key value will be displayed, copy, and save the value in a safe location.
+   - You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
+     so record it as soon as it is visible from the Azure portal.
+1. In the list of pages for the app, select **API permissions**
+   - Click the **Add a permission** button and then,
+   - Ensure that the **Microsoft APIs** tab is selected
+   - In the *Commonly used Microsoft APIs* section, click on **Microsoft Graph**
+   - In the **Delegated permissions** section, ensure that the right permissions are checked: **User.Read**. Use the search box if necessary.
+   - Select the **Add permissions** button
+
 1. In the list of pages for the app, select **Expose an API**
    - Select **Add a scope**
    - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
@@ -161,6 +177,18 @@ If you want to register your apps manually, as a first step you'll need to:
    - In the **Delegated permissions** section, ensure that the right permissions are checked: **access_as_user**. Use the search box if necessary.
    - Select the **Add permissions** button
 
+<!-- REWORD -->
+#### Configure authorized client applications for service (TodoListService (active-directory-dotnet-native-aspnetcore-v2))
+
+For the middle tier web API (`TodoListService (active-directory-dotnet-native-aspnetcore-v2)`) to be able to call the downstream web APIs, the user must grant the middle tier permission to do so in the form of consent.
+However, since the middle tier has no interactive UI of its own, you need to explicitly bind the client app registration in Azure AD, with the registration for the web API.
+This binding merges the consent required by both the client and middle tier into a single dialog, which will be presented to the user by the client.
+You can do so by adding the "Client ID" of the client app, to the manifest of the web API in the `knownClientApplications` property. Here's how:
+
+1. In the [Azure portal](https://portal.azure.com), navigate to your `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` app registration, and in the *Expose an API* section, click on **Add a client application**.
+   Client IDs of the client applications (`TodoListClient (active-directory-dotnet-native-aspnetcore-v2)`) as elements of the array.
+1. Click **Add application**
+
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
 #### Choose which users account to sign in
@@ -185,6 +213,7 @@ a GUID or domain name | users can only sign in with an account for a specific or
 1. Open the solution in Visual Studio.
 1. In the *TodoListService-v2* project, open the `appsettings.json` file.
 1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the *TodoListService-v2* application, that you registered earlier.
+1. Find the `ClientSecret` property and replace the existing value with the key you saved during the creation of the `TodoListService-v2` app, in the Azure portal.
 1. [Optional] if you want to limit sign-in to users in your organization, also update the following properties:
 - `Domain`, replacing the existing value with your AAD tenant domain, for example, contoso.onmicrosoft.com.
 - `TenantId`, replacing the existing value with the Tenant ID.
@@ -199,7 +228,7 @@ a GUID or domain name | users can only sign in with an account for a specific or
 
 ### Step 4: Run the sample
 
-Clean the solution, rebuild the solution, and run it. You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
+Clean the solution, rebuild the solution, and run it.  You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
 
 When you start the Web API from Visual Studio, depending on the browser you use, you'll get:
 
@@ -413,7 +442,8 @@ services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationSche
 This code makes sure that:
 
 - the tokens are validated with Azure AD v2.0 (the ASP.NET Core 2.1 template is for the moment an Azure AD v1.0 template)
-- the valid audiences are both the ClientID of our Web API (default value of `options.Audience` with the ASP.NET Core template and api://{ClientID}
+- the valid audiences are both the ClientID of our Web API (default value of `options.Audience` with the ASP.NET Core template
+  and api://{ClientID}
 - the issuer is validated (for the multi-tenant case)
 
 #### Change the App URL
@@ -430,13 +460,6 @@ If you're using Visual Studio 2017:
 
 If you are not using Visual Studio, edit the `TodoListService\Properties\launchsettings.json` file.
 
-## Next phase of the tutorial: the Web API itself calls another downstream Web API
-
-You know pretty much everything on how to protect your Web API with the Microsoft identity platform. If your Web API
-gives access to your own data, you are done. However, if you want your API to provide added value by transforming the results of other Web APIs (such as Microsoft Graph), you'll want to know how to call these. In the next phase, you'll learn how to enable your Web API to call
-a downstream API on behalf of the user.
-
-See [2. Web API now calls Microsoft Graph](../2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md)
 
 ## How to deploy this sample to Azure
 
@@ -499,6 +522,13 @@ For more information, visit the following links:
   - [Quickstart: Configure a client application to access web APIs (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis)
   - [Quickstart: Quickstart: Configure an application to expose web APIs (Preview)](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis)
 
-- To learn more about ASP.NET Core Web APIs: see [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-2.1&tabs=visual-studio%2Caspnetcore2x) and also:
+- To learn more about the code, visit [Conceptual documentation for MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki#conceptual-documentation) and in particular:
+  - [Acquiring tokens with authorization codes on web apps](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-with-authorization-codes-on-web-apps)
+  - [Customizing Token cache serialization](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/token-cache-serialization)
+
+- Articles about the Azure AD V2 endpoint [http://aka.ms/aaddevv2](http://aka.ms/aaddevv2), with a focus on:
+  - [Azure Active Directory v2.0 and OAuth 2.0 On-Behalf-Of flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols-oauth-on-behalf-of)
+
+- [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-2.1&tabs=visual-studio%2Caspnetcore2x)
   - [AuthenticationBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationbuilder?view=aspnetcore-2.0)
   - [Azure Active Directory with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.1)
