@@ -97,12 +97,12 @@ There are two projects in this sample. Each needs to be separately registered in
 If you want to use this automation:
 
 1. Follow the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md), 
-1. Once you've run the script be sure to follow the manual steps. Indeed Azure AD PowerShell does not yet provide full control on applications consuming v2.0 tokens, even if this registration is already possible from the Azure portal:
-   1. In the list of pages for the application registration of the *TodoListService-v2* application select **Manifest**
+1. Once you've run the script, be sure to follow the manual steps. Indeed Azure AD PowerShell does not yet provide full control on applications consuming v2.0 tokens, even if this registration is already possible from the Azure portal:
+   1. In the list of pages for the application registration of the *TodoListService-v2* application, select **Manifest**
       - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
-   1. In the list of pages for the application registration of the *TodoListClient-v2* application select **Manifest**
+   1. In the list of pages for the application registration of the *TodoListClient-v2* application, select **Manifest**
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
 
@@ -382,7 +382,7 @@ namespace Microsoft.AspNetCore.Authentication
 }
 ```
 
-This code validates that the issuer of the token sent, by its client, to the Web API, can be trusted. This code enables your Web API to accept both v1.0 and v2.0 tokens, which might be useful if you want to migrate your existing Web API from v1.0 to v2.0
+This code validates that the issuer of the token sent, by its client, to the Web API, can be trusted. This code enables your Web API to accept both v1.0 and v2.0 [access tokens](https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens), which might be useful if you want to migrate your existing Web API from v1.0 to v2.0
 
 #### Modify the startup.cs file so that the Web API becomes v2.0 multi-tenant app
 
