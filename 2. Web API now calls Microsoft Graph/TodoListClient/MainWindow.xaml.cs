@@ -234,7 +234,7 @@ namespace TodoListClient
             try
             {
                 result = await _app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
-                this.SetUserName(result.Account);
+                SetUserName(result.Account);
                 UserName.Content = Properties.Resources.UserNotSignedIn;
             }
             // There is no access token in the cache, so prompt the user to sign-in.

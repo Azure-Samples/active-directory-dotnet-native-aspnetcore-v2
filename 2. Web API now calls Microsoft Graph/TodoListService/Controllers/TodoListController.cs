@@ -47,7 +47,7 @@ namespace TodoListService.Controllers
     {
         public TodoListController(ITokenAcquisition tokenAcquisition)
         {
-            this._tokenAcquisition = tokenAcquisition;
+            _tokenAcquisition = tokenAcquisition;
         }
 
         readonly ITokenAcquisition _tokenAcquisition;
@@ -58,7 +58,7 @@ namespace TodoListService.Controllers
         [HttpGet]
         public IEnumerable<TodoItem> Get()
         {
-            string owner = (User.FindFirst(ClaimTypes.NameIdentifier))?.Value;
+            string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return TodoStore.Where(t => t.Owner == owner).ToList();
         }
 
@@ -66,8 +66,8 @@ namespace TodoListService.Controllers
         [HttpPost]
         public async void Post([FromBody]TodoItem todo)
         {
-            string owner = (User.FindFirst(ClaimTypes.NameIdentifier))?.Value;
-            string ownerName = string.Empty;
+            string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string ownerName;
 #if ENABLE_OBO
             // This is a synchronous call, so that the clients know, when they call Get, that the 
             // call to the downstream API (Microsoft Graph) has completed.
@@ -79,13 +79,13 @@ namespace TodoListService.Controllers
             }
             catch (MsalException ex)
             {
-                this.HttpContext.Response.ContentType = "text/plain";
+                HttpContext.Response.ContentType = "text/plain";
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n"+ex.ErrorCode + "\n"+ ex.Message);
             }
             catch (Exception ex)
             {
-                this.HttpContext.Response.ContentType = "text/plain";
+                HttpContext.Response.ContentType = "text/plain";
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await HttpContext.Response.WriteAsync("An error occurred while calling the downstream API\n" + ex.Message);
             }
@@ -95,7 +95,7 @@ namespace TodoListService.Controllers
 
         public async Task<string> CallGraphApiOnBehalfOfUser()
         {
-            string[] scopes = new string[] { "user.read" };
+            string[] scopes = { "user.read" };
 
             // we use MSAL.NET to get a token to call the API On Behalf Of the current user
             try
@@ -125,10 +125,8 @@ namespace TodoListService.Controllers
                 dynamic me = JsonConvert.DeserializeObject(content);
                 return me;
             }
-            else
-            {
-                throw new Exception(content);
-            }
+
+            throw new Exception(content);
         }
     }
 }

@@ -62,7 +62,6 @@ namespace Microsoft.AspNetCore.Authentication
         /// configure the confidential client application and a token cache provider.
         /// This constructor is called by ASP.NET Core dependency injection
         /// </summary>
-        /// <param name="options">Options to configure the application</param>
         public TokenAcquisition(ITokenCacheProvider tokenCacheProvider, IConfiguration configuration)
         {
             _azureAdOptions = new AzureADOptions();
@@ -73,7 +72,7 @@ namespace Microsoft.AspNetCore.Authentication
         /// <summary>
         /// Scopes which are already requested by MSAL.NET. they should not be re-requested;
         /// </summary>
-        private readonly string[] _scopesRequestedByMsalNet = new string[] { "openid", "profile", "offline_access" };
+        private readonly string[] _scopesRequestedByMsalNet = { "openid", "profile", "offline_access" };
 
         /// <summary>
         /// In a Web App, adds, to the MSAL.NET cache, the account of the user authenticating to the Web App, when the authorization code is received (after the user
@@ -214,7 +213,7 @@ namespace Microsoft.AspNetCore.Authentication
         /// }
         /// </code>
         /// </example>
-        public void AddAccountToCacheFromJwt(OpenIdConnect.TokenValidatedContext tokenValidatedContext, IEnumerable<string> scopes = null)
+        public void AddAccountToCacheFromJwt(TokenValidatedContext tokenValidatedContext, IEnumerable<string> scopes = null)
         {
             if (tokenValidatedContext == null)
                 throw new ArgumentNullException(nameof(tokenValidatedContext));
@@ -297,11 +296,6 @@ namespace Microsoft.AspNetCore.Authentication
         /// <summary>
         /// Adds an account to the token cache from a JWT token and other parameters related to the token cache implementation
         /// </summary>
-        /// <param name="scopes"></param>
-        /// <param name="jwtToken"></param>
-        /// <param name="properties"></param>
-        /// <param name="principal"></param>
-        /// <param name="httpContext"></param>
         private void AddAccountToCacheFromJwt(IEnumerable<string> scopes, JwtSecurityToken jwtToken, AuthenticationProperties properties, ClaimsPrincipal principal, HttpContext httpContext)
         {
             try
