@@ -40,25 +40,25 @@ namespace TodoListClient
         /// <returns></returns>
         public static TokenCache GetUserCache()
         {
-            if (usertokenCache == null)
+            if (_usertokenCache == null)
             {
-                usertokenCache = new TokenCache();
-                usertokenCache.SetBeforeAccess(BeforeAccessNotification);
-                usertokenCache.SetAfterAccess(AfterAccessNotification);
+                _usertokenCache = new TokenCache();
+                _usertokenCache.SetBeforeAccess(BeforeAccessNotification);
+                _usertokenCache.SetAfterAccess(AfterAccessNotification);
             }
-            return usertokenCache;
+            return _usertokenCache;
         }
 
-        static TokenCache usertokenCache;
+        private static TokenCache _usertokenCache;
 
         /// <summary>
         /// Path to the token cache
         /// </summary>
-        public static readonly string CacheFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalcache.bin";
+        private static readonly string CacheFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalcache.bin";
 
         private static readonly object FileLock = new object();
 
-        public static void BeforeAccessNotification(TokenCacheNotificationArgs args)
+        private static void BeforeAccessNotification(TokenCacheNotificationArgs args)
         {
             lock (FileLock)
             {
@@ -70,7 +70,7 @@ namespace TodoListClient
             }
         }
 
-        public static void AfterAccessNotification(TokenCacheNotificationArgs args)
+        private static void AfterAccessNotification(TokenCacheNotificationArgs args)
         {
             // if the access operation resulted in a cache update
             if (args.TokenCache.HasStateChanged)
