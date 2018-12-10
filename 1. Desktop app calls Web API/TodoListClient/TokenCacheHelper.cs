@@ -40,25 +40,25 @@ namespace TodoListClient
         /// <returns></returns>
         public static TokenCache GetUserCache()
         {
-            if (usertokenCache == null)
+            if (_userTokenCache == null)
             {
-                usertokenCache = new TokenCache();
-                usertokenCache.SetBeforeAccess(BeforeAccessNotification);
-                usertokenCache.SetAfterAccess(AfterAccessNotification);
+                _userTokenCache = new TokenCache();
+                _userTokenCache.SetBeforeAccess(BeforeAccessNotification);
+                _userTokenCache.SetAfterAccess(AfterAccessNotification);
             }
-            return usertokenCache;
+            return _userTokenCache;
         }
 
-        static TokenCache usertokenCache;
+        private static TokenCache _userTokenCache;
 
         /// <summary>
         /// Path to the token cache
         /// </summary>
-        public static readonly string CacheFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalcache.bin";
+        private static readonly string CacheFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalcache.bin";
 
         private static readonly object FileLock = new object();
 
-        public static void BeforeAccessNotification(TokenCacheNotificationArgs args)
+        private static void BeforeAccessNotification(TokenCacheNotificationArgs args)
         {
             lock (FileLock)
             {
@@ -70,10 +70,10 @@ namespace TodoListClient
             }
         }
 
-        public static void AfterAccessNotification(TokenCacheNotificationArgs args)
+        private static void AfterAccessNotification(TokenCacheNotificationArgs args)
         {
             // if the access operation resulted in a cache update
-            if (args.TokenCache.HasStateChanged)
+            if (args.HasStateChanged)
             {
                 lock (FileLock)
                 {
@@ -83,8 +83,6 @@ namespace TodoListClient
                                                              null, 
                                                              DataProtectionScope.CurrentUser)
                                       );
-                    // once the write operation takes place restore the HasStateChanged bit to false
-                    args.TokenCache.HasStateChanged = false;
                 }
             }
         }
