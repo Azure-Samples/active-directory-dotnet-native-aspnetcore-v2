@@ -189,6 +189,8 @@ a GUID or domain name | users can only sign in with an account for a specific or
 
 #### Configure the TodoListService C# project
 
+Note: if you used the setup scripts, the changes below will have been applied for you
+
 1. Open the solution in Visual Studio.
 1. In the *TodoListService-v2* project, open the `appsettings.json` file.
 1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the *TodoListService-v2* application, that you registered earlier.
@@ -197,6 +199,8 @@ a GUID or domain name | users can only sign in with an account for a specific or
 - `TenantId`, replacing the existing value with the Tenant ID.
 
 #### Configure the TodoListClient C# project
+
+Note: if you used the setup scripts, the changes below will have been applied for you
 
 1. In the TodoListClient project, open `App.config`.
 1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the *TodoListClient-v2* app copied from the app registration page.
