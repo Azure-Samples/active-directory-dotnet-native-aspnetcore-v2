@@ -59,7 +59,8 @@ namespace TodoListService
                 // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
                 options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ValidateAadIssuer;
 
-
+                // If you want to debug, or just understand the JwtBearer events, uncomment the following line of code
+                // options.Events = JwtBearerMiddlewareDiagnostics.Subscribe(options.Events);
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
