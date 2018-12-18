@@ -179,7 +179,6 @@ namespace TodoListClient
         /// <returns></returns>
         private async Task HandleChallengeFromWebApi(HttpResponseMessage response, IAccount account)
         {
-            const string msaTenantId = "9188040d-6c67-4c5b-b112-36a304b66dad";
 
             AuthenticationHeaderValue bearer = response.Headers.WwwAuthenticate.FirstOrDefault(v => v.Scheme == "Bearer");
             IEnumerable<string> parameters = bearer.Parameter.Split(',').Select(v => v.Trim());
@@ -189,7 +188,7 @@ namespace TodoListClient
             string proposedAction = GetParameter(parameters, "proposedAction");
 
             string loginHint = account?.Username;
-            string domainHint = account?.HomeAccountId.TenantId == msaTenantId ? "consumers" : "organizations";
+            string domainHint = IsConsumerAccount(account) ? "consumers" : "organizations";
             string extraQueryParameters = $"claims={claims}&domainHint={domainHint}";
 
             if (proposedAction == "forceRefresh")
@@ -203,6 +202,19 @@ namespace TodoListClient
                 PublicClientApplication pca = new PublicClientApplication(clientId);
                 await pca.AcquireTokenAsync(scopes, loginHint, UIBehavior.Consent, extraQueryParameters, new string[] { }, pca.Authority);
             }
+        }
+
+        /// <summary>
+        /// Tells if the account is a consumer account
+        /// </summary>
+        /// <param name="account">Account</param>
+        /// <returns><c>true</c> if the application supports MSA+AAD and the home tenant id of the account is the MSA tenant. <c>false</c>
+        /// otherwise (in particular if the app is a single-tenant app, returning <c>false</c> enables MSA accounts which are guest
+        /// of a directory</returns>
+        private static bool IsConsumerAccount(IAccount account)
+        {
+            const string msaTenantId = "9188040d-6c67-4c5b-b112-36a304b66dad";
+            return (tenant == "common" || tenant == "consumers") && account?.HomeAccountId.TenantId == msaTenantId;
         }
 
         private static string GetParameter(IEnumerable<string> parameters, string parameterName)
