@@ -59,9 +59,10 @@ namespace TodoListService
                 // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
                 options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ValidateAadIssuer;
 
-
+                // If you want to debug, or just understand the JwtBearer events, uncomment the following line of code
+                // options.Events = JwtBearerMiddlewareDiagnostics.Subscribe(options.Events);
             });
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,6 +70,10 @@ namespace TodoListService
         {
             if (env.IsDevelopment())
             {
+                // Since IdentityModel version 5.2.1 (or since Microsoft.AspNetCore.Authentication.JwtBearer version 2.2.0),
+                // PII hiding in log files is enabled by default for GDPR concerns.
+                // For debugging/development purposes, one can enable additional detail in exceptions by setting IdentityModelEventSource.ShowPII to true.
+                // Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
                 app.UseDeveloperExceptionPage();
             }
             else
