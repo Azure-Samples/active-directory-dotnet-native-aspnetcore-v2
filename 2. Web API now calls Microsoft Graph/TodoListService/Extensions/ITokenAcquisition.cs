@@ -98,7 +98,7 @@ namespace Microsoft.AspNetCore.Authentication
         /// }
         /// </code>
         /// </example>
-        void AddAccountToCacheFromJwt(OpenIdConnect.TokenValidatedContext tokenValidationContext, IEnumerable<string> scopes = null);
+        void AddAccountToCacheFromJwt(TokenValidatedContext tokenValidationContext, IEnumerable<string> scopes = null);
 
         /// <summary>
         /// Used in Web APIs (which therefore cannot have an interaction with the user). 

@@ -31,26 +31,26 @@ using TodoListService.Models;
 
 namespace TodoListService.Controllers
 {
-   [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     public class TodoListController : Controller
     {
-        static ConcurrentBag<TodoItem> todoStore = new ConcurrentBag<TodoItem>();
+        static ConcurrentBag<TodoItem> _todoStore = new ConcurrentBag<TodoItem>();
 
         // GET: api/values
         [HttpGet]
         public IEnumerable<TodoItem> Get()
         {
-            string owner = (User.FindFirst(ClaimTypes.NameIdentifier))?.Value;
-            return todoStore.Where(t => t.Owner == owner).ToList();
+            string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return _todoStore.Where(t => t.Owner == owner).ToList();
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]TodoItem Todo)
+        public void Post([FromBody]TodoItem todo)
         {
-            string owner = (User.FindFirst(ClaimTypes.NameIdentifier))?.Value;
-            todoStore.Add(new TodoItem { Owner = owner, Title = Todo.Title });
+            string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            _todoStore.Add(new TodoItem { Owner = owner, Title = todo.Title });
         }
     }
 }

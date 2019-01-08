@@ -248,7 +248,7 @@ Function ConfigureApplications
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListScope" -newValue ("api://"+$serviceAadApplication.AppId+"/user_impersonation")
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListBaseAddress" -newValue $serviceAadApplication.HomePage
    Write-Host ""
-   Write-Host "IMPORTANT: Think of completing the following manual step(s) in the Azure portal":
+   Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
    Write-Host "- For 'service'"
    Write-Host "  - Navigate to '$servicePortalUrl'"
    Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
@@ -260,6 +260,10 @@ Function ConfigureApplications
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
 }
 
+if ((Get-Module -ListAvailable -Name "AzureAD") -eq $null) {
+    Install-Module "AzureAD" -Scope CurrentUser
+}
+Import-Module AzureAD
 
 # Run interactively (will ask you for the tenant ID)
 ConfigureApplications -Credential $Credential -tenantId $TenantId

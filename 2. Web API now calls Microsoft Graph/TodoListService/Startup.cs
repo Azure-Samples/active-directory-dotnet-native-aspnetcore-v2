@@ -30,7 +30,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Identity.Client;
 
 namespace TodoListService
 {
@@ -74,12 +73,12 @@ namespace TodoListService
                 options.Events = new JwtBearerEvents();
                 options.Events.OnTokenValidated = async context =>
                 {
-                    var _tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
+                    var tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
                     var scopes = new string[] { "user.read" };
                     context.Success();
 
                     // Adds the token to the cache, and also handles the incremental consent and claim challenges
-                    _tokenAcquisition.AddAccountToCacheFromJwt(context, scopes);
+                    tokenAcquisition.AddAccountToCacheFromJwt(context, scopes);
                 };
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

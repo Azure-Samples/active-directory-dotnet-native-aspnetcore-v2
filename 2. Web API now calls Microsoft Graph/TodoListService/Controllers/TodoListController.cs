@@ -47,44 +47,45 @@ namespace TodoListService.Controllers
     {
         public TodoListController(ITokenAcquisition tokenAcquisition)
         {
-            this.tokenAcquisition = tokenAcquisition;
+            _tokenAcquisition = tokenAcquisition;
         }
-        ITokenAcquisition tokenAcquisition;
 
-        static ConcurrentBag<TodoItem> todoStore = new ConcurrentBag<TodoItem>();
+        readonly ITokenAcquisition _tokenAcquisition;
+
+        static readonly ConcurrentBag<TodoItem> TodoStore = new ConcurrentBag<TodoItem>();
 
         // GET: api/values
         [HttpGet]
         public IEnumerable<TodoItem> Get()
         {
-            string owner = (User.FindFirst(ClaimTypes.NameIdentifier))?.Value;
-            return todoStore.Where(t => t.Owner == owner).ToList();
+            string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return TodoStore.Where(t => t.Owner == owner).ToList();
         }
 
         // POST api/values
         [HttpPost]
-        public async void Post([FromBody]TodoItem Todo)
+        public async void Post([FromBody]TodoItem todo)
         {
-            string owner = (User.FindFirst(ClaimTypes.NameIdentifier))?.Value;
-            string ownerName = string.Empty;
+            string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string ownerName;
 #if ENABLE_OBO
             // This is a synchronous call, so that the clients know, when they call Get, that the 
             // call to the downstream API (Microsoft Graph) has completed.
             try
             {
-                ownerName = CallGraphAPIOnBehalfOfUser().GetAwaiter().GetResult();
-                string title = string.IsNullOrWhiteSpace(ownerName) ? Todo.Title : $"{Todo.Title} ({ownerName})";
-                todoStore.Add(new TodoItem { Owner = owner, Title = title });
+                ownerName = CallGraphApiOnBehalfOfUser().GetAwaiter().GetResult();
+                string title = string.IsNullOrWhiteSpace(ownerName) ? todo.Title : $"{todo.Title} ({ownerName})";
+                TodoStore.Add(new TodoItem { Owner = owner, Title = title });
             }
             catch (MsalException ex)
             {
-                this.HttpContext.Response.ContentType = "text/plain";
+                HttpContext.Response.ContentType = "text/plain";
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n"+ex.ErrorCode + "\n"+ ex.Message);
             }
             catch (Exception ex)
             {
-                this.HttpContext.Response.ContentType = "text/plain";
+                HttpContext.Response.ContentType = "text/plain";
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await HttpContext.Response.WriteAsync("An error occurred while calling the downstream API\n" + ex.Message);
             }
@@ -92,20 +93,20 @@ namespace TodoListService.Controllers
 
         }
 
-        public async Task<string> CallGraphAPIOnBehalfOfUser()
+        public async Task<string> CallGraphApiOnBehalfOfUser()
         {
-            string[] scopes = new string[] { "user.read" };
+            string[] scopes = { "user.read" };
 
             // we use MSAL.NET to get a token to call the API On Behalf Of the current user
             try
             {
-                string accessToken = await tokenAcquisition.GetAccessTokenOnBehalfOfUser(HttpContext, scopes);
+                string accessToken = await _tokenAcquisition.GetAccessTokenOnBehalfOfUser(HttpContext, scopes);
                 dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
                 return me.userPrincipalName;
             }
             catch (MsalUiRequiredException ex)
             {
-                tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(HttpContext, scopes, ex);
+                _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(HttpContext, scopes, ex);
                 return string.Empty;
             }
         }
@@ -124,10 +125,8 @@ namespace TodoListService.Controllers
                 dynamic me = JsonConvert.DeserializeObject(content);
                 return me;
             }
-            else
-            {
-                throw new Exception(content);
-            }
+
+            throw new Exception(content);
         }
     }
 }

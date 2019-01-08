@@ -24,7 +24,6 @@ SOFTWARE.
 
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Configuration;
 // The following using statements were added for this sample.
@@ -50,45 +49,45 @@ namespace TodoListClient
         // The Redirect URI is the URI where Azure AD will return OAuth responses.
         // The Authority is the sign-in URL of the tenant.
         //
-        private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
-        private static string tenant = ConfigurationManager.AppSettings["ida:Tenant"];
-        private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
+        private static readonly string AadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
+        private static readonly string Tenant = ConfigurationManager.AppSettings["ida:Tenant"];
+        private static readonly string ClientId = ConfigurationManager.AppSettings["ida:ClientId"];
 
-        private static string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
+        private static readonly string Authority = string.Format(CultureInfo.InvariantCulture, AadInstance, Tenant);
 
         //
         // To authenticate to the To Do list service, the client needs to know the service's App ID URI.
         // To contact the To Do list service we need it's URL as well.
         //
-        private static string todoListScope = ConfigurationManager.AppSettings["todo:TodoListScope"];
-        private static string todoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListBaseAddress"];
-        private static string[] scopes = new string[] { todoListScope };
+        private static readonly string TodoListScope = ConfigurationManager.AppSettings["todo:TodoListScope"];
+        private static readonly string TodoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListBaseAddress"];
+        private static readonly string[] Scopes = { TodoListScope };
 
-        private HttpClient httpClient = new HttpClient();
-        private PublicClientApplication app = null;
+        private readonly HttpClient _httpClient = new HttpClient();
+        private readonly PublicClientApplication _app;
 
         // Button strings
-        const string signInString = "Sign In";
-        const string clearCacheString = "Clear Cache";
+        private const string SignInString = "Sign In";
+        private const string ClearCacheString = "Clear Cache";
 
         public MainWindow()
         {
             InitializeComponent();
-            app = new PublicClientApplication(clientId, authority, TokenCacheHelper.GetUserCache());
+            _app = new PublicClientApplication(ClientId, Authority, TokenCacheHelper.GetUserCache());
             GetTodoList();
         }
 
         private void GetTodoList()
         {
-            GetTodoList(SignInButton.Content.ToString() != clearCacheString);
+            GetTodoList(SignInButton.Content.ToString() != ClearCacheString);
         }
 
         private async Task GetTodoList(bool isAppStarting)
         {
-            var accounts = await app.GetAccountsAsync();
+            var accounts = (await _app.GetAccountsAsync()).ToList();
             if (!accounts.Any())
             {
-                SignInButton.Content = signInString;
+                SignInButton.Content = SignInString;
                 return;
             }
             //
@@ -97,9 +96,9 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await app.AcquireTokenSilentAsync(scopes, accounts.FirstOrDefault());
-                SignInButton.Content = clearCacheString;
-                this.SetUserName(result.Account);
+                result = await _app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
+                SignInButton.Content = ClearCacheString;
+                SetUserName(result.Account);
             }
             // There is no access token in the cache, so prompt the user to sign-in.
             catch (MsalUiRequiredException)
@@ -107,7 +106,7 @@ namespace TodoListClient
                 if (!isAppStarting)
                 {
                     MessageBox.Show("Please sign in to view your To-Do list");
-                    SignInButton.Content = signInString;
+                    SignInButton.Content = SignInString;
                 }
             }
             catch (MsalException ex)
@@ -125,15 +124,15 @@ namespace TodoListClient
             }
 
             // Once the token has been returned by ADAL, add it to the http authorization header, before making the call to access the To Do list service.
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             // Call the To Do list service.
-            HttpResponseMessage response = await httpClient.GetAsync(todoListBaseAddress + "/api/todolist");
+            HttpResponseMessage response = await _httpClient.GetAsync(TodoListBaseAddress + "/api/todolist");
 
             if (response.IsSuccessStatusCode)
             {
 
-                // Read the response and databind to the GridView to display To Do items.
+                // Read the response and data-bind to the GridView to display To Do items.
                 string s = await response.Content.ReadAsStringAsync();
                 List<TodoItem> toDoArray = JsonConvert.DeserializeObject<List<TodoItem>>(s);
 
@@ -148,7 +147,7 @@ namespace TodoListClient
 
         private async void AddTodoItem(object sender, RoutedEventArgs e)
         {
-            var accounts = await app.GetAccountsAsync();
+            var accounts = (await _app.GetAccountsAsync()).ToList();
 
             if (!accounts.Any())
             {
@@ -167,15 +166,15 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await app.AcquireTokenSilentAsync(scopes, accounts.FirstOrDefault());
-                this.SetUserName(result.Account);
+                result = await _app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
+                SetUserName(result.Account);
                 UserName.Content = Properties.Resources.UserNotSignedIn;
             }
             // There is no access token in the cache, so prompt the user to sign-in.
             catch (MsalUiRequiredException)
             {
                 MessageBox.Show("Please re-sign");
-                SignInButton.Content = signInString;
+                SignInButton.Content = SignInString;
             }
             catch (MsalException ex)
             {
@@ -187,6 +186,8 @@ namespace TodoListClient
                 }
                 UserName.Content = Properties.Resources.UserNotSignedIn;
 
+                MessageBox.Show("Unexpected Error: " + message);
+
                 return;
             }
 
@@ -195,7 +196,7 @@ namespace TodoListClient
             //
 
             // Once the token has been returned by ADAL, add it to the http authorization header, before making the call to access the To Do service.
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             // Forms encode Todo item, to POST to the todo list web api.
             TodoItem todoItem = new TodoItem() { Title = TodoText.Text };
@@ -204,7 +205,7 @@ namespace TodoListClient
 
             // Call the To Do list service.
 
-            HttpResponseMessage response = await httpClient.PostAsync(todoListBaseAddress + "/api/todolist", content);
+            HttpResponseMessage response = await _httpClient.PostAsync(TodoListBaseAddress + "/api/todolist", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -220,21 +221,21 @@ namespace TodoListClient
 
         private async void SignIn(object sender = null, RoutedEventArgs args = null)
         {
-            var accounts = await app.GetAccountsAsync();
+            var accounts = (await _app.GetAccountsAsync()).ToList();
 
             // If there is already a token in the cache, clear the cache and update the label on the button.
-            if (SignInButton.Content.ToString() == clearCacheString)
+            if (SignInButton.Content.ToString() == ClearCacheString)
             {
                 TodoList.ItemsSource = string.Empty;
 
                 // clear the cache
                 while (accounts.Any())
                 {
-                    await app.RemoveAsync(accounts.First());
-                    accounts = await app.GetAccountsAsync();
+                    await _app.RemoveAsync(accounts.First());
+                    accounts = (await _app.GetAccountsAsync()).ToList();
                 }
                 // Also clear cookies from the browser control.
-                SignInButton.Content = signInString;
+                SignInButton.Content = SignInString;
                 UserName.Content = Properties.Resources.UserNotSignedIn;
                 return;
             }
@@ -247,8 +248,8 @@ namespace TodoListClient
             {
                 // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
                 // would re-sign-in the same user
-                result = await app.AcquireTokenAsync(scopes, accounts.FirstOrDefault(), UIBehavior.SelectAccount, string.Empty);
-                SignInButton.Content = clearCacheString;
+                result = await _app.AcquireTokenAsync(Scopes, accounts.FirstOrDefault(), UIBehavior.SelectAccount, string.Empty);
+                SignInButton.Content = ClearCacheString;
                 SetUserName(result.Account);
                 GetTodoList();
             }
@@ -271,10 +272,7 @@ namespace TodoListClient
                 }
 
                 UserName.Content = Properties.Resources.UserNotSignedIn;
-
-                return;
             }
-
         }
 
         // Set user name to text box
