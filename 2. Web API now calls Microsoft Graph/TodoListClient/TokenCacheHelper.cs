@@ -40,16 +40,16 @@ namespace TodoListClient
         /// <returns></returns>
         public static TokenCache GetUserCache()
         {
-            if (_usertokenCache == null)
+            if (_userTokenCache == null)
             {
-                _usertokenCache = new TokenCache();
-                _usertokenCache.SetBeforeAccess(BeforeAccessNotification);
-                _usertokenCache.SetAfterAccess(AfterAccessNotification);
+                _userTokenCache = new TokenCache();
+                _userTokenCache.SetBeforeAccess(BeforeAccessNotification);
+                _userTokenCache.SetAfterAccess(AfterAccessNotification);
             }
-            return _usertokenCache;
+            return _userTokenCache;
         }
 
-        private static TokenCache _usertokenCache;
+        private static TokenCache _userTokenCache;
 
         /// <summary>
         /// Path to the token cache

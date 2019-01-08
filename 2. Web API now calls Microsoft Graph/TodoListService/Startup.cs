@@ -71,6 +71,10 @@ namespace TodoListService
                 // When an access token for our own Web API is validated, we add it to MSAL.NET's cache so that it can
                 // be used from the controllers.
                 options.Events = new JwtBearerEvents();
+
+                // If you want to debug, or just understand the JwtBearer events, uncomment the following line of code
+                // options.Events = JwtBearerMiddlewareDiagnostics.Subscribe(options.Events);
+
                 options.Events.OnTokenValidated = async context =>
                 {
                     var tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
@@ -91,6 +95,10 @@ namespace TodoListService
 
             if (env.IsDevelopment())
             {
+                // Since IdentityModel version 5.2.1 (or since Microsoft.AspNetCore.Authentication.JwtBearer version 2.2.0),
+                // PII hiding in log files is enabled by default for GDPR concerns.
+                // For debugging/development purposes, one can enable additional detail in exceptions by setting IdentityModelEventSource.ShowPII to true.
+                // Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
                 app.UseDeveloperExceptionPage();
             }
             else

@@ -83,11 +83,10 @@ namespace TodoListClient
                                                              null, 
                                                              DataProtectionScope.CurrentUser)
                                       );
+                    // once the write operation takes place restore the HasStateChanged bit to false
+                    args.TokenCache.HasStateChanged = false;
                 }
-
-                args.TokenCache.HasStateChanged = false;
             }
-
         }
     }
 }

@@ -215,7 +215,7 @@ namespace TodoListClient
         private static bool IsConsumerAccount(IAccount account)
         {
             const string msaTenantId = "9188040d-6c67-4c5b-b112-36a304b66dad";
-            return (tenant == "common" || tenant == "consumers") && account?.HomeAccountId.TenantId == msaTenantId;
+            return (Tenant == "common" || Tenant == "consumers") && account?.HomeAccountId.TenantId == msaTenantId;
         }
 
         private static string GetParameter(IEnumerable<string> parameters, string parameterName)
