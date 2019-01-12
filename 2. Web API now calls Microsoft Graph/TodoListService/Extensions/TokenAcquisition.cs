@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.AppConfig;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -57,6 +58,9 @@ namespace Microsoft.AspNetCore.Authentication
 
         private readonly ITokenCacheProvider _tokenCacheProvider;
 
+        // Ideally
+        private readonly ConfidentialClientApplicationOptions _confidentialClientApplicationOptions;
+
         /// <summary>
         /// Constructor of the TokenAcquisition service. This requires the Azure AD Options to 
         /// configure the confidential client application and a token cache provider.
@@ -65,7 +69,9 @@ namespace Microsoft.AspNetCore.Authentication
         public TokenAcquisition(ITokenCacheProvider tokenCacheProvider, IConfiguration configuration)
         {
             _azureAdOptions = new AzureADOptions();
+            _confidentialClientApplicationOptions = new ConfidentialClientApplicationOptions();
             configuration.Bind("AzureAD", _azureAdOptions);
+            configuration.Bind("AzureAD", _confidentialClientApplicationOptions);
             _tokenCacheProvider = tokenCacheProvider;
         }
 
@@ -233,15 +239,20 @@ namespace Microsoft.AspNetCore.Authentication
         /// <param name="authenticationProperties"></param>
         /// <param name="signInScheme"></param>
         /// <returns></returns>
-        private ConfidentialClientApplication CreateApplication(HttpContext httpContext, ClaimsPrincipal claimsPrincipal, AuthenticationProperties authenticationProperties, string signInScheme)
+        private IConfidentialClientApplication CreateApplication(HttpContext httpContext, ClaimsPrincipal claimsPrincipal, AuthenticationProperties authenticationProperties, string signInScheme)
         {
-            ConfidentialClientApplication app;
+            IConfidentialClientApplication app;
             var request = httpContext.Request;
-            var currentUri = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase, _azureAdOptions.CallbackPath ?? string.Empty);
-            var credential = new ClientCredential(_azureAdOptions.ClientSecret);
             TokenCache userTokenCache = _tokenCacheProvider.GetCache(httpContext, claimsPrincipal, authenticationProperties, signInScheme);
-            string authority = _azureAdOptions.Instance + _azureAdOptions.TenantId;
-            app = new ConfidentialClientApplication(_azureAdOptions.ClientId, authority, currentUri, credential, userTokenCache, null);
+
+            // Because the name of the relevant properties of ASP.NET Core AzureADOptions are 
+            // the same as in ConfidentialClientApplicationOptions, you can write simple things (ClientId, Instance, TenantId and
+            // ClientSecret are already read from the config file. Only remains the RedirectUri)
+            _confidentialClientApplicationOptions.RedirectUri = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase, _azureAdOptions.CallbackPath ?? string.Empty); ;
+            app = ConfidentialClientApplicationBuilder
+                .CreateWithApplicationOptions(_confidentialClientApplicationOptions)
+                .WithUserTokenCache(userTokenCache)
+                .Build();
             return app;
         }
 
@@ -252,7 +263,7 @@ namespace Microsoft.AspNetCore.Authentication
         /// </summary>
         /// <param name="claimsPrincipal">Claims principal for the user on behalf of whom to get a token 
         /// <param name="scopes">Scopes for the downstream API to call</param>
-        private async Task<string> GetAccessTokenOnBehalfOfUser(HttpContext httpContext, ConfidentialClientApplication application, ClaimsPrincipal claimsPrincipal, IEnumerable<string> scopes)
+        private async Task<string> GetAccessTokenOnBehalfOfUser(HttpContext httpContext, IConfidentialClientApplication application, ClaimsPrincipal claimsPrincipal, IEnumerable<string> scopes)
         {
             string accountIdentifier = claimsPrincipal.GetMsalAccountId();
             return await GetAccessTokenOnBehalfOfUser(httpContext, application, accountIdentifier, scopes);
@@ -264,7 +275,7 @@ namespace Microsoft.AspNetCore.Authentication
         /// <param name="accountIdentifier">User account identifier for which to acquire a token. 
         /// See <see cref="Microsoft.Identity.Client.AccountId.Identifier"/></param>
         /// <param name="scopes">Scopes for the downstream API to call</param>
-        private async Task<string> GetAccessTokenOnBehalfOfUser(HttpContext httpContext, ConfidentialClientApplication application, string accountIdentifier, IEnumerable<string> scopes)
+        private async Task<string> GetAccessTokenOnBehalfOfUser(HttpContext httpContext, IConfidentialClientApplication application, string accountIdentifier, IEnumerable<string> scopes)
         {
             if (accountIdentifier == null)
                 throw new ArgumentNullException(nameof(accountIdentifier));
@@ -287,7 +298,7 @@ namespace Microsoft.AspNetCore.Authentication
                 ReplyForbiddenWithWwwAuthenticateHeader(httpContext, scopes, ex);
                 return null;
             }
-            catch (MsalException ex)
+            catch (MsalException)
             {
                 // TODO process the exception see if this is retryable etc ...
                 throw;
