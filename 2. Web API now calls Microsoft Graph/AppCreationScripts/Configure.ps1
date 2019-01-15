@@ -302,13 +302,8 @@ Function ConfigureApplications
    Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
    Write-Host "- For 'service'"
    Write-Host "  - Navigate to '$servicePortalUrl'"
-   Write-Host "  - [Optional] Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
-   Write-Host "  -  Then if you changed the signInAudience to 'AzureADandPersonalMicrosoftAccount, remove the GUID in the knownClientApplications"
+   Write-Host "  - Navigate to the Manifest page and change 'accessTokenAcceptedVersion' to '2'."
    Write-Host "  - [Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
-   Write-Host "  - If you do not wish to grant admin consent to the Web API, navigate to the Authentication page and check the `urn:ietf:wg:oauth:2.0:oob` reply URI."
-   Write-Host "- For 'client'"
-   Write-Host "  - Navigate to '$clientPortalUrl'"
-   Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
 
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
 }
