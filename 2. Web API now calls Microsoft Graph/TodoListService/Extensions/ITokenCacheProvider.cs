@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Identity.Client;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Microsoft.AspNetCore.Authentication
 {
