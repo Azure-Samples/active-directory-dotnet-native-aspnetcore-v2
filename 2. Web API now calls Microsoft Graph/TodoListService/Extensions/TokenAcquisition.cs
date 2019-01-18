@@ -240,7 +240,7 @@ namespace Microsoft.AspNetCore.Authentication
             var currentUri = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase, _azureAdOptions.CallbackPath ?? string.Empty);
             var credential = new ClientCredential(_azureAdOptions.ClientSecret);
             TokenCache userTokenCache = _tokenCacheProvider.GetCache(httpContext, claimsPrincipal, authenticationProperties, signInScheme);
-            string authority = _azureAdOptions.Instance + _azureAdOptions.TenantId;
+            string authority = _azureAdOptions.Instance + "/" + _azureAdOptions.TenantId;
             app = new ConfidentialClientApplication(_azureAdOptions.ClientId, authority, currentUri, credential, userTokenCache, null);
             return app;
         }
