@@ -185,6 +185,8 @@ If you want to register your apps manually, as a first step you'll need to:
    - In the **Delegated permissions** section, ensure that the right permissions are checked: **access_as_user**. Use the search box if necessary.
    - Select the **Add permissions** button
 
+> Important. Even if you declared the permission in the application registration to be (middletier)/**access_as_user**, in the code, you will need to acquire a token for (middletier)/**.default** in order to let the user consent to the downstream API (Graph) as well as the TodoListService
+
 #### Register the client app as an authorized client application for the Web API
 
 In order for the user to be able to consent to the Web API and its downstream API, we need to register the client (TodolistClient) as an authorized
