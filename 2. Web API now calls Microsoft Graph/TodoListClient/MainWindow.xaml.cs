@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.AppConfig;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -68,7 +69,7 @@ namespace TodoListClient
         private static readonly string[] Scopes = { TodoListScope };
 
         private readonly HttpClient _httpClient = new HttpClient();
-        private readonly PublicClientApplication _app;
+        private readonly IPublicClientApplication _app;
 
         // Button strings
         const string SignInString = "Sign In";
@@ -77,7 +78,11 @@ namespace TodoListClient
         public MainWindow()
         {
             InitializeComponent();
-            _app = new PublicClientApplication(ClientId, Authority, TokenCacheHelper.GetUserCache());
+            _app = PublicClientApplicationBuilder.Create(ClientId)
+                .WithAuthority(new Uri(Authority))
+                .Build();
+            TokenCacheFileSerializer tokenCacheSerializer = new TokenCacheFileSerializer();
+            tokenCacheSerializer.EnsurePersistence(_app.UserTokenCache, System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalcache.bin");
             GetTodoList();
         }
 
@@ -100,7 +105,8 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await _app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
+                result = await _app.AcquireTokenSilent(Scopes)
+                    .ExecuteAsync();
                 SignInButton.Content = ClearCacheString;
                 SetUserName(result.Account);
             }
@@ -189,19 +195,28 @@ namespace TodoListClient
 
             string loginHint = account?.Username;
             string domainHint = IsConsumerAccount(account) ? "consumers" : "organizations";
-            string extraQueryParameters = $"claims={claims}&domainHint={domainHint}";
+            Dictionary<string, string> extraQueryParameters = new Dictionary<string, string>();
+            extraQueryParameters.Add("claims", claims);
+            extraQueryParameters.Add("domainHint", domainHint);
 
             if (proposedAction == "forceRefresh")
             {
                 // Removes the account, but then re-signs-in
                 await _app.RemoveAsync(account);
-                await _app.AcquireTokenAsync(scopes, loginHint, UIBehavior.Consent, extraQueryParameters,
-                    new string[] { }, _app.Authority);
+                await (_app as PublicClientApplication).AcquireTokenInteractive(scopes, this)
+                    .WithLoginHint(loginHint)
+                    .WithPrompt(Prompt.Consent)
+                    .WithExtraQueryParameters(extraQueryParameters)
+                    .ExecuteAsync();
             }
             else if (proposedAction == "consent")
             {
                 PublicClientApplication pca = new PublicClientApplication(clientId);
-                await pca.AcquireTokenAsync(scopes, loginHint, UIBehavior.Consent, extraQueryParameters, new string[] { }, pca.Authority);
+                await pca.AcquireTokenInteractive(scopes, this)
+                    .WithLoginHint(loginHint)
+                    .WithPrompt(Prompt.Consent)
+                    .WithExtraQueryParameters(extraQueryParameters)
+                    .ExecuteAsync();
             }
         }
 
@@ -245,7 +260,8 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await _app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
+                result = await _app.AcquireTokenSilent(Scopes)
+                    .ExecuteAsync();
                 SetUserName(result.Account);
                 UserName.Content = Properties.Resources.UserNotSignedIn;
             }
@@ -324,10 +340,12 @@ namespace TodoListClient
             //
             try
             {
-                // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
+                // Force a sign-in (Prompt.SelectAccount), as the MSAL web browser might contain cookies for the current user, and using .Auto
                 // would re-sign-in the same user
-                var result = await _app.AcquireTokenAsync(Scopes, accounts.FirstOrDefault(), UIBehavior.SelectAccount,
-                    string.Empty, null, _app.Authority);
+                var result = await _app.AcquireTokenInteractive(Scopes, this)
+                    .WithPrompt(Prompt.SelectAccount)
+                    .WithAccount(accounts.FirstOrDefault())
+                    .ExecuteAsync();
                 SignInButton.Content = ClearCacheString;
                 SetUserName(result.Account);
                 GetTodoList();
