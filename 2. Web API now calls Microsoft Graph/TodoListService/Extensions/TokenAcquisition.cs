@@ -315,7 +315,9 @@ namespace Microsoft.AspNetCore.Authentication
                 IEnumerable<string> requestedScopes;
                 if (jwtToken != null)
                 {
-                    userAssertion = new UserAssertion(jwtToken.RawData, "urn:ietf:params:oauth:grant-type:jwt-bearer");
+                    // In the case of JWE, the user assertion is the nested JWT
+                    string rawData = (jwtToken.InnerToken!=null) ? jwtToken.InnerToken.RawData : jwtToken.RawData;
+                    userAssertion = new UserAssertion(rawData, "urn:ietf:params:oauth:grant-type:jwt-bearer");
                     requestedScopes = scopes ?? jwtToken.Audiences.Select(a => $"{a}/.default");
                 }
                 else

@@ -30,6 +30,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace TodoListService
@@ -68,6 +70,9 @@ namespace TodoListService
                 // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
                 // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
                 options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ValidateAadIssuer;
+
+                var certificate = new X509Certificate2(@"C:\Users\jmprieur\Documents\TestJWE.pfx", "TestJWE", X509KeyStorageFlags.EphemeralKeySet);
+                options.TokenValidationParameters.TokenDecryptionKey = new X509SecurityKey(certificate);
 
                 // When an access token for our own Web API is validated, we add it to MSAL.NET's cache so that it can
                 // be used from the controllers.

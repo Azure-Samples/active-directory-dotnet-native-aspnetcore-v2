@@ -80,6 +80,7 @@ namespace TodoListClient
             InitializeComponent();
             _app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(new Uri(Authority))
+                .WithExtraQueryParameters(new Dictionary<string, string>() { { "slice", "testslice" }, { "encjwt", "true" } })
                 .Build();
             TokenCacheFileSerializer tokenCacheSerializer = new TokenCacheFileSerializer();
             tokenCacheSerializer.EnsurePersistence(_app.UserTokenCache, 
