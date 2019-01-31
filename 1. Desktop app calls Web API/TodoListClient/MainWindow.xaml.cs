@@ -248,7 +248,7 @@ namespace TodoListClient
             {
                 // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
                 // would re-sign-in the same user
-                result = await _app.AcquireTokenAsync(Scopes, accounts.FirstOrDefault(), UIBehavior.SelectAccount, string.Empty);
+                result = await _app.AcquireTokenAsync(Scopes, accounts.FirstOrDefault(), Prompt.SelectAccount, string.Empty);
                 SignInButton.Content = ClearCacheString;
                 SetUserName(result.Account);
                 GetTodoList();
