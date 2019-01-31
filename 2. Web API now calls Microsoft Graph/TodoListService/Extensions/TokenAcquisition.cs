@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.Authentication
     {
         private readonly AzureADOptions _azureAdOptions;
 
-        private readonly ITokenCacheProvider _tokenCacheProvider;
+        private readonly ITokenCachePersistenceProvider _tokenCacheProvider;
 
         // Ideally
         private readonly ConfidentialClientApplicationOptions _confidentialClientApplicationOptions;
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.Authentication
         /// configure the confidential client application and a token cache provider.
         /// This constructor is called by ASP.NET Core dependency injection
         /// </summary>
-        public TokenAcquisition(ITokenCacheProvider tokenCacheProvider, IConfiguration configuration)
+        public TokenAcquisition(ITokenCachePersistenceProvider tokenCacheProvider, IConfiguration configuration)
         {
             _azureAdOptions = new AzureADOptions();
             _confidentialClientApplicationOptions = new ConfidentialClientApplicationOptions();
@@ -243,7 +243,6 @@ namespace Microsoft.AspNetCore.Authentication
         {
             IConfidentialClientApplication app;
             var request = httpContext.Request;
-            TokenCache userTokenCache = _tokenCacheProvider.GetCache(httpContext, claimsPrincipal, authenticationProperties, signInScheme);
 
             // Because the name of the relevant properties of ASP.NET Core AzureADOptions are 
             // the same as in ConfidentialClientApplicationOptions, you can write simple things (ClientId, Instance, TenantId and
@@ -251,8 +250,8 @@ namespace Microsoft.AspNetCore.Authentication
             _confidentialClientApplicationOptions.RedirectUri = UriHelper.BuildAbsolute(request.Scheme, request.Host, request.PathBase, _azureAdOptions.CallbackPath ?? string.Empty); ;
             app = ConfidentialClientApplicationBuilder
                 .CreateWithApplicationOptions(_confidentialClientApplicationOptions)
-                .WithUserTokenCache(userTokenCache)
                 .Build();
+            _tokenCacheProvider.EnsurePersistence(httpContext, app.UserTokenCache, claimsPrincipal, authenticationProperties, signInScheme);
             return app;
         }
 
@@ -328,7 +327,10 @@ namespace Microsoft.AspNetCore.Authentication
                 var application = CreateApplication(httpContext, principal, properties, null);
 
                 // Synchronous call to make sure that the cache is filled-in before the controller tries to get access tokens
-                AuthenticationResult result = application.AcquireTokenOnBehalfOfAsync(scopes.Except(_scopesRequestedByMsalNet), userAssertion).GetAwaiter().GetResult();
+                AuthenticationResult result = application.AcquireTokenOnBehalfOf(scopes.Except(_scopesRequestedByMsalNet), userAssertion)
+                    .ExecuteAsync()
+                    .GetAwaiter()
+                    .GetResult();
             }
             catch (MsalUiRequiredException ex)
             {

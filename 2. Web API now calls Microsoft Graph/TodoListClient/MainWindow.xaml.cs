@@ -82,7 +82,8 @@ namespace TodoListClient
                 .WithAuthority(new Uri(Authority))
                 .Build();
             TokenCacheFileSerializer tokenCacheSerializer = new TokenCacheFileSerializer();
-            tokenCacheSerializer.EnsurePersistence(_app.UserTokenCache, System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalcache.bin");
+            tokenCacheSerializer.EnsurePersistence(_app.UserTokenCache, 
+                                                   Assembly.GetExecutingAssembly().Location + ".msalcache.bin");
             GetTodoList();
         }
 
@@ -105,7 +106,7 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await _app.AcquireTokenSilent(Scopes)
+                result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync();
                 SignInButton.Content = ClearCacheString;
                 SetUserName(result.Account);
@@ -260,7 +261,7 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await _app.AcquireTokenSilent(Scopes)
+                result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync();
                 SetUserName(result.Account);
                 UserName.Content = Properties.Resources.UserNotSignedIn;

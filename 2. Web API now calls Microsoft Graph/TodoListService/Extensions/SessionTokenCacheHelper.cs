@@ -19,15 +19,15 @@ namespace Microsoft.AspNetCore.Authentication
         public static IServiceCollection AddSessionBasedTokenCache(this IServiceCollection services)
         {
             // Token acquisition service
-            services.AddSingleton<ITokenCacheProvider, SessionBasedTokenCacheProvider>();
+            services.AddSingleton<ITokenCachePersistenceProvider, SessionBasedTokenCacheProvider>();
             return services;
         }
     }
 
     /// <summary>
-    /// Provides an implementation of <see cref="ITokenCacheProvider"/> for a cookie based token cache implementation
+    /// Provides an implementation of <see cref="ITokenCachePersistenceProvider"/> for a cookie based token cache implementation
     /// </summary>
-    public class SessionBasedTokenCacheProvider : ITokenCacheProvider
+    public class SessionBasedTokenCacheProvider : ITokenCachePersistenceProvider
     {
         private SessionTokenCacheHelper _helper;
 
@@ -35,15 +35,16 @@ namespace Microsoft.AspNetCore.Authentication
         /// Get an MSAL.NET Token cache from the HttpContext, and possibly the AuthenticationProperties and Cookies sign-in scheme
         /// </summary>
         /// <param name="httpContext">HttpContext</param>
-        /// <param name="claimsPrincipal">The user</param>
-        /// <param name="authenticationProperties">Authentication properties</param>
-        /// <param name="signInScheme">Sign-in scheme</param>
-        /// <returns>A token cache to use in the application</returns>
-        public TokenCache GetCache(HttpContext httpContext, ClaimsPrincipal claimsPrincipal, AuthenticationProperties authenticationProperties, string signInScheme)
+        /// <param name="tokenCache">Token cache to serialize/deserialize for the given user</param>
+        /// <param name="claimsPrincipal">Information about the user</param>
+        /// <param name="authenticationProperties">Authentication properties (for the cookie based ccookie based token cache serialization). Can be <c>null</c>
+        /// if you don't want to use cookie based token cache serialization</param>
+        /// <param name="signInScheme">[Optional] Authentication properties (for the cookie based cookie based token cache serialization). Can be <c>null</c>
+
+        public void EnsurePersistence(HttpContext httpContext, ITokenCache tokenCache, ClaimsPrincipal claimsPrincipal, AuthenticationProperties authenticationProperties, string signInScheme)
         {
             string userId = claimsPrincipal.GetMsalAccountId();
-            _helper = new SessionTokenCacheHelper(userId, httpContext);
-            return _helper.GetMsalCacheInstance();
+            _helper = new SessionTokenCacheHelper(userId, tokenCache, httpContext);
         }
     }
 
@@ -53,22 +54,16 @@ namespace Microsoft.AspNetCore.Authentication
         private readonly string _cacheId;
         private readonly ISession _session;
 
-        private readonly TokenCache _cache = new TokenCache();
+        private readonly ITokenCache _cache;
 
-        public SessionTokenCacheHelper(string userId, HttpContext httpcontext)
+        public SessionTokenCacheHelper(string userId, ITokenCache tokenCache, HttpContext httpcontext)
         {
-            // not object, we want the SUB
+            _cache = tokenCache;
             _cacheId = userId + "_TokenCache";
             _session = httpcontext.Session;
-            Load();
-        }
-
-        public TokenCache GetMsalCacheInstance()
-        {
             _cache.SetBeforeAccess(BeforeAccessNotification);
             _cache.SetAfterAccess(AfterAccessNotification);
             Load();
-            return _cache;
         }
 
         private void Load()
