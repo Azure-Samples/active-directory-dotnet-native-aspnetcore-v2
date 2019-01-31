@@ -67,8 +67,8 @@ namespace TodoListClient
         private readonly PublicClientApplication _app;
 
         // Button strings
-        private const string SignInString = "Sign In";
-        private const string ClearCacheString = "Clear Cache";
+        const string SignInString = "Sign In";
+        const string ClearCacheString = "Clear Cache";
 
         public MainWindow()
         {
@@ -186,7 +186,7 @@ namespace TodoListClient
                 }
                 UserName.Content = Properties.Resources.UserNotSignedIn;
 
-                MessageBox.Show("Unexpected Error: " + message);
+                MessageBox.Show("Unexpected error: " + message);
 
                 return;
             }

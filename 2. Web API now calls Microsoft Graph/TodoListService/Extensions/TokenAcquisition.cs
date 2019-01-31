@@ -287,7 +287,7 @@ namespace Microsoft.AspNetCore.Authentication
                 ReplyForbiddenWithWwwAuthenticateHeader(httpContext, scopes, ex);
                 return null;
             }
-            catch (MsalException ex)
+            catch (MsalException)
             {
                 // TODO process the exception see if this is retryable etc ...
                 throw;

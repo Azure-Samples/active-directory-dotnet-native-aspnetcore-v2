@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace TodoListService
 {
@@ -83,9 +84,10 @@ namespace TodoListService
 
                     // Adds the token to the cache, and also handles the incremental consent and claim challenges
                     tokenAcquisition.AddAccountToCacheFromJwt(context, scopes);
+                    await Task.FromResult(0);
                 };
             });
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
