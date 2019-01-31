@@ -88,7 +88,7 @@ namespace TodoListClient
 
         private async Task GetTodoList(bool isAppStarting)
         {
-            var accounts = await _app.GetAccountsAsync();
+            var accounts = (await _app.GetAccountsAsync()).ToList();
             if (!accounts.Any())
             {
                 SignInButton.Content = SignInString;
@@ -136,7 +136,7 @@ namespace TodoListClient
             if (response.IsSuccessStatusCode)
             {
 
-                // Read the response and databind to the GridView to display To Do items.
+                // Read the response and data-bind to the GridView to display To Do items.
                 string s = await response.Content.ReadAsStringAsync();
                 List<TodoItem> toDoArray = JsonConvert.DeserializeObject<List<TodoItem>>(s);
 
@@ -226,7 +226,7 @@ namespace TodoListClient
 
         private async void AddTodoItem(object sender, RoutedEventArgs e)
         {
-            var accounts = await _app.GetAccountsAsync();
+            var accounts = (await _app.GetAccountsAsync()).ToList();
 
             if (!accounts.Any())
             {
@@ -300,7 +300,7 @@ namespace TodoListClient
 
         private async void SignIn(object sender = null, RoutedEventArgs args = null)
         {
-            var accounts = await _app.GetAccountsAsync();
+            var accounts = (await _app.GetAccountsAsync()).ToList();
 
             // If there is already a token in the cache, clear the cache and update the label on the button.
             if (SignInButton.Content.ToString() == ClearCacheString)
@@ -311,7 +311,7 @@ namespace TodoListClient
                 while (accounts.Any())
                 {
                     await _app.RemoveAsync(accounts.First());
-                    accounts = await _app.GetAccountsAsync();
+                    accounts = (await _app.GetAccountsAsync()).ToList();
                 }
                 // Also clear cookies from the browser control.
                 SignInButton.Content = SignInString;
@@ -352,7 +352,6 @@ namespace TodoListClient
 
                 UserName.Content = Properties.Resources.UserNotSignedIn;
             }
-
         }
 
         // Set user name to text box

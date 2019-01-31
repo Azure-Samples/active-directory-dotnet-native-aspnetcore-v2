@@ -73,7 +73,7 @@ namespace TodoListClient
         private static void AfterAccessNotification(TokenCacheNotificationArgs args)
         {
             // if the access operation resulted in a cache update
-            if (args.TokenCache.HasStateChanged)
+            if (args.HasStateChanged)
             {
                 lock (FileLock)
                 {
@@ -83,8 +83,6 @@ namespace TodoListClient
                                                              null, 
                                                              DataProtectionScope.CurrentUser)
                                       );
-                    // once the write operation takes place restore the HasStateChanged bit to false
-                    args.TokenCache.HasStateChanged = false;
                 }
             }
         }
