@@ -26,12 +26,16 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.Identity.Client;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 
 namespace TodoListClient
 {
+    /// <summary>
+    /// File serializer for a token cache.
+    /// </summary>
     public class TokenCacheFileSerializer
     {
         /// <summary>
@@ -41,41 +45,29 @@ namespace TodoListClient
         /// <param name="cacheFilePath">Path on the disk where to persist the token cache</param>
         public void EnsurePersistence(ITokenCache userTokenCache, string cacheFilePath)
         {
-            if (_userTokenCache != null)
-            {
-                _userTokenCache = userTokenCache;
-                _userTokenCache.SetBeforeAccess(BeforeAccessNotification);
-                _userTokenCache.SetAfterAccess(AfterAccessNotification);
-                _cacheFilePath = cacheFilePath;
-                if (!_fileLockDictionary.ContainsKey(cacheFilePath))
-                {
-                    _fileLockDictionary.Add(cacheFilePath, new object());
-                }
-            }
+            _userTokenCache = userTokenCache ?? throw new ArgumentNullException("userTokenCache");
+            _userTokenCache.SetBeforeAccess(BeforeAccessNotification);
+            _userTokenCache.SetAfterAccess(AfterAccessNotification);
+            _cacheFilePath = cacheFilePath;
         }
 
+        /// <summary>
+        /// Token cache to persist in the file
+        /// </summary>
         static ITokenCache _userTokenCache;
 
         /// <summary>
-        /// Path to the token cache
+        /// Path of the file where the token cache is persisted
         /// </summary>
         private string _cacheFilePath;
 
-        /// <summary>
-        /// Dictionnary containing the locks for token file serialization
-        /// </summary>
-        private static readonly Dictionary<string, object> _fileLockDictionary = new Dictionary<string, object>();
-
         private void BeforeAccessNotification(TokenCacheNotificationArgs args)
         {
-            lock (_fileLockDictionary[_cacheFilePath])
-            {
-                args.TokenCache.Deserialize(File.Exists(_cacheFilePath)
-                    ? ProtectedData.Unprotect(File.ReadAllBytes(_cacheFilePath),
-                                              null,
-                                              DataProtectionScope.CurrentUser)
-                    : null);
-            }
+            args.TokenCache.Deserialize(File.Exists(_cacheFilePath)
+                ? ProtectedData.Unprotect(File.ReadAllBytes(_cacheFilePath),
+                                          null,
+                                          DataProtectionScope.CurrentUser)
+                : null);
         }
 
         private void AfterAccessNotification(TokenCacheNotificationArgs args)
@@ -83,15 +75,12 @@ namespace TodoListClient
             // if the access operation resulted in a cache update
             if (args.HasStateChanged)
             {
-                lock (_fileLockDictionary[_cacheFilePath])
-                {
-                    // reflect changes in the persistent store
-                    File.WriteAllBytes(_cacheFilePath,
-                                       ProtectedData.Protect(args.TokenCache.Serialize(), 
-                                                             null, 
-                                                             DataProtectionScope.CurrentUser)
-                                      );
-                }
+                // reflect changes in the persistent store
+                File.WriteAllBytes(_cacheFilePath,
+                                   ProtectedData.Protect(args.TokenCache.Serialize(),
+                                                         null,
+                                                         DataProtectionScope.CurrentUser)
+                                  );
             }
         }
     }
