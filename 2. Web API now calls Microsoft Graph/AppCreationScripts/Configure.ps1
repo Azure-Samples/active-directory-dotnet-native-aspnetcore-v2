@@ -279,11 +279,11 @@ Function ConfigureApplications
    Write-Host "Granted permissions."
 
    # Configure known client applications for service 
-   # Write-Host "Configure known client applications for the 'service'"
-   # $knowApplications = New-Object System.Collections.Generic.List[System.String]
-   # $knowApplications.Add($clientAadApplication.AppId)
-   # Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -KnownClientApplications $knowApplications
-   # Write-Host "Configured."
+   Write-Host "Configure known client applications for the 'service'"
+   $knowApplications = New-Object System.Collections.Generic.List[System.String]
+    $knowApplications.Add($clientAadApplication.AppId)
+   Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -KnownClientApplications $knowApplications
+   Write-Host "Configured."
 
 
    # Update config file for 'service'
@@ -296,23 +296,23 @@ Function ConfigureApplications
    $configFile = $pwd.Path + "\..\TodoListClient\App.Config"
    Write-Host "Updating the sample code ($configFile)"
    ReplaceSetting -configFilePath $configFile -key "ida:ClientId" -newValue $clientAadApplication.AppId
-   ReplaceSetting -configFilePath $configFile -key "todo:TodoListScope" -newValue ("api://"+$serviceAadApplication.AppId+"/user_impersonation")
+   ReplaceSetting -configFilePath $configFile -key "todo:TodoListScope" -newValue ("api://"+$serviceAadApplication.AppId+"/.default")
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListBaseAddress" -newValue $serviceAadApplication.HomePage
    Write-Host ""
-   Write-Host "IMPORTANT: Think of completing the following manual step(s) in the Azure portal":
+   Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
    Write-Host "- For 'service'"
    Write-Host "  - Navigate to '$servicePortalUrl'"
-   Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
-   Write-Host "  - If you changed the signInAudience to 'AzureADandPersonalMicrosoftAccount, remove the GUID in the knownClientApplications"
-   Write-Host "  - Still in the Manifest page, change 'accessTokenAcceptedVersion' to 2 "
+   Write-Host "  - Navigate to the Manifest page and change 'accessTokenAcceptedVersion' to '2'."
    Write-Host "  - [Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
-   Write-Host "- For 'client'"
-   Write-Host "  - Navigate to '$clientPortalUrl'"
-   Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
 
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
 }
 
+# Pre-requisites
+if ((Get-Module -ListAvailable -Name "AzureAD") -eq $null) { 
+    Install-Module "AzureAD" -Scope CurrentUser 
+} 
+Import-Module AzureAD
 
 # Run interactively (will ask you for the tenant ID)
 ConfigureApplications -Credential $Credential -tenantId $TenantId
