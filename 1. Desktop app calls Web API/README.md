@@ -135,9 +135,9 @@ If you want to register your apps manually, as a first step you'll need to:
 1. In the list of pages for the app, select **Expose an API**
    - Select **Add a scope**
    - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
-   - Enter the following parameters
+   - Enter the following parameters:
      - for **Scope name** use `access_as_user`
-     - Keep **Admins and users** for **Who can consent**
+     - Ensure the **Admins and users** option is selected for **Who can consent**
      - in **Admin consent display name** type `Access TodoListService as a user`
      - in **Admin consent description** type `Accesses the TodoListService Web API as a user`
      - in **User consent display name** type `Access TodoListService as a user`
