@@ -56,9 +56,9 @@ You're done. this just works!
 We advise four ways of running the script:
 
 - Interactive: you will be prompted for credentials, and the scripts decide in which tenant to create the objects,
-- non-interactive: you will provide crendentials, and the scripts decide in which tenant to create the objects,
-- Interactive in specific tenant: you will be prompted for credentials, and the scripts decide in which tenant to create the objects,
-- non-interactive in specific tenant: you will provide crendentials, and the scripts decide in which tenant to create the objects.
+- non-interactive: you will provide credentials, and the scripts decide in which tenant to create the objects,
+- Interactive in specific tenant:  you will provide the tenant in which you want to create the objects and then you will be prompted for credentials, and the scripts will create the objects,
+- non-interactive in specific tenant: you will provide tenant in which you want to create the objects and credentials, and the scripts will create the objects.
 
 Here are the details on how to do this.
 
