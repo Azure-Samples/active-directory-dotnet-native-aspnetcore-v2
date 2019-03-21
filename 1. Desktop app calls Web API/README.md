@@ -164,7 +164,7 @@ If you want to register your apps manually, as a first step you'll need to:
 1. In the list of pages for the app, select **API permissions**
    - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected
-   - In the list of APIs, select the API `TodoListService-v2`.
+   - In the list of APIs, select the `TodoListService-v2` API, or the name you entered for the Web API.
    - In the **Delegated permissions** section, ensure that the right permissions are checked: **access_as_user**. Use the search box if necessary.
    - Select the **Add permissions** button
 
