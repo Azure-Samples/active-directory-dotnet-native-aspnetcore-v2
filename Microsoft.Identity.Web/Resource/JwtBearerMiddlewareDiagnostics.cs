@@ -3,8 +3,11 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNetCore.Authentication
+namespace Microsoft.Identity.Web.Resource
 {
+    /// <summary>
+    /// Diagnostics for the JwtBearer middleware (used in Web APIs)
+    /// </summary>
     public class JwtBearerMiddlewareDiagnostics
     {
         /// <summary>

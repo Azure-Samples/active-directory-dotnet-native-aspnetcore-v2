@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Web.Resource;
 
 namespace TodoListService
 {
@@ -57,7 +58,7 @@ namespace TodoListService
 
                 // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
                 // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
-                options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ValidateAadIssuer;
+                options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ForAadInstance(options.Authority).ValidateAadIssuer;
 
                 // If you want to debug, or just understand the JwtBearer events, uncomment the following line of code
                 // options.Events = JwtBearerMiddlewareDiagnostics.Subscribe(options.Events);
