@@ -24,6 +24,8 @@ namespace Microsoft.Identity.Web
             services.AddAuthentication(AzureADDefaults.JwtBearerAuthenticationScheme)
                     .AddAzureADBearer(options => configuration.Bind("AzureAd", options));
 
+            services.AddSession();
+
             // Added
             services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
             {

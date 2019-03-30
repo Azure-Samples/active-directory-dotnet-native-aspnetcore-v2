@@ -349,9 +349,14 @@ namespace TodoListClient
                     .WithPrompt(Prompt.SelectAccount)
                     .ExecuteAsync()
                     .ConfigureAwait(false);
-                SignInButton.Content = ClearCacheString;
-                SetUserName(result.Account);
-                GetTodoList();
+
+                Dispatcher.Invoke(() =>
+                {
+                    SignInButton.Content = ClearCacheString;
+                    SetUserName(result.Account);
+                    GetTodoList();
+                }
+                );
             }
             catch (MsalException ex)
             {
