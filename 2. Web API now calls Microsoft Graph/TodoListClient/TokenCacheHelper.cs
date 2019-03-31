@@ -35,23 +35,6 @@ namespace TodoListClient
     {
  
         /// <summary>
-        /// Get the user token cache
-        /// </summary>
-        /// <returns></returns>
-        public static TokenCache GetUserCache()
-        {
-            if (_userTokenCache == null)
-            {
-                _userTokenCache = new TokenCache();
-                _userTokenCache.SetBeforeAccess(BeforeAccessNotification);
-                _userTokenCache.SetAfterAccess(AfterAccessNotification);
-            }
-            return _userTokenCache;
-        }
-
-        private static TokenCache _userTokenCache;
-
-        /// <summary>
         /// Path to the token cache
         /// </summary>
         private static readonly string CacheFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalcache.bin";
@@ -62,7 +45,7 @@ namespace TodoListClient
         {
             lock (FileLock)
             {
-                args.TokenCache.Deserialize(File.Exists(CacheFilePath)
+                args.TokenCache.DeserializeMsalV3(File.Exists(CacheFilePath)
                     ? ProtectedData.Unprotect(File.ReadAllBytes(CacheFilePath),
                                               null,
                                               DataProtectionScope.CurrentUser)
@@ -79,12 +62,17 @@ namespace TodoListClient
                 {
                     // reflect changes in the persistent store
                     File.WriteAllBytes(CacheFilePath,
-                                       ProtectedData.Protect(args.TokenCache.Serialize(), 
+                                       ProtectedData.Protect(args.TokenCache.SerializeMsalV3(), 
                                                              null, 
                                                              DataProtectionScope.CurrentUser)
                                       );
                 }
             }
+        }
+        internal static void EnableSerialization(ITokenCache tokenCache)
+        {
+            tokenCache.SetBeforeAccess(BeforeAccessNotification);
+            tokenCache.SetAfterAccess(AfterAccessNotification);
         }
     }
 }

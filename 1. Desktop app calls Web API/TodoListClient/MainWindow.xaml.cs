@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.AppConfig;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Configuration;
@@ -64,7 +65,7 @@ namespace TodoListClient
         private static readonly string[] Scopes = { TodoListScope };
 
         private readonly HttpClient _httpClient = new HttpClient();
-        private readonly PublicClientApplication _app;
+        private readonly IPublicClientApplication _app;
 
         // Button strings
         const string SignInString = "Sign In";
@@ -73,7 +74,11 @@ namespace TodoListClient
         public MainWindow()
         {
             InitializeComponent();
-            _app = new PublicClientApplication(ClientId, Authority, TokenCacheHelper.GetUserCache());
+            _app = PublicClientApplicationBuilder.Create(ClientId)
+                .WithAuthority(Authority)
+                .Build();
+
+            TokenCacheHelper.EnableSerialization(_app.UserTokenCache);
             GetTodoList();
         }
 
@@ -96,7 +101,9 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await _app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
+                result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
                 SignInButton.Content = ClearCacheString;
                 SetUserName(result.Account);
             }
@@ -166,7 +173,9 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await _app.AcquireTokenSilentAsync(Scopes, accounts.FirstOrDefault());
+                result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
                 SetUserName(result.Account);
                 UserName.Content = Properties.Resources.UserNotSignedIn;
             }
@@ -248,10 +257,17 @@ namespace TodoListClient
             {
                 // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
                 // would re-sign-in the same user
-                result = await _app.AcquireTokenAsync(Scopes, accounts.FirstOrDefault(), UIBehavior.SelectAccount, string.Empty);
-                SignInButton.Content = ClearCacheString;
-                SetUserName(result.Account);
-                GetTodoList();
+                result = await _app.AcquireTokenInteractive(Scopes, accounts.FirstOrDefault())
+                    .WithPrompt(Prompt.SelectAccount)
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
+                Dispatcher.Invoke(() =>
+                {
+                    SignInButton.Content = ClearCacheString;
+                    SetUserName(result.Account);
+                    GetTodoList();
+                }
+                );
             }
             catch (MsalException ex)
             {

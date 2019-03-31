@@ -4,7 +4,7 @@ using Microsoft.Identity.Client;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.AspNetCore.Authentication
+namespace Microsoft.Identity.Web.Client
 {
     public interface ITokenAcquisition
     {
@@ -44,8 +44,10 @@ namespace Microsoft.AspNetCore.Authentication
         /// </summary>
         /// <param name="context">HttpContext associated with the Controller or auth operation</param>
         /// <param name="scopes">Scopes to request for the downstream API to call</param>
+        /// <param name="tenantId">Enables to override the tenant/account for the same identity. This is useful in the 
+        /// cases where a given account is guest in other tenants, and you want to acquire tokens for a specific tenant</param>
         /// <returns>An access token to call on behalf of the user, the downstream API characterized by its scopes</returns>
-        Task<string> GetAccessTokenOnBehalfOfUser(HttpContext context, IEnumerable<string> scopes);
+        Task<string> GetAccessTokenOnBehalfOfUser(HttpContext context, IEnumerable<string> scopes, string tenantId=null);
 
         /// <summary>
         /// In a Web API, adds to the MSAL.NET cache, the account of the user for which a bearer token was received when the Web API was called.
@@ -69,7 +71,7 @@ namespace Microsoft.AspNetCore.Authentication
         /// };
         /// </code>
         /// </example>
-        void AddAccountToCacheFromJwt(JwtBearer.TokenValidatedContext tokenValidationContext, IEnumerable<string> scopes = null);
+        void AddAccountToCacheFromJwt(AspNetCore.Authentication.JwtBearer.TokenValidatedContext tokenValidationContext, IEnumerable<string> scopes = null);
 
         /// <summary>
         /// [not recommended] In a Web App, adds, to the MSAL.NET cache, the account of the user authenticating to the Web App.
@@ -99,6 +101,14 @@ namespace Microsoft.AspNetCore.Authentication
         /// </code>
         /// </example>
         void AddAccountToCacheFromJwt(TokenValidatedContext tokenValidationContext, IEnumerable<string> scopes = null);
+
+        /// <summary>
+        /// Removes the account associated with context.HttpContext.User from the MSAL.NET cache
+        /// </summary>
+        /// <param name="context">RedirectContext passed-in to a <see cref="OnRedirectToIdentityProviderForSignOut"/> 
+        /// Openidconnect event</param>
+        /// <returns></returns>
+        Task RemoveAccount(RedirectContext context);
 
         /// <summary>
         /// Used in Web APIs (which therefore cannot have an interaction with the user). 

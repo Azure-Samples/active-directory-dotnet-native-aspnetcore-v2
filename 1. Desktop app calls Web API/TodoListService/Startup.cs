@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Web.Resource;
 
 namespace TodoListService
 {
@@ -45,23 +46,9 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(AzureADDefaults.BearerAuthenticationScheme)
-                .AddAzureADBearer(options => Configuration.Bind("AzureAd", options));
-            services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
-            {
-			    // This is an Azure AD v2.0 Web API
-                options.Authority += "/v2.0";
-				
-				// The valid audiences are both the Client ID (options.Audience) and api://{ClientID}
-                options.TokenValidationParameters.ValidAudiences = new string[] { options.Audience, $"api://{options.Audience}" };
+            services.AddProtectWebApiWithMicrosoftIdentityPlatformV2(Configuration)
+                    ;
 
-                // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
-                // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
-                options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ValidateAadIssuer;
-
-                // If you want to debug, or just understand the JwtBearer events, uncomment the following line of code
-                // options.Events = JwtBearerMiddlewareDiagnostics.Subscribe(options.Events);
-            });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
