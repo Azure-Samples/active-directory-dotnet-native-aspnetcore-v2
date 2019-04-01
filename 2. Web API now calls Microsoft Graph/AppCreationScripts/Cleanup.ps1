@@ -5,11 +5,10 @@ param(
     [string] $tenantId
 )
 
-if ((Get-Module -ListAvailable -Name "AzureAD") -eq $null) {
-    Install-Module "AzureAD" -Scope CurrentUser
-}
+if ((Get-Module -ListAvailable -Name "AzureAD") -eq $null) { 
+    Install-Module "AzureAD" -Scope CurrentUser 
+} 
 Import-Module AzureAD
-
 $ErrorActionPreference = 'Stop'
 
 Function Cleanup

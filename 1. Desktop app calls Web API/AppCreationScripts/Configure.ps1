@@ -226,7 +226,7 @@ Function ConfigureApplications
    # Add Required Resources Access (from 'client' to 'service')
    Write-Host "Getting access from 'client' to 'service'"
    $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService (active-directory-dotnet-native-aspnetcore-v2)" `
-                                                -requiredDelegatedPermissions "user_impersonation";
+                                                -requiredDelegatedPermissions "user_impersonation" `
 
    $requiredResourcesAccess.Add($requiredPermissions)
 
@@ -251,8 +251,11 @@ Function ConfigureApplications
    Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
    Write-Host "- For 'service'"
    Write-Host "  - Navigate to '$servicePortalUrl'"
-   Write-Host "  - Navigate to the Manifest page and change 'accessTokenAcceptedVersion' to '2'."
-   Write-Host "  - [Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
+   Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
+   Write-Host "  - Still in the Manifest page, change 'accessTokenAcceptedVersion' to 2 "
+   Write-Host "- For 'client'"
+   Write-Host "  - Navigate to '$clientPortalUrl'"
+   Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
 
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
 }

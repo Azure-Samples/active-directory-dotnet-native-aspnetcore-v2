@@ -1,5 +1,32 @@
 # Registering the Azure Active Directory applications and updating the configuration files for this sample using PowerShell scripts
 
+## Overview
+
+### Quick summary
+
+1. On Windows run PowerShell and navigate to the root of the cloned directory
+1. In PowerShell run:
+   ```PowerShell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
+   ```
+1. Run the script to create your Azure AD application and configure the code of the sample application accordinly. (Other ways of running the scripts are described below)
+   ```PowerShell
+   .\AppCreationScripts\Configure.ps1
+   ```
+1. Open the Visual Studio solution and click start
+
+### More details
+
+The following paragraphs:
+
+- [Present the scripts](#presentation-of-the-scripts) and explain their [usage patterns](#usage-pattern-for-tests-and-devops-scenarios) for test and DevOps scenarios.
+- Explain the [pre-requisites](#pre-requisites)
+- Explain [four ways of running the scripts](#four-ways-to-run-the-script):
+  - [Interactively](#option-1-interactive) to create the app in your home tenant
+  - [Passing credentials](#option-2-non-interactive) to create the app in your home tenant
+  - [Interactively in a specific tenant](#option-3-interactive-but-create-apps-in-a-specified-tenant)
+  - [Passing credentials in a specific tenant](#option-4-non-interactive-and-create-apps-in-a-specified-tenant)
+
 ## Goal of the scripts
 
 ### Presentation of the scripts
@@ -26,21 +53,30 @@ The `Configure.ps1` will stop if it tries to create an Azure AD application whic
 
 ### Pre-requisites
 
-To use the app creation scripts:
-
 1. Open PowerShell (On Windows, press  `Windows-R` and type `PowerShell` in the search window)
 2. Navigate to the root directory of the project.
-3. Until you change it, the default Execution Policy for scripts is usually `Restricted`. In order to run the PowerShell script you need to set the Execution Policy to `RemoteSigned`. You can set this just for the current PowerShell process by running the command:
+3. Until you change it, the default [Execution Policy](https:/go.microsoft.com/fwlink/?LinkID=135170) for scripts is usually `Restricted`. In order to run the PowerShell script you need to set the Execution Policy to `RemoteSigned`. You can set this just for the current PowerShell process by running the command:
     ```PowerShell
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
     ```
+### (Optionally) install AzureAD PowerShell modules
+The scripts install the required PowerShell module (AzureAD) for the current user if needed. However, if you want to install if for all users on the machine, you can follow the following steps:
+
 4. If you have never done it already, in the PowerShell window, install the AzureAD PowerShell modules. For this:
 
    1. Open PowerShell as admin (On Windows, Search Powershell in the search bar, right click on it and select Run as administrator).
    2. Type:
-        ```PowerShell
-        Install-Module AzureAD
-        ```
+      ```PowerShell
+      Install-Module AzureAD
+      ```
+
+      or if you cannot be administrator on your machine, run:
+      ```PowerShell
+      Install-Module AzureAD -Scope CurrentUser
+      ```
+
+### Run the script and start running
+
 5. Go to the `AppCreationScripts` sub-folder. From the folder where you cloned the repo,
     ```PowerShell
     cd AppCreationScripts
@@ -56,9 +92,9 @@ You're done. this just works!
 We advise four ways of running the script:
 
 - Interactive: you will be prompted for credentials, and the scripts decide in which tenant to create the objects,
-- non-interactive: you will provide crendentials, and the scripts decide in which tenant to create the objects,
-- Interactive in specific tenant: you will be prompted for credentials, and the scripts decide in which tenant to create the objects,
-- non-interactive in specific tenant: you will provide crendentials, and the scripts decide in which tenant to create the objects.
+- non-interactive: you will provide credentials, and the scripts decide in which tenant to create the objects,
+- Interactive in specific tenant:  you will provide the tenant in which you want to create the objects and then you will be prompted for credentials, and the scripts will create the objects,
+- non-interactive in specific tenant: you will provide tenant in which you want to create the objects and credentials, and the scripts will create the objects.
 
 Here are the details on how to do this.
 
