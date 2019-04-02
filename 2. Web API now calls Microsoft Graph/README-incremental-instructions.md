@@ -96,7 +96,7 @@ If you want to use this automation:
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
    1. In the **Authentication** page for the *TodoListService-v2* application, check the `urn:ietf:wg:oauth:2.0:oob` reply URI so that the client can propose incremental consent to the user for the Web API when needed.
-   1. In the list of pages for the application registration of the *TodoListClient-v2* application, select **Manifest**
+   1. In tthe application registration page for the *TodoListClient-v2* application, select the **Manifest** section:
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
 
@@ -119,7 +119,7 @@ These instructions only show the differences with the first part.
    - When you press the **Add** button, the key value will be displayed, copy, and save the value in a safe location.
    - You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
      so record it as soon as it is visible from the Azure portal.
-1. In the list of pages for the app, select **API permissions**
+1. Select the **API permissions** section
    - Click the **Add a permission** button and then,
    - Ensure that the **Microsoft APIs** tab is selected
    - In the *Commonly used Microsoft APIs* section, click on **Microsoft Graph**
@@ -129,7 +129,7 @@ These instructions only show the differences with the first part.
 1. [Otherwise] If you have not granted admin consent to the Web API in the previous optional step, select **Authentication** in the list of pages and there:
    - Check the `urn:ietf:wg:oauth:2.0:oob` Redirect URI checkbox. This is so that the client can propose incremental consent to the user for the downstream web apis used by our *TodoListService-v2* Web API.
    - Select **Save**
-1. [Optional] In the list of pages, select **Manifest**
+1. [Optional] Select the **Manifest** section and:
    - in the manifest, search for **"accessTokenAcceptedVersion"**, and see that its value is **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
    - Select **Save**
 
@@ -160,7 +160,10 @@ Clean the solution, rebuild the solution, and run it
 
 ### Current limitations
 
-- The on-behalf-of flow does not currently work for Microsoft Personal accounts.
+The on-behalf-of flow works for Microsoft Personal accounts, but the consent is not yet rolled-up in the client for the user to consent to the Web API calling the downstream API (here Microsoft Graph). To make this work, the suggestion is:
+
+- either to use the same client ID in the Client and the Service. This way the consent for the service will appear in the client.
+- or to provide a protected page on the Web API (which therefore also becomes a Web app) so that the user can have an interaction
 
 ## How was the code created
 
