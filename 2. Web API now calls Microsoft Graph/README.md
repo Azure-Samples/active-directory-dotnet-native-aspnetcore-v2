@@ -7,7 +7,7 @@ client: .NET Desktop (WPF)
 service: ASP.NET Core Web API, Microsoft Graph
 endpoint: AAD v2.0
 ---
-# ASP.NET Core 2.1 Web API calling Microsoft Graph, itself called from a WPF application using Azure AD V2
+# ASP.NET Core Web API calling Microsoft Graph, itself called from a WPF application using Azure AD V2
 
 ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/497/badge)
 
