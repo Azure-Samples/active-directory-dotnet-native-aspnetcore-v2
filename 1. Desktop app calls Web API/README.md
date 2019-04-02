@@ -98,11 +98,11 @@ If you want to use this automation:
 
 1. Follow the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md), 
 1. Once you've run the script, be sure to follow the manual steps. Indeed Azure AD PowerShell does not yet provide full control on applications consuming v2.0 tokens, even if this registration is already possible from the Azure portal:
-   1. In the list of pages for the application registration of the *TodoListService-v2* application, select **Manifest**
+   1. Select the **Manifest** section in the application registration of the *TodoListService-v2* application
       - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
-   1. In the list of pages for the application registration of the *TodoListClient-v2* application, select **Manifest**
+   1. select **Manifest** section in the  the application registration of the *TodoListClient-v2* application, 
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
 
@@ -132,7 +132,7 @@ If you want to register your apps manually, as a first step you'll need to:
    - Select **Register** to create the application.
 
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ClientId` in `TodoListService\appsettings.json`).
-1. In the list of pages for the app, select **Expose an API**
+1. Select the **Expose an API** section
    - Select **Add a scope**
    - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
    - Enter the following parameters
@@ -144,7 +144,7 @@ If you want to register your apps manually, as a first step you'll need to:
      - in **User consent description** type `Accesses the TodoListService Web API as a user`
      - Keep **State** as **Enabled**
      - Select **Add scope**
-1. [Optional] In the list of pages, select **Manifest**
+1. [Optional] select the **Manifest** section
    - in the manifest, search for **"accessTokenAcceptedVersion"**, and see that its value is **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
    - Select **Save**
 
@@ -158,10 +158,10 @@ If you want to register your apps manually, as a first step you'll need to:
    - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
    - Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ida:ClientId` in `TodoListClient\App.Config`).
-1. In the list of pages for the app, select **Authentication**.
+1. Select the **Authentication** section.
    - In the **Redirect URLs** | **Suggested Redirect URLs for public clients (mobile, desktop)** section, check **urn:ietf:wg:oauth:2.0:oob**
    - Select **Save**.
-1. In the list of pages for the app, select **API permissions**
+1. Select **API permissions** section
    - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected
    - In the list of APIs, select the API `TodoListService-v2`.

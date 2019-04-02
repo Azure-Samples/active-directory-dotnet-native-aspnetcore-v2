@@ -106,7 +106,7 @@ If you want to use this automation:
 
 1. Follow the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md), 
 1. Once you've run the script, be sure to follow the manual steps. Indeed Azure AD PowerShell does not yet provide full control on applications consuming v2.0 tokens, even if this registration is already possible from the Azure portal:
-   1. In the list of pages for the application registration of the *TodoListService-v2* application, select **Manifest**
+   1. Select the **Manifest** section in the application registration of the *TodoListService-v2* application
       - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
       - Select **Save**
 
@@ -129,19 +129,19 @@ If you want to register your apps manually, as a first step you'll need to:
 
 1. In **App registrations (Preview)** page, select **New registration**.
 1. When the **Register an application page** appears, enter your application's registration information:
-   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListService`.
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListService-v2`.
    - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
    - In the Redirect URI (optional) section, select **Web** in the combo-box.
    - For the *Redirect URI*, enter the base URL for the sample. By default, this sample uses `https://localhost:44351/`.
    - Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
-1. From the **Certificates & secrets** page, in the **Client secrets** section, choose **New client secret**:
+1. From the **Certificates & secrets** section, in the **Client secrets** section, choose **New client secret**:
    - Type a key description (of instance `app secret`),
    - Select a key duration of either **In 1 year**, **In 2 years**, or **Never Expires**.
    - When you press the **Add** button, the key value will be displayed, copy, and save the value in a safe location.
    - You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
      so record it as soon as it is visible from the Azure portal.
-1. In the list of pages for the app, select **API permissions**
+1. In the **API permissions** section
    - Click the **Add a permission** button and then,
    - Ensure that the **Microsoft APIs** tab is selected
    - In the *Commonly used Microsoft APIs* section, click on **Microsoft Graph**
@@ -149,7 +149,7 @@ If you want to register your apps manually, as a first step you'll need to:
    - Select the **Add permissions** button
    - [Optional] if you are a tenant admin, and agree to grant the admin consent to the web api, select **Grant admin consent for {your tenant domain}**. If you don't do
     it, users will be presented a consent screen enabling them to consent to using the web api.
-1. In the list of pages for the app, select **Expose an API**
+1. Select the **Expose an API** section
    - Select **Add a scope**
    - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
    - Enter the following parameters
@@ -161,7 +161,7 @@ If you want to register your apps manually, as a first step you'll need to:
      - in **User consent description** type `Accesses the TodoListService Web API as a user`
      - Keep **State** as **Enabled**
      - Select **Add scope**
-1. [Optional] In the list of pages, select **Manifest**
+1. [Optional] select the **Manifest** section
    - in the manifest, search for **"accessTokenAcceptedVersion"**, and see that its value is **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
    - Select **Save**
 
@@ -175,10 +175,10 @@ If you want to register your apps manually, as a first step you'll need to:
    - In the **Supported account types** section, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
    - Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ida:ClientId` in `TodoListClient\App.Config`).
-1. In the list of pages for the app, select **Authentication**.
+1. Select the **Authentication** section.
    - In the **Redirect URLs** | **Suggested Redirect URLs for public clients (mobile, desktop)** section, check **urn:ietf:wg:oauth:2.0:oob**
    - Select **Save**.
-1. In the list of pages for the app, select **API permissions**
+1. Select **API permissions** section
    - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected
    - In the list of APIs, select the API `TodoListService-v2`.
@@ -204,7 +204,7 @@ application for the service. Here is how to do:
 #### Choose which users account to sign in
 
 By default the sample is configured to enable users to sign in with any work and school accounts (AAD) accounts.
-This constrain is ensured by `ida:Tenant` in `TodoListClient\App.Config` having the value `organizations`.
+This constraint is ensured by `ida:Tenant` in `TodoListClient\App.Config` having the value `organizations`.
 
 ##### Important note
 

@@ -82,7 +82,7 @@ If you want to use this automation:
 
 1. Follow the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md), 
 1. Once you've run the script, be sure to follow the manual steps. Indeed Azure AD PowerShell does not yet provide full control on applications consuming v2.0 tokens, even if this registration is already possible from the Azure portal:
-   1. In the list of pages for the application registration of the *TodoListService-v2* application, select **Manifest**
+   1. elect the **Manifest** section in the application registration of the *TodoListService-v2* application
       - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
@@ -104,13 +104,13 @@ These instructions only show the differences with the first part.
 #### Register the service app (TodoListService)
 
 1. In **App registrations (Preview)** page, find the *TodoListService-2* app
-1. From the **Certificates & secrets** page, in the **Client secrets** section, choose **New client secret**:
+1. From the **Certificates & secrets** section, in the **Client secrets** section, choose **New client secret**:
    - Type a key description (of instance `app secret`),
    - Select a key duration of either **In 1 year**, **In 2 years**, or **Never Expires**.
    - When you press the **Add** button, the key value will be displayed, copy, and save the value in a safe location.
    - You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
      so record it as soon as it is visible from the Azure portal.
-1. In the list of pages for the app, select **API permissions**
+1. In the **API permissions** section
    - Click the **Add a permission** button and then,
    - Ensure that the **Microsoft APIs** tab is selected
    - In the *Commonly used Microsoft APIs* section, click on **Microsoft Graph**
@@ -120,7 +120,7 @@ These instructions only show the differences with the first part.
 1. [Otherwise] If you have not granted admin consent to the Web API in the previous optional step, select **Authentication** in the list of pages and there:
    - Check the `urn:ietf:wg:oauth:2.0:oob` Redirect URI checkbox. This is so that the client can propose incremental consent to the user for the downstream web apis used by our *TodoListService-v2* Web API.
    - Select **Save**
-1. [Optional] In the list of pages, select **Manifest**
+1. [Optional] select the **Manifest** section
    - in the manifest, search for **"accessTokenAcceptedVersion"**, and see that its value is **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
    - Select **Save**
 
