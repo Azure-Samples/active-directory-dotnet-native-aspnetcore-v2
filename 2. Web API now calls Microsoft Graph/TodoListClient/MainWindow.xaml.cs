@@ -23,7 +23,6 @@ SOFTWARE.
 */
 
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.AppConfig;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
