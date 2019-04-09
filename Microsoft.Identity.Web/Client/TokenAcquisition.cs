@@ -30,7 +30,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.AppConfig;
 using Microsoft.Identity.Web.Client.TokenCacheProviders;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -389,24 +388,24 @@ namespace Microsoft.Identity.Web.Client
         /// </summary>
         /// <param name="httpContext">HttpContext</param>
         /// <param name="scopes">Scopes to consent to</param>
-        /// <param name="msalSeviceException"><see cref="MsalUiRequiredException"/> triggering the challenge</param>
+        /// <param name="msalServiceException"><see cref="MsalUiRequiredException"/> triggering the challenge</param>
 
-        public void ReplyForbiddenWithWwwAuthenticateHeader(HttpContext httpContext, IEnumerable<string> scopes, MsalUiRequiredException msalSeviceException)
+        public void ReplyForbiddenWithWwwAuthenticateHeader(HttpContext httpContext, IEnumerable<string> scopes, MsalUiRequiredException msalServiceException)
         {
             // A user interaction is required, but we are in a Web API, and therefore, we need to report back to the client through an wwww-Authenticate header https://tools.ietf.org/html/rfc6750#section-3.1
             string proposedAction = "consent";
-            if (msalSeviceException.ErrorCode == MsalUiRequiredException.InvalidGrantError)
+            if (msalServiceException.ErrorCode == MsalError.InvalidGrantError)
             {
-                if (AcceptedTokenVersionIsNotTheSameAsTokenVersion(msalSeviceException))
+                if (AcceptedTokenVersionIsNotTheSameAsTokenVersion(msalServiceException))
                 {
-                    throw msalSeviceException;
+                    throw msalServiceException;
                 }
             }
 
             IDictionary<string, string> parameters = new Dictionary<string, string>()
                 {
                     { "clientId", azureAdOptions.ClientId },
-                    { "claims", msalSeviceException.Claims },
+                    { "claims", msalServiceException.Claims },
                     { "scopes", string.Join(",", scopes) },
                     { "proposedAction", proposedAction }
                 };
