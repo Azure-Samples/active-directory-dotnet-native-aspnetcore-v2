@@ -446,6 +446,28 @@ If you're using Visual Studio 2017:
 
 If you are not using Visual Studio, edit the `TodoListService\Properties\launchsettings.json` file.
 
+## Choosing which scopes to expose
+
+This sample exposes a delegated permission. Also it does not verify the scope. We want, in the future, have an additional step about authorization. For the moment this paragraph will explain best practices.
+
+You can also expose app-only permissions if parts of your API needs to be accessed independenty of a user (that is by a [daemon application](https://github.com/Azure-Samples/ms-identity-dotnetcore-daemon)).
+
+### For delegated permissions how to access scopes
+
+If a token has delegated persmission scopes they will be in the `scp` claim.
+
+### When to expose App only permissions?
+
+In general, if there is a customer use case for your API where app-only access is better/more secure than delegated access, then you should expose app-only permissions. You should always consider the alternative: if you don’t offer an app-only permissions, customers who have a scenario for app-only will end up doing things you don’t want them doing (e.g. including a user’s password in code or config or script)
+
+### How to detect an app-only token? how to get the app roles from the token?
+
+The best way to verify that a token is an app-only access token is to verify that the `oid` and `sub` claims are the same. 
+
+App-only permissions are modeled as app roles. As such, the app-only permissions granted to a client will be present in the “roles” claim of the access token when the client has authenticated as the app (only—without a user).
+
+
+
 ## Next phase of the tutorial: the Web API itself calls another downstream Web API
 
 You know pretty much everything on how to protect your Web API with the Microsoft identity platform. If your Web API
