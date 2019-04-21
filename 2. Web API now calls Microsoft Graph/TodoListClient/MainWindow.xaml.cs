@@ -107,8 +107,13 @@ namespace TodoListClient
                 result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync()
                     .ConfigureAwait(false);
-                SignInButton.Content = ClearCacheString;
-                SetUserName(result.Account);
+
+                Dispatcher.Invoke(
+                    () =>
+                    {
+                        SignInButton.Content = ClearCacheString;
+                        SetUserName(result.Account);
+                    });
             }
             // There is no access token in the cache, so prompt the user to sign-in.
             catch (MsalUiRequiredException)
@@ -146,7 +151,11 @@ namespace TodoListClient
                 string s = await response.Content.ReadAsStringAsync();
                 List<TodoItem> toDoArray = JsonConvert.DeserializeObject<List<TodoItem>>(s);
 
-                TodoList.ItemsSource = toDoArray.Select(t => new { t.Title });
+                Dispatcher.Invoke(() =>
+                {
+
+                    TodoList.ItemsSource = toDoArray.Select(t => new { t.Title });
+                });
             }
             else
             {
@@ -201,8 +210,9 @@ namespace TodoListClient
             {
                 // Removes the account, but then re-signs-in
                 await _app.RemoveAsync(account);
-                await _app.AcquireTokenInteractive(scopes, loginHint)
+                await _app.AcquireTokenInteractive(scopes)
                     .WithPrompt(Prompt.Consent)
+                    .WithLoginHint(loginHint)
                     .WithExtraQueryParameters(extraQueryParameters)
                     .WithAuthority(_app.Authority)
                     .ExecuteAsync()
@@ -212,8 +222,9 @@ namespace TodoListClient
             {
                 IPublicClientApplication pca = PublicClientApplicationBuilder.Create(clientId)
                     .Build();
-                await pca.AcquireTokenInteractive(scopes, loginHint)
+                await pca.AcquireTokenInteractive(scopes)
                     .WithPrompt(Prompt.Consent)
+                    .WithLoginHint(loginHint)
                     .WithExtraQueryParameters(extraQueryParameters)
                     .WithAuthority(pca.Authority)
                     .ExecuteAsync()
@@ -282,8 +293,12 @@ namespace TodoListClient
                     message += "Error Code: " + ex.ErrorCode + "Inner Exception : " + ex.InnerException.Message;
                 }
 
-                UserName.Content = Properties.Resources.UserNotSignedIn;
-                MessageBox.Show("Unexpected error: " + message);
+                Dispatcher.Invoke(() =>
+               {
+                   UserName.Content = Properties.Resources.UserNotSignedIn;
+                   MessageBox.Show("Unexpected error: " + message);
+               });
+
 
                 return;
             }
@@ -344,7 +359,8 @@ namespace TodoListClient
             {
                 // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
                 // would re-sign-in the same user
-                var result = await _app.AcquireTokenInteractive(Scopes, accounts.FirstOrDefault())
+                var result = await _app.AcquireTokenInteractive(Scopes)
+                    .WithAccount(accounts.FirstOrDefault())
                     .WithPrompt(Prompt.SelectAccount)
                     .ExecuteAsync()
                     .ConfigureAwait(false);

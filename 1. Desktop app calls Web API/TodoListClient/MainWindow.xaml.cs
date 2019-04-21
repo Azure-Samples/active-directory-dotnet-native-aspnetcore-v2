@@ -103,8 +103,13 @@ namespace TodoListClient
                 result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync()
                     .ConfigureAwait(false);
-                SignInButton.Content = ClearCacheString;
-                SetUserName(result.Account);
+
+                Dispatcher.Invoke(
+                    () =>
+                    {
+                        SignInButton.Content = ClearCacheString;
+                        SetUserName(result.Account);
+                    });
             }
             // There is no access token in the cache, so prompt the user to sign-in.
             catch (MsalUiRequiredException)
@@ -142,7 +147,11 @@ namespace TodoListClient
                 string s = await response.Content.ReadAsStringAsync();
                 List<TodoItem> toDoArray = JsonConvert.DeserializeObject<List<TodoItem>>(s);
 
-                TodoList.ItemsSource = toDoArray.Select(t => new { t.Title });
+                Dispatcher.Invoke(() =>
+                {
+
+                    TodoList.ItemsSource = toDoArray.Select(t => new { t.Title });
+                });
             }
             else
             {
@@ -192,9 +201,13 @@ namespace TodoListClient
                 {
                     message += "Error Code: " + ex.ErrorCode + "Inner Exception : " + ex.InnerException.Message;
                 }
-                UserName.Content = Properties.Resources.UserNotSignedIn;
 
-                MessageBox.Show("Unexpected error: " + message);
+                Dispatcher.Invoke(() =>
+               {
+                   UserName.Content = Properties.Resources.UserNotSignedIn;
+                   MessageBox.Show("Unexpected error: " + message);
+               });
+
 
                 return;
             }
@@ -251,12 +264,12 @@ namespace TodoListClient
             //
             // Get an access token to call the To Do list service.
             //
-            AuthenticationResult result = null;
             try
             {
                 // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
                 // would re-sign-in the same user
-                result = await _app.AcquireTokenInteractive(Scopes, accounts.FirstOrDefault())
+                var result = await _app.AcquireTokenInteractive(Scopes)
+                    .WithAccount(accounts.FirstOrDefault())
                     .WithPrompt(Prompt.SelectAccount)
                     .ExecuteAsync()
                     .ConfigureAwait(false);
