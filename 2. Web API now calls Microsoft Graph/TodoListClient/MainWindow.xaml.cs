@@ -79,7 +79,6 @@ namespace TodoListClient
             InitializeComponent();
             _app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(Authority)
-                .WithRedirectUri("https://login.microsoftonline.com/common/oauth2/nativeclient")
                 .Build();
 
             TokenCacheHelper.EnableSerialization(_app.UserTokenCache);
