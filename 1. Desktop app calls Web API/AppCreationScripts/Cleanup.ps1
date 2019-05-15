@@ -55,18 +55,16 @@ This function removes the Azure AD applications for the sample. These applicatio
     if ($app)
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
-        Write-Host "Removed."
+        Write-Host "Removed TodoListService (active-directory-dotnet-native-aspnetcore-v2)."
     }
-
-    Write-Host "Removing 'client' (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) if needed"
+        Write-Host "Removing 'client' (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) if needed"
     $app=Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient (active-directory-dotnet-native-aspnetcore-v2)'"  
 
     if ($app)
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
-        Write-Host "Removed."
+        Write-Host "Removed TodoListClient (active-directory-dotnet-native-aspnetcore-v2)."
     }
-
-}
+    }
 
 Cleanup -Credential $Credential -tenantId $TenantId
