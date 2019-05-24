@@ -29,6 +29,9 @@ namespace Microsoft.Identity.Web
             // Added
             services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
             {
+                // Reinitialize the options as this has changed to JwtBearerOptions to pick configuration values for attributes unique to JwtBearerOptions 
+                configuration.Bind("AzureAd", options);
+
                 // This is an Azure AD v2.0 Web API
                 options.Authority += "/v2.0";
 
@@ -36,7 +39,7 @@ namespace Microsoft.Identity.Web
                 options.TokenValidationParameters.ValidAudiences = new string[] { options.Audience, $"api://{options.Audience}" };
 
                 // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
-                // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
+                // we inject our own multi-tenant validation logic (which even accepts both V1 and V2 tokens)
                 options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.ForAadInstance(options.Authority).ValidateAadIssuer;
 
                 // When an access token for our own Web API is validated, we add it to MSAL.NET's cache so that it can
