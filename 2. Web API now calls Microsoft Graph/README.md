@@ -16,7 +16,7 @@ endpoint: AAD v2.0
 >
 > This article (README.md) contains the full instructions on how to configure the sample. If you have gone through Phase 1 and have already configured your Web API rather switch to the instructions for an incremental configuration in [README-incremental-instructions.md](README-incremental-instructions.md)
 
-> At that time, the Azure AD v2.0 endpoint does not yet completely support the on-behalf-of flow for users signing-in with a Microsoft Personal account. Limitations are called out in the [Current limitations](#Current-limitations) section
+> At that time, when using a Web API calling downstream APIs on behalf of users signed-in with a Microsoft Personal account, the registration will be a bit different. See the [Current limitations](#Current-limitations) section
 
 ## About this sample
 
@@ -63,7 +63,7 @@ The WPF application (TodoListClient) enables a user to:
 
 - Sign in. The first time a user signs in, a consent screen is presented. This consent screen lets the user consent for the application to access the TodoList Service.
 - When the user has signed-in, the user sees the list of to-do items exposed by Web API for the signed-in identity
-- The user can add more to-do items by clicking on *Add item* button. As they add items, they see that these items appear with their user name between parenthesis
+- The user can add more to-do items by clicking on *Add item* button. As they add items, they see that these items appear with their user name between parenthesis. This is the difference between the previous chapter of the tutorial and this one.
 
 Next time a user runs the application, the user is signed-in with the same identity as the application maintains a cache on disk. Users can clear the cache (which will also have the effect of signing them out)
 
@@ -99,6 +99,8 @@ There are two projects in this sample. Each needs to be separately registered in
 - or use PowerShell scripts that:
   - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you
   - modify the Visual Studio projects' configuration files.
+  
+> Note however that the automation will not, at this point, allow you to sign-in with a personal Microsoft account. If you want to allow sign in with personal Microsoft accounts, use the manual instructions. 
 
 If you want to use this automation:
 1. On Windows run PowerShell and navigate to the root of the cloned directory
@@ -125,16 +127,15 @@ If you don't want to use this automation, follow the steps below
 
 #### Choose the Azure AD tenant where you want to create your applications
 
-
-
 If you want to register your apps manually, as a first step you'll need to:
 
 1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
 1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory**.
    Change your portal session to the desired Azure AD tenant.
 
-#### Register the service app (TodoListService)
+> 
 
+#### Register the service app (TodoListService)
 
 1. Navigate to the Microsoft identity platform for developers [App registrations](https://go.microsoft.com/fwlink/?linkid=2083908) page.
 1. Select **New registration**.
