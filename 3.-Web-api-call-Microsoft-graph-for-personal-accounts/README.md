@@ -7,7 +7,7 @@ client: .NET Desktop (WPF)
 service: ASP.NET Core Web API, Microsoft Graph
 endpoint: AAD v2.0
 ---
-# ASP.NET Core Web API calling Microsoft Graph including personal accounts, itself called from a WPF application using the Microsoft identity platform (formerly named Azure AD) v2
+# ASP.NET Core Web API calling Microsoft Graph including personal accounts, itself called from a WPF application using the Microsoft identity platform (formerly named Azure AD v2.0)
 
 ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/497/badge)
 
@@ -18,7 +18,7 @@ endpoint: AAD v2.0
 
 ## About this sample
 
-Contrary to the previous chapter, this one shows how to let personal Microsoft account sign-in.
+Contrary to the previous chapter, this one shows how to enable users to sign in with a Microsoft personal account
 
 ### Table of content
 
@@ -130,7 +130,7 @@ If you want to register your apps manually, as a first step you'll need to:
 1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory**.
    Change your portal session to the desired Azure AD tenant.
 
-#### Register the service app part
+#### Register the service app
 
 1. Navigate to the Microsoft identity platform for developers [App registrations](https://go.microsoft.com/fwlink/?linkid=2083908) page.
 1. Select **New registration**.
@@ -166,7 +166,7 @@ If you want to register your apps manually, as a first step you'll need to:
      - Keep **State** as **Enabled**
      - Select **Add scope**
 
-#### Register the client part (in the same app)
+#### Register the client aspect (in the same app)
 
 What **differs from the previous chapter** is that you will use the same application ID for the client part as for the service part
 
@@ -226,9 +226,9 @@ NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` 
 
 ## How was the code created
 
-For details about the way the code to protect the Web API was created, see [How was the code created](../.%20Web%20API%20now%20calls%20Microsoft%20Graph#How-was-the-code-created) section, of the README.md file located in the sibling folder named **2. Web API now calls Microsoft Graph**.
+For details about the code used for protecting a Web API, see [How was the code created](../.%20Web%20API%20now%20calls%20Microsoft%20Graph#How-was-the-code-created) section, of the README.md file located in the sibling folder named **2. Web API now calls Microsoft Graph**.
 
-This section, here, is only about the differences in the code to let the Web API call the Microsoft Graph with Microsoft personal accounts
+This section addresses the differences in the code for the Web API calling the Microsoft Graph with Microsoft personal accounts
 
 ### Change to the Web API (TodoListService)
 
