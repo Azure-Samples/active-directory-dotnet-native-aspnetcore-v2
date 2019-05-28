@@ -27,8 +27,9 @@ Sub folder                    | Description
 ----------------------------- | -----------
 [1. Desktop app calls Web API](https://aka.ms/msidentity-aspnetcore-webapi) | This first part, presents an ASP.NET Core 2.2 Web API protected by Azure Active Directory OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) </p> ![Topology](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/topology.png)
 [2. Web API now calls Microsoft Graph](https://aka.ms/msidentity-aspnetcore-webapi-calls-msgraph)  | This second part presents an increment where the Web API now calls Microsoft Graph on-behalf of the user signed-in in the desktop application. In this part, the Web API uses the Microsoft Authentication Library for .NET (MSAL.NET) to acquire a token for Microsoft Graph using the [on-behalf-of](https://aka.ms/msal-net-on-behalf-of) flow </p>  ![Topology](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/ReadmeFiles/topology.png)
+[3.-Web-api-call-Microsoft-graph-for-personal-accounts](3.-Web-api-call-Microsoft-graph-for-personal-accounts)  | This third part presents an increment where the Web API now calls Microsoft Graph on-behalf of the user signed-in in the desktop application, including with **personal Microsoft accounts**. In this part, the Web API also usea the Microsoft Authentication Library for .NET (MSAL.NET) to acquire a token for Microsoft Graph using the [on-behalf-of](https://aka.ms/msal-net-on-behalf-of) flow, but the client ID of the desktop app and the Web API are the same </p>  ![Topology](3.-Web-api-call-Microsoft-graph-for-personal-accounts/ReadmeFiles/topology.png)
 
-> Note: Even if you'll probably get the most of this tutorial by going through the part in the proposed order, it's also possible to jump directly to the second part.
+> Note: Even if you'll probably get the most of this tutorial by going through the part in the proposed order, it's also possible to jump directly to the second part or third part.
 
 ### User experience with this sample
 
@@ -51,6 +52,10 @@ Next time a user runs the application, the user is signed-in with the same ident
 The second phase of the tutorials modifies the Web API so that the todo-items also mention the identity of the user adding them.
 
 <img src="2.%20Web%20API%20now%20calls%20Microsoft%20Graph/ReadmeFiles/todolist-client.png" alt="TodoList Client with user name" width="320" />
+
+#### In the third part of the tutorial
+
+The experience in the third phase is the same as in the second phase, but users can sign-in with their personal Microsoft account
 
 ## How to run this sample
 

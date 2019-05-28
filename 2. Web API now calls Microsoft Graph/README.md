@@ -133,8 +133,6 @@ If you want to register your apps manually, as a first step you'll need to:
 1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory**.
    Change your portal session to the desired Azure AD tenant.
 
-> 
-
 #### Register the service app (TodoListService)
 
 1. Navigate to the Microsoft identity platform for developers [App registrations](https://go.microsoft.com/fwlink/?linkid=2083908) page.
@@ -225,7 +223,7 @@ Accepted tenants can have the following values:
 
 Value | Meaning
 ----- | --------
-`common` | users can sign in with any Work and School account, or Microsoft Personal account. *Don't use it for the moment. See [Current Limitations](#Current-limitations)*
+`common` | users can sign in with any Work and School account, or Microsoft Personal account. *Don't use it in this part of the tutorial. See [Current Limitations](#Current-limitations)*
 `organizations` |  users can sign in with any Work and School account
 `consumers` |  users can sign in with a Microsoft Personal account. *Don't use it for the moment (same as common)*
 a GUID or domain name | users can only sign in with an account for a specific organization described by its tenant ID (GUID) or domain name
@@ -271,8 +269,8 @@ NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` 
 
 The on-behalf-of flow works for Microsoft Personal accounts, but the consent is not yet rolled-up in the client for the user to consent to the Web API calling the downstream API (here Microsoft Graph). To make this work, the suggestion is:
 
-- either to use the same client ID in the Client and the Service. This way the consent for the service will appear in the client.
-- or to provide a protected page on the Web API (which therefore also becomes a Web app) so that the user can have an interaction
+- either to use the same client ID in the Client and the Service. This way the consent for the service will appear in the client. This approach is described in the third part of the tutorial [3.-Web-api-call-Microsoft-graph-for-personal-accounts](../3.-Web-api-call-Microsoft-graph-for-personal-accounts)
+- or to provide a protected page on the Web API (which therefore also becomes a Web app) so that the user can have an interaction to consent.
 
 ## How was the code created
 
