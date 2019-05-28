@@ -357,11 +357,12 @@ namespace TodoListClient
             //
             try
             {
-                // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
-                // would re-sign-in the same user
+                // Force a sign-in (Prompt.SelectAccount), as the MSAL web browser might contain cookies for the current user
+                // and we don't necessarily want to re-sign-in the same user
                 var result = await _app.AcquireTokenInteractive(Scopes)
                     .WithAccount(accounts.FirstOrDefault())
                     .WithPrompt(Prompt.SelectAccount)
+                    .WithExtraScopesToConsent(new[] { "user.read" })
                     .ExecuteAsync()
                     .ConfigureAwait(false);
 

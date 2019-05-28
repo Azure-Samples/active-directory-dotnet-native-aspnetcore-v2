@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Identity.Web", "..\Microsoft.Identity.Web\Microsoft.Identity.Web.csproj", "{BAF87009-6850-487B-A9AA-65641C5472B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Identity.Web", "..\Microsoft.Identity.Web\Microsoft.Identity.Web.csproj", "{832C0D5E-7506-48EF-91D8-1B2D365BBEBE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,13 +28,16 @@ Global
 		{443FB1A8-4F29-4D18-A4EB-23C3D764580C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{443FB1A8-4F29-4D18-A4EB-23C3D764580C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{443FB1A8-4F29-4D18-A4EB-23C3D764580C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BAF87009-6850-487B-A9AA-65641C5472B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BAF87009-6850-487B-A9AA-65641C5472B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BAF87009-6850-487B-A9AA-65641C5472B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BAF87009-6850-487B-A9AA-65641C5472B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{832C0D5E-7506-48EF-91D8-1B2D365BBEBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{832C0D5E-7506-48EF-91D8-1B2D365BBEBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{832C0D5E-7506-48EF-91D8-1B2D365BBEBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{832C0D5E-7506-48EF-91D8-1B2D365BBEBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{832C0D5E-7506-48EF-91D8-1B2D365BBEBE} = {DDAC3758-9CAE-4790-84B1-5B6258BAE44E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C0E11621-7A5F-4207-9629-0155FF96ADC4}
