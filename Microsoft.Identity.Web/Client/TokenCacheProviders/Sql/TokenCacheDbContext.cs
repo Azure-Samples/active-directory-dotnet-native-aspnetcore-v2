@@ -22,15 +22,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ***********************************************************************************************/
 
-namespace Microsoft.Identity.Web
+using Microsoft.EntityFrameworkCore;
+
+namespace Microsoft.Identity.Web.Client.TokenCacheProviders
 {
     /// <summary>
-    /// claim keys constants
+    /// The DBContext that is used by the TokenCache providers to read and write to a Sql database.
     /// </summary>
-    public static class ClaimConstants
+    public class TokenCacheDbContext : DbContext
     {
-        public const string ObjectId = "http://schemas.microsoft.com/identity/claims/objectidentifier";
-        public const string TenantId = "http://schemas.microsoft.com/identity/claims/tenantid";
-        public const string tid = "tid";
+        public TokenCacheDbContext(DbContextOptions<TokenCacheDbContext> options)
+        : base(options)
+        { }
+
+        /// <summary>
+        /// The app token cache table
+        /// </summary>
+        public DbSet<AppTokenCache> AppTokenCache { get; set; }
+
+        /// <summary>
+        /// The user token cache table
+        /// </summary>
+        public DbSet<UserTokenCache> UserTokenCache { get; set; }
     }
 }

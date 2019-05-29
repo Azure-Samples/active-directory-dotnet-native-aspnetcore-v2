@@ -64,6 +64,9 @@ namespace Microsoft.Identity.Web.Client
         /// <param name="configuration"></param>
         public TokenAcquisition(IConfiguration configuration, IMSALAppTokenCacheProvider appTokenCacheProvider, IMSALUserTokenCacheProvider userTokenCacheProvider)
         {
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+
             azureAdOptions = new AzureADOptions();
             configuration.Bind("AzureAD", azureAdOptions);
 
@@ -255,10 +258,12 @@ namespace Microsoft.Identity.Web.Client
                 account = accounts.FirstOrDefault(a => a.Username == user.GetLoginHint());
             }
 
- //           this.AppTokenCacheProvider?.Clear();
-            this.UserTokenCacheProvider?.Clear();
+            if (account!=null)
+            {
+                this.UserTokenCacheProvider?.Clear(account.HomeAccountId.Identifier);
 
-            await app.RemoveAsync(account);
+                await app.RemoveAsync(account);
+            }
         }
 
         /// <summary>

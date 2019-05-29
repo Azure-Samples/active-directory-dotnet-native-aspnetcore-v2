@@ -22,26 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ***********************************************************************************************/
 
-using Microsoft.AspNetCore.Http;
-using Microsoft.Identity.Client;
-using System.Security.Claims;
-
-namespace Microsoft.Identity.Web.Client.TokenCacheProviders
+namespace Microsoft.Identity.Web
 {
     /// <summary>
-    /// MSAL token cache provider interface for user accounts
+    /// Constants for claim types.
     /// </summary>
-    public interface IMSALUserTokenCacheProvider
+    public static class ClaimConstants
     {
-        /// <summary>Initializes this instance of TokenCacheProvider with essentials to initialize themselves.</summary>
-        /// <param name="tokenCache">The token cache instance of MSAL application</param>
-        /// <param name="httpcontext">The Httpcontext whose Session will be used for caching.This is required by some providers.</param>
-        /// <param name="user">The signed-in user for whom the cache needs to be established. Not needed by all providers.</param>
-        void Initialize(ITokenCache tokenCache, HttpContext httpcontext, ClaimsPrincipal user);
-
-        /// <summary>
-        /// Clears the token cache for this user
-        /// </summary>
-        void Clear(string accountId);
+        public const string Name = "name";
+        public const string ObjectId = "http://schemas.microsoft.com/identity/claims/objectidentifier";
+        public const string Oid = "oid";
+        public const string PreferredUserName = "preferred_username";
+        public const string TenantId = "http://schemas.microsoft.com/identity/claims/tenantid";
+        public const string Tid = "tid";
     }
 }
