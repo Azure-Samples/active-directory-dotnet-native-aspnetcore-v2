@@ -128,7 +128,7 @@ namespace Microsoft.Identity.Web.Client
                 // even if it's not done yet, so that it does not concurrently call the Token endpoint.
                 context.HandleCodeRedemption();
 
-                var application = BuildConfidentialClientApplication(context.HttpContext, context.Principal);
+                var application = GetOrBuildConfidentialClientApplication(context.HttpContext, context.Principal);
 
                 // Do not share the access token with ASP.NET Core otherwise ASP.NET will cache it and will not send the OAuth 2.0 request in
                 // case a further call to AcquireTokenByAuthorizationCodeAsync in the future for incremental consent (getting a code requesting more scopes)
@@ -163,7 +163,7 @@ namespace Microsoft.Identity.Web.Client
                 throw new ArgumentNullException(nameof(scopes));
 
             // Use MSAL to get the right token to call the API
-            var application = BuildConfidentialClientApplication(context, context.User);
+            var application = GetOrBuildConfidentialClientApplication(context, context.User);
             return await GetAccessTokenOnBehalfOfUser(application, context.User, scopes, tenant);
         }
 
@@ -248,7 +248,7 @@ namespace Microsoft.Identity.Web.Client
         public async Task RemoveAccount(RedirectContext context)
         {
             ClaimsPrincipal user = context.HttpContext.User;
-            IConfidentialClientApplication app = BuildConfidentialClientApplication(context.HttpContext, user);
+            IConfidentialClientApplication app = GetOrBuildConfidentialClientApplication(context.HttpContext, user);
             IAccount account = await app.GetAccountAsync(context.HttpContext.User.GetMsalAccountId());
 
             // Workaround for the guest account
@@ -264,6 +264,23 @@ namespace Microsoft.Identity.Web.Client
 
                 await app.RemoveAsync(account);
             }
+        }
+
+        IConfidentialClientApplication application;
+
+        /// <summary>
+        /// Creates an MSAL Confidential client application if needed
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="claimsPrincipal"></param>
+        /// <returns></returns>
+        private IConfidentialClientApplication GetOrBuildConfidentialClientApplication(HttpContext httpContext, ClaimsPrincipal claimsPrincipal)
+        {
+            if (application == null)
+            {
+                application = BuildConfidentialClientApplication(httpContext, claimsPrincipal);
+            }
+            return application;
         }
 
         /// <summary>
@@ -371,7 +388,7 @@ namespace Microsoft.Identity.Web.Client
                     // TODO: Understand if we could support other kind of client assertions (SAML);
                 }
 
-                var application = BuildConfidentialClientApplication(httpContext, principal);
+                var application = GetOrBuildConfidentialClientApplication(httpContext, principal);
 
                 // .Result to make sure that the cache is filled-in before the controller tries to get access tokens
                 var result = application.AcquireTokenOnBehalfOf(requestedScopes.Except(scopesRequestedByMsalNet), userAssertion)
