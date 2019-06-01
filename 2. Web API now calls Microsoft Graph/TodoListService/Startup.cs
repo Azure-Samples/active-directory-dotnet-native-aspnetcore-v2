@@ -45,7 +45,7 @@ namespace TodoListService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddProtectWebApiWithMicrosoftIdentityPlatformV2(Configuration)
-                    .AddProtectedApiCallsWebApis(Configuration, new string[] { "user.read" })
+                    .AddProtectedApiCallsWebApis(Configuration, null /*new string[] { "user.read" }*/)
                     .AddInMemoryTokenCaches();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
