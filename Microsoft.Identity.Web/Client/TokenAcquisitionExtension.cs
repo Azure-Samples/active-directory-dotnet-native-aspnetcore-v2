@@ -58,7 +58,7 @@ namespace Microsoft.Identity.Web
         public static IServiceCollection AddTokenAcquisition(this IServiceCollection services)
         {
             // Token acquisition service
-            services.AddSingleton<ITokenAcquisition>(factory =>
+            services.AddTransient<ITokenAcquisition>(factory =>
             {
                 var config = factory.GetRequiredService<IConfiguration>();
                 var apptokencacheprovider = factory.GetService<IMSALAppTokenCacheProvider>();
