@@ -24,7 +24,7 @@ namespace Microsoft.Identity.Web
         /// <param name="services">Service collection to which to add authentication</param>
         /// <param name="configuration">Configuration</param>
         /// <returns></returns>
-        public static IServiceCollection AddProtectWebApiWithMicrosoftIdentityPlatformV2(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddProtectWebApiWithMicrosoftIdentityPlatformV2(this IServiceCollection services, IConfiguration configuration, X509Certificate2 tokenDecryptionCertificate = null)
         {
             services.AddAuthentication(AzureADDefaults.JwtBearerAuthenticationScheme)
                     .AddAzureADBearer(options => configuration.Bind("AzureAd", options));
@@ -47,10 +47,15 @@ namespace Microsoft.Identity.Web
                 // we inject our own multitenant validation logic (which even accepts both V1 and V2 tokens)
                 options.TokenValidationParameters.IssuerValidator = AadIssuerValidator.GetIssuerValidator(options.Authority).ValidateAadIssuer;
 
+                // If you provide a token decryption certificate, it will be used to decrypt the token
+                if (tokenDecryptionCertificate != null)
+                {
+                    options.TokenValidationParameters.TokenDecryptionKey = new X509SecurityKey(tokenDecryptionCertificate);
+                }
+
                 // When an access token for our own Web API is validated, we add it to MSAL.NET's cache so that it can
                 // be used from the controllers.
                 options.Events = new JwtBearerEvents();
-
                 // If you want to debug, or just understand the JwtBearer events, uncomment the following line of code
                 // options.Events = JwtBearerMiddlewareDiagnostics.Subscribe(options.Events);
             });
@@ -68,17 +73,11 @@ namespace Microsoft.Identity.Web
         /// will be kept with the user's claims until the API calls a downstream API. Otherwise the account for the 
         /// user is immediately added to the token cache</param>
         /// <returns></returns>
-        public static IServiceCollection AddProtectedApiCallsWebApis(this IServiceCollection services, IConfiguration configuration, IEnumerable<string> scopes = null, X509Certificate2 tokenDecryptionCertificate=null)
+        public static IServiceCollection AddProtectedApiCallsWebApis(this IServiceCollection services, IConfiguration configuration, IEnumerable<string> scopes = null)
         {
             services.AddTokenAcquisition();
             services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
             {
-                // If you provide a token decryption certificate, it will be used to decrypt the token
-                if (tokenDecryptionCertificate != null)
-                {
-                    options.TokenValidationParameters.TokenDecryptionKey = new X509SecurityKey(tokenDecryptionCertificate);
-                }
-
                 // If you don't pre-provide scopes when adding calling AddProtectedApiCallsWebApis, the On behalf of
                 // flow will be delayed (lazy construction of MSAL's application
                 options.Events.OnTokenValidated = async context =>
