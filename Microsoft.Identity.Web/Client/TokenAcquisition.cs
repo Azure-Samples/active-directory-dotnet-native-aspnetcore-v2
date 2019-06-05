@@ -392,7 +392,8 @@ namespace Microsoft.Identity.Web.Client
                 IEnumerable<string> requestedScopes;
                 if (jwtToken != null)
                 {
-                    userAssertion = new UserAssertion(jwtToken.RawData, "urn:ietf:params:oauth:grant-type:jwt-bearer");
+                    string rawData = (jwtToken.InnerToken != null) ? jwtToken.InnerToken.RawData : jwtToken.RawData;
+                    userAssertion = new UserAssertion(rawData, "urn:ietf:params:oauth:grant-type:jwt-bearer");
                     requestedScopes = scopes ?? jwtToken.Audiences.Select(a => $"{a}/.default");
                 }
                 else
