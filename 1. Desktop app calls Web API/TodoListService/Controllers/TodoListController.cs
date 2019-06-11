@@ -23,6 +23,7 @@ SOFTWARE.
  */
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,7 @@ namespace TodoListService.Controllers
         [HttpGet]
         public IEnumerable<TodoItem> Get()
         {
+            HttpContext.VerifyUserHasRequiredScope("user_impersonation");
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return TodoStore.Where(t => t.Owner == owner).ToList();
         }
@@ -49,6 +51,7 @@ namespace TodoListService.Controllers
         [HttpPost]
         public void Post([FromBody]TodoItem todo)
         {
+            HttpContext.VerifyUserHasRequiredScope("user_impersonation");
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             TodoStore.Add(new TodoItem { Owner = owner, Title = todo.Title });
         }
