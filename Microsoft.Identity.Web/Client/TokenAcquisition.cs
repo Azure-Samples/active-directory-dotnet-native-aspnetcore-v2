@@ -139,6 +139,7 @@ namespace Microsoft.Identity.Web.Client
             }
             catch (MsalException ex)
             {
+                // brentsch - todo, write to a log
                 Debug.WriteLine(ex.Message);
                 throw;
             }
