@@ -38,11 +38,17 @@ namespace TodoListService.Controllers
     {
         static readonly ConcurrentBag<TodoItem> TodoStore = new ConcurrentBag<TodoItem>();
 
+        /// <summary>
+        /// The Web API will only accept tokens 1) for users, 2) having the user_impersonation scope for
+        /// this API
+        /// </summary>
+        const string scopeRequiredByAPI = "user_impersonation";
+
         // GET: api/values
         [HttpGet]
         public IEnumerable<TodoItem> Get()
         {
-            HttpContext.VerifyUserHasRequiredScope("user_impersonation");
+            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByAPI);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return TodoStore.Where(t => t.Owner == owner).ToList();
         }
@@ -51,7 +57,7 @@ namespace TodoListService.Controllers
         [HttpPost]
         public void Post([FromBody]TodoItem todo)
         {
-            HttpContext.VerifyUserHasRequiredScope("user_impersonation");
+            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByAPI);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             TodoStore.Add(new TodoItem { Owner = owner, Title = todo.Title });
         }
