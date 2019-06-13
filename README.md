@@ -11,6 +11,7 @@ endpoint: AAD v2.0
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
+
 ## About this sample
 
 ### Scenario
