@@ -9,7 +9,7 @@ endpoint: AAD v2.0
 ---
 # ASP.NET Core Web API calling Microsoft Graph including personal accounts, itself called from a WPF application using the Microsoft identity platform (formerly named Azure AD v2.0)
 
-![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/497/badge)
+[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD Samples/.NET client samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
 > The sample in this folder is part of a multi-phase tutorial. This folder is about the third phase named **Web API now calls Microsoft Graph including personal accounts**.
 > The second phase is available from [2. Web API now calls Microsoft Graph](../2.%20Web%20API%20now%20calls%20Microsoft%20Graph).
