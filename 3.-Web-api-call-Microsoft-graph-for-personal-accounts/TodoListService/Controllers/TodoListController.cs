@@ -57,9 +57,10 @@ namespace TodoListService.Controllers
 
         /// <summary>
         /// The Web API will only accept tokens 1) for users, 2) having the user_impersonation scope for
-        /// this API
+        /// this API (if you created the app using the App creation script) or 'access_as_user' if you created
+        /// it following the README.md.
         /// </summary>
-        const string scopeRequiredByAPI = "user_impersonation";
+        static string[] scopeRequiredByAPI = new string[] { "user_impersonation", "access_as_user" };
 
         // GET: api/values
         [HttpGet]
