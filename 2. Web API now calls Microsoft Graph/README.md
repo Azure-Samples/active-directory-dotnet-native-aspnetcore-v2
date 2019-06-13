@@ -9,7 +9,7 @@ endpoint: AAD v2.0
 ---
 # ASP.NET Core Web API calling Microsoft Graph, itself called from a WPF application using Azure AD V2
 
-[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD Samples/.NET client samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
+[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
 > The sample in this folder is part of a multi-phase tutorial. This folder is about the second phase named **Web API now calls Microsoft Graph**.
 > The first phase is available from [1. Desktop app calls Web API](../1.%20Desktop%20app%20calls%20Web%20API).

@@ -9,7 +9,7 @@ endpoint: AAD v2.0
 ---
 # Calling an ASP.NET Core Web API from a WPF application using Azure AD V2
 
-[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD Samples/.NET client samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
+[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
 ## About this sample
 
