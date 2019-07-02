@@ -49,11 +49,11 @@ namespace Microsoft.Identity.Web.Resource
         /// <summary>
         /// A list of all Issuers across the various Azure AD instances
         /// </summary>
-        private readonly SortedSet<string> _issuerAliases;
+        private readonly ISet<string> _issuerAliases;
 
         internal /* internal for test */ AadIssuerValidator(IEnumerable<string> aliases)
         {
-            _issuerAliases = new SortedSet<string>(aliases);
+            _issuerAliases = new HashSet<string>(aliases, StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -86,8 +86,12 @@ namespace Microsoft.Identity.Web.Resource
                 }
 
                 // Add issuer aliases of the chosen authority
-                string authority = authorityHost ?? FallbackAuthority;
-                var aliases = issuerMetadata.Metadata.Where(m => m.Aliases.Any(a => a == authority)).SelectMany(m => m.Aliases).Distinct();
+                string authority = authorityHost ?? new Uri(FallbackAuthority).Host;
+                var aliases = issuerMetadata.Metadata
+                    .Where(m => m.Aliases.Any(a => string.Equals(a , authority, StringComparison.OrdinalIgnoreCase)))
+                    .SelectMany(m => m.Aliases)
+                    .Distinct();
+
                 s_issuerValidators[authority] = new AadIssuerValidator(aliases);
                 return s_issuerValidators[authority];
             }
@@ -143,15 +147,15 @@ namespace Microsoft.Identity.Web.Resource
 
             try
             {
-                var uri = new Uri(validIssuerTemplate.Replace("{tenantid}", tenantId));
+                var issuerFromTemplateUri = new Uri(validIssuerTemplate.Replace("{tenantid}", tenantId));
                 var actualIssuerUri = new Uri(actualIssuer);
 
                 // Template authority is in the aliases
-                return _issuerAliases.Contains(uri.Authority) &&
-                    // "iss" authority matches
-                    string.Equals(uri.Authority, actualIssuerUri.Authority) &&
+                return _issuerAliases.Contains(issuerFromTemplateUri.Authority) &&
+                    // "iss" authority is in the aliases
+                    _issuerAliases.Contains(actualIssuerUri.Authority) &&
                     // Template authority ends in the tenantId
-                    IsValidTidInLocalPath(tenantId, uri) &&
+                    IsValidTidInLocalPath(tenantId, issuerFromTemplateUri) &&
                     // "iss" ends in the tenantId
                     IsValidTidInLocalPath(tenantId, actualIssuerUri);
             }

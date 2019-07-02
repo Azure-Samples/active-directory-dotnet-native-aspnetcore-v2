@@ -12,6 +12,7 @@ namespace Microsoft.Identity.Web.Test
     {
         private const string Tid = "9188040d-6c67-4c5b-b112-36a304b66dad";
         private static readonly string Iss = $"https://login.microsoftonline.com/{Tid}/v2.0";
+        private static readonly string Iss2 = $"https://sts.windows.net/{Tid}/v2.0";
         private static readonly IEnumerable<string> s_aliases = new[] { "login.microsoftonline.com", "sts.windows.net" };
 
         [Fact]
@@ -43,6 +44,20 @@ namespace Microsoft.Identity.Web.Test
                 new TokenValidationParameters() { ValidIssuers = new[] { "https://login.microsoftonline.com/{tenantid}/v2.0" } });
         }
 
+
+        [Fact]
+        public void PassingValidationWithAlias()
+        {
+            // Arrange
+            AadIssuerValidator validator = new AadIssuerValidator(s_aliases);
+            Claim issClaim = new Claim("tid", Tid);
+            Claim tidClaim = new Claim("iss", Iss2);  // sts.windows.net
+            JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(issuer: Iss2, claims: new[] { issClaim, tidClaim });
+
+            // Act & Assert
+            validator.Validate(Iss2, jwtSecurityToken,
+                new TokenValidationParameters() { ValidIssuers = new[] { "https://login.microsoftonline.com/{tenantid}/v2.0" } });
+        }
 
         [Fact]
         public void TokenValidationParameters_ValidIssuer()
