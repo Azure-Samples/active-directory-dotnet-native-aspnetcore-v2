@@ -1,12 +1,12 @@
 ---
-services: active-directory
-platforms: dotnet
-author: jmprieur
-level: 200
-client: .NET Desktop (WPF)
-service: ASP.NET Core Web API
-endpoint: AAD v2.0
+languages:
+- csharp
+products:
+- azure
+- azure-active-directory
+topic: sample
 ---
+
 # Calling an ASP.NET Core Web API from a WPF application using Azure AD V2
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
