@@ -164,7 +164,7 @@ If you want to register your apps manually, as a first step you'll need to:
    - Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ida:ClientId` in `TodoListClient\App.Config`).
 1. From the app's Overview page, select the **Authentication** section.
-   1. In the **Redirect URIs** list, under **Suggested Redirect URIs for public clients (mobile, desktop)** check the box next to **https://login.microsoftonline.com/common/oauth2/nativeclient**.
+   1. In the **Redirect URIs** list, select for **TYPE** Public client (mobile & desktop). Then paste this value **urn:ietf:wg:oauth:2.0:oob** in the **REDIRECT URI** column. 
    1. Select **Save**.
 1. Select the **API permissions** section
    - Click the **Add a permission** button and then,

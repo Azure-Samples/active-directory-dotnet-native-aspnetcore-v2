@@ -75,8 +75,6 @@ namespace TodoListClient
             InitializeComponent();
             _app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(Authority)
-                //Sets the default redirect URI to https://login.microsoftonline.com/common/oauth2/nativeclient for .NET Framework
-                .WithDefaultRedirectUri()
                 .Build();
 
             TokenCacheHelper.EnableSerialization(_app.UserTokenCache);
