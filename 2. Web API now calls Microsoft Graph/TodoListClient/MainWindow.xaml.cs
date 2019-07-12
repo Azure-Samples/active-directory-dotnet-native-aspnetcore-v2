@@ -79,6 +79,7 @@ namespace TodoListClient
             InitializeComponent();
             _app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(Authority)
+                .WithDefaultRedirectUri()
                 .Build();
 
             TokenCacheHelper.EnableSerialization(_app.UserTokenCache);
@@ -221,7 +222,8 @@ namespace TodoListClient
             else if (proposedAction == "consent")
             {
                 IPublicClientApplication pca = PublicClientApplicationBuilder.Create(clientId)
-                    .Build();
+                .WithDefaultRedirectUri()
+                .Build();
                 await pca.AcquireTokenInteractive(scopes)
                     .WithPrompt(Prompt.Consent)
                     .WithLoginHint(loginHint)

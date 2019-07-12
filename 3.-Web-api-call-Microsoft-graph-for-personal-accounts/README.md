@@ -172,7 +172,7 @@ What **differs from the previous chapter** is that you will use the same applica
 
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project (`ida:ClientId` in `TodoListClient\App.Config`).
 1. From the app's Overview page, select the **Authentication** section.
-   - In the **Redirect URLs** | Add the following redirect URI: **urn:ietf:wg:oauth:2.0:oob**
+   - In the **Redirect URIs** list, under **Suggested Redirect URIs for public clients (mobile, desktop)** check the box next to **https://login.microsoftonline.com/common/oauth2/nativeclient**.
    - Select **Save**.
 
 ### Step 3:  Configure the sample to use your Azure AD tenant
