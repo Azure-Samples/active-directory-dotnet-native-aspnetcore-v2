@@ -4,7 +4,8 @@ languages:
 products:
 - azure
 - azure-active-directory
-topic: sample
+page_type: sample
+description: "A sample that shows how to call an ASP.NET Core Web API from a WPF application using Azure Aactive Directory V2."
 ---
 
 # Calling an ASP.NET Core Web API from a WPF application using Azure AD V2
