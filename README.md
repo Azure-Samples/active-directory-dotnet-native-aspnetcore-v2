@@ -2,6 +2,7 @@
 languages:
 - csharp
 products:
+- aspnet
 - azure
 - azure-active-directory
 page_type: sample
