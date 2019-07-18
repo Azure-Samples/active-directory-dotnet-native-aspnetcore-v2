@@ -5,7 +5,7 @@ param(
     [string] $tenantId
 )
 
-if ((Get-Module -ListAvailable -Name "AzureAD") -eq $null) { 
+if ($null -eq (Get-Module -ListAvailable -Name "AzureAD")) { 
     Install-Module "AzureAD" -Scope CurrentUser 
 } 
 Import-Module AzureAD
@@ -44,27 +44,28 @@ This function removes the Azure AD applications for the sample. These applicatio
         $tenantId = $creds.Tenant.Id
     }
     $tenant = Get-AzureADTenantDetail
-    $tenantName =  ($tenant.VerifiedDomains | Where { $_._Default -eq $True }).Name
+    $tenantName =  ($tenant.VerifiedDomains | Where-Object { $_._Default -eq $True }).Name
     
     # Removes the applications
     Write-Host "Cleaning-up applications from tenant '$tenantName'"
 
     Write-Host "Removing 'service' (TodoListService (active-directory-dotnet-native-aspnetcore-v2)) if needed"
-    $app=Get-AzureADApplication -Filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'"  
+    $apps=Get-AzureADApplication -Filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'"  
 
-    if ($app)
+    foreach ($app in $apps) 
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
         Write-Host "Removed TodoListService (active-directory-dotnet-native-aspnetcore-v2)."
     }
-        Write-Host "Removing 'client' (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) if needed"
-    $app=Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient (active-directory-dotnet-native-aspnetcore-v2)'"  
 
-    if ($app)
+        Write-Host "Removing 'client' (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) if needed"
+    $apps=Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient (active-directory-dotnet-native-aspnetcore-v2)'"  
+
+    foreach ($app in $apps) 
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
         Write-Host "Removed TodoListClient (active-directory-dotnet-native-aspnetcore-v2)."
     }
-    }
+}
 
 Cleanup -Credential $Credential -tenantId $TenantId
