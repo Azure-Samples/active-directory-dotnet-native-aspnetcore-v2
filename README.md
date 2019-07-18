@@ -1,12 +1,14 @@
 ---
-services: active-directory
-platforms: dotnet
-author: jmprieur
-level: 200
-client: .NET Desktop (WPF)
-service: ASP.NET Core Web API
-endpoint: AAD v2.0
+languages:
+- csharp
+products:
+- aspnet
+- azure
+- azure-active-directory
+page_type: sample
+description: "A sample that shows how to call an ASP.NET Core Web API from a WPF application using Azure Active Directory V2."
 ---
+
 # Calling an ASP.NET Core Web API from a WPF application using Azure AD V2
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
@@ -87,7 +89,7 @@ Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get supp
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
 Make sure that your questions or comments are tagged with [`msal` `dotnet`].
 
-If you find a bug in the sample, please raise the issue on [GitHub Issues](../../issues).
+If you find a bug in the sample, please open an issue on [GitHub Issues](../../issues).
 
 To provide a recommendation, visit the following [User Voice page](https://feedback.azure.com/forums/169401-azure-active-directory).
 
