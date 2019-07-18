@@ -98,7 +98,7 @@ namespace Microsoft.Identity.Web.Client
         /// From the configuration of the Authentication of the ASP.NET Core Web API:
         /// <code>OpenIdConnectOptions options;</code>
         ///
-        /// Subscribe to the authorization code recieved event:
+        /// Subscribe to the authorization code received event:
         /// <code>
         ///  options.Events = new OpenIdConnectEvents();
         ///  options.Events.OnAuthorizationCodeReceived = OnAuthorizationCodeReceived;
@@ -125,8 +125,16 @@ namespace Microsoft.Identity.Web.Client
             try
             {
                 // As AcquireTokenByAuthorizationCodeAsync is asynchronous we want to tell ASP.NET core that we are handing the code
-                // even if it's not done yet, so that it does not concurrently call the Token endpoint.
+                // even if it's not done yet, so that it does not concurrently call the Token endpoint. (otherwise there will be a
+                // race condition ending-up in an error from Azure AD telling "code already redeemed")
                 context.HandleCodeRedemption();
+
+                // The cache will need the claims from the ID token. In the case of guest scenarios
+                // If they are not yet in the HttpContext.User's claims, adding them.
+                if (!context.HttpContext.User.Claims.Any())
+                {
+                    (context.HttpContext.User.Identity as ClaimsIdentity).AddClaims(context.Principal.Claims);
+                }
 
                 var application = GetOrBuildConfidentialClientApplication(context.HttpContext, context.Principal);
 
@@ -272,7 +280,7 @@ namespace Microsoft.Identity.Web.Client
                 account = accounts.FirstOrDefault(a => a.Username == user.GetLoginHint());
             }
 
-            if (account!=null)
+            if (account != null)
             {
                 this.UserTokenCacheProvider?.Clear(account.HomeAccountId.Identifier);
 
@@ -280,7 +288,7 @@ namespace Microsoft.Identity.Web.Client
             }
         }
 
-        IConfidentialClientApplication application;
+        private IConfidentialClientApplication application;
 
         /// <summary>
         /// Creates an MSAL Confidential client application if needed
@@ -359,14 +367,15 @@ namespace Microsoft.Identity.Web.Client
             // Get the account
             IAccount account = await application.GetAccountAsync(accountIdentifier);
 
-            // Special case for guest users as the Guest iod / tenant id are not surfaced.
+            // Special case for guest users as the Guest id / tenant id are not surfaced.
             if (account == null)
             {
                 var accounts = await application.GetAccountsAsync();
                 account = accounts.FirstOrDefault(a => a.Username == loginHint);
             }
 
-            AuthenticationResult result;
+            AuthenticationResult result = null;
+
             if (string.IsNullOrWhiteSpace(tenant))
             {
                 result = await application.AcquireTokenSilent(scopes.Except(scopesRequestedByMsalNet), account)
@@ -379,6 +388,7 @@ namespace Microsoft.Identity.Web.Client
                                           .WithAuthority(authority)
                                           .ExecuteAsync();
             }
+
             return result.AccessToken;
         }
 
@@ -417,9 +427,8 @@ namespace Microsoft.Identity.Web.Client
             }
         }
 
-
         /// <summary>
-        /// Used in Web APIs (which therefore cannot have an interaction with the user). 
+        /// Used in Web APIs (which therefore cannot have an interaction with the user).
         /// Replies to the client through the HttpReponse by sending a 403 (forbidden) and populating wwwAuthenticateHeaders so that
         /// the client can trigger an iteraction with the user so that the user consents to more scopes
         /// </summary>
@@ -466,7 +475,7 @@ namespace Microsoft.Identity.Web.Client
         {
             // Normally app developers should not make decisions based on the internal AAD code
             // however until the STS sends sub-error codes for this error, this is the only
-            // way to distinguish the case. 
+            // way to distinguish the case.
             // This is subject to change in the future
             return (msalSeviceException.Message.Contains("AADSTS50013"));
         }

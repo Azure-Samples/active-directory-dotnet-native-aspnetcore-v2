@@ -31,7 +31,6 @@ using Microsoft.Identity.Web.Client;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Microsoft.Identity.Web
@@ -40,10 +39,10 @@ namespace Microsoft.Identity.Web
     {
         /// <summary>
         /// Add authentication with Microsoft identity platform v2.0 (AAD v2.0).
-        /// This supposes that the configuration files have a section named "AzureAD"
+        /// This expects the configuration files will have a section named "AzureAD"
         /// </summary>
-        /// <param name="services">Service collection to which to add authentication</param>
-        /// <param name="configuration">Configuration</param>
+        /// <param name="services">Service collection to which to add this authentication scheme</param>
+        /// <param name="configuration">The Configuration object</param>
         /// <returns></returns>
         public static IServiceCollection AddAzureAdV2Authentication(this IServiceCollection services, IConfiguration configuration)
         {
@@ -76,16 +75,8 @@ namespace Microsoft.Identity.Web
                 // and [Access Tokens](https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens)
                 options.TokenValidationParameters.NameClaimType = "preferred_username";
 
-                // Handling the sign-out
-                options.Events.OnRedirectToIdentityProviderForSignOut = async context =>
-                {
-                    var user = context.HttpContext.User;
-
-                    // Avoid displaying the select account dialog
-                    context.ProtocolMessage.LoginHint = user.GetLoginHint();
-                    context.ProtocolMessage.DomainHint = user.GetDomainHint();
-                    await Task.FromResult(0);
-                };
+                // Force the account selection (to avoid automatic sign-in with the account signed-in with Windows)
+                //options.Prompt = "select_account";
 
                 // Avoids having users being presented the select account dialog when they are already signed-in
                 // for instance when going through incremental consent

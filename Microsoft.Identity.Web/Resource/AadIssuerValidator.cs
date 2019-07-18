@@ -22,15 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ***********************************************************************************************/
 
+using Microsoft.Identity.Web.InstanceDiscovery;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using Microsoft.Identity.Web.InstanceDiscovery;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.Identity.Web.Resource
 {
@@ -44,6 +44,7 @@ namespace Microsoft.Identity.Web.Resource
 
         // TODO: separate AadIssuerValidator creation logic from the validation logic in order to unit test it
         private static readonly IDictionary<string, AadIssuerValidator> s_issuerValidators = new ConcurrentDictionary<string, AadIssuerValidator>();
+
         private static readonly ConfigurationManager<IssuerMetadata> s_configManager = new ConfigurationManager<IssuerMetadata>(AzureADIssuerMetadataUrl, new IssuerConfigurationRetriever());
 
         /// <summary>
@@ -88,10 +89,9 @@ namespace Microsoft.Identity.Web.Resource
                 // Add issuer aliases of the chosen authority
                 string authority = authorityHost ?? new Uri(FallbackAuthority).Host;
                 var aliases = issuerMetadata.Metadata
-                    .Where(m => m.Aliases.Any(a => string.Equals(a , authority, StringComparison.OrdinalIgnoreCase)))
+                    .Where(m => m.Aliases.Any(a => string.Equals(a, authority, StringComparison.OrdinalIgnoreCase)))
                     .SelectMany(m => m.Aliases)
                     .Distinct();
-
                 s_issuerValidators[authority] = new AadIssuerValidator(aliases);
                 return s_issuerValidators[authority];
             }
@@ -152,12 +152,12 @@ namespace Microsoft.Identity.Web.Resource
 
                 // Template authority is in the aliases
                 return _issuerAliases.Contains(issuerFromTemplateUri.Authority) &&
-                    // "iss" authority is in the aliases
-                    _issuerAliases.Contains(actualIssuerUri.Authority) &&
-                    // Template authority ends in the tenantId
-                    IsValidTidInLocalPath(tenantId, issuerFromTemplateUri) &&
-                    // "iss" ends in the tenantId
-                    IsValidTidInLocalPath(tenantId, actualIssuerUri);
+                       // "iss" authority is in the aliases
+                       _issuerAliases.Contains(actualIssuerUri.Authority) &&
+                      // Template authority ends in the tenantId
+                      IsValidTidInLocalPath(tenantId, issuerFromTemplateUri) &&
+                      // "iss" ends in the tenantId
+                      IsValidTidInLocalPath(tenantId, actualIssuerUri);
             }
             catch
             {
@@ -186,7 +186,7 @@ namespace Microsoft.Identity.Web.Resource
             }
 
             // brentsch - todo, TryGetPayloadValue is available in 5.5.0
-            if (securityToken is JsonWebToken  jsonWebToken)
+            if (securityToken is JsonWebToken jsonWebToken)
             {
                 var tid = jsonWebToken.GetPayloadValue<string>(ClaimConstants.Tid);
                 if (tid != null)
