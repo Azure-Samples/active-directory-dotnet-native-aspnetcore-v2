@@ -5,9 +5,9 @@ author: jmprieur
 level: 300
 client: .NET Desktop (WPF)
 service: ASP.NET Core Web API
-endpoint: AAD v2.0
+endpoint: Microsoft identity platform
 ---
-# Calling an ASP.NET Core Web API from a WPF application using Azure AD V2
+# Calling an ASP.NET Core Web API from a WPF application using Microsoft identity platform
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
@@ -45,7 +45,7 @@ The .Net application uses the Active Directory Authentication Library [MSAL.NET]
 ![Topology](./ReadmeFiles/topology.png)
 
 > This sample is very similar to the [active-directory-dotnet-native-aspnetcore](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore) sample except that that one is for the Azure AD V1 endpoint
-> and the token is acquired using [ADAL.NET](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet), whereas this sample is for the V2 endpoint, and the token is acquired using [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet). The Web API was also modified to accept both V1 and V2 tokens.
+> and the token is acquired using [ADAL.NET](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet), whereas this sample is for the Microsoft identity platform endpoint, and the token is acquired using [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet). The Web API was also modified to accept both V1 and V2 tokens.
 
 ### User experience when using this sample
 
@@ -152,7 +152,7 @@ If you want to register your apps manually, as a first step you'll need to:
    - in the manifest, search for **"accessTokenAcceptedVersion"**, and see that its value is **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
    - Select **Save**
 
-> Important: it's up to the Web API to decide which version of token (v1.0 or v2.0) it accepts. Then when clients request a token for your Web API using the v2.0 endpoint, they'll get a token which version is accepted by the Web API. The code validating the tokens in this sample was written to accept both versions.
+> Important: it's up to the Web API to decide which version of token (v1.0 or v2.0) it accepts. Then when clients request a token for your Web API using the identity platform endpoint, they'll get a token which version is accepted by the Web API. The code validating the tokens in this sample was written to accept both versions.
 
 #### Register the client app (TodoListClient)
 
@@ -395,7 +395,7 @@ This code validates that the issuer of the token sent, by its client, to the Web
 
 #### Modify the startup.cs file so that the Web API becomes v2.0 multi-tenant app
 
-Currently the ASP.NET Core templates create Azure AD v1.0 Web APIs. However you can easylly change them to use the Azure AD v2.0 endpoint. To update them, make the following changes in the `Startup.cs` file.
+Currently the ASP.NET Core templates create Azure AD v1.0 Web APIs. However you can easylly change them to use the Microsoft identity platform endpoint. To update them, make the following changes in the `Startup.cs` file.
 
 Add a using for `Microsoft.AspNetCore.Authentication.JwtBearer`
 
@@ -428,7 +428,7 @@ services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationSche
 
 This code makes sure that:
 
-- the tokens are validated with Azure AD v2.0 (the ASP.NET Core 2.1 template is for the moment an Azure AD v1.0 template)
+- the tokens are validated with Microsoft identity platform (the ASP.NET Core 2.1 template is for the moment an Azure AD v1.0 template)
 - the valid audiences are both the ClientID of our Web API (default value of `options.Audience` with the ASP.NET Core template and api://{ClientID}
 - the issuer is validated (for the multi-tenant case)
 
