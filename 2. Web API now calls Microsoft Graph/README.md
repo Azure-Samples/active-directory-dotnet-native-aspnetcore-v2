@@ -5,9 +5,9 @@ author: jmprieur
 level: 400
 client: .NET Desktop (WPF)
 service: ASP.NET Core Web API, Microsoft Graph
-endpoint: AAD v2.0
+endpoint: Microsoft identity platform
 ---
-# ASP.NET Core Web API calling Microsoft Graph, itself called from a WPF application using Azure AD V2
+# ASP.NET Core Web API calling Microsoft Graph, itself called from a WPF application using Microsoft identity platform
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
@@ -115,7 +115,7 @@ If you want to use this automation:
    > Other ways of running the scripts are described in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
 
 1. In the list of pages for the application registration of the `TodoListService-v2` application, select **Manifest**
-      - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
+      - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts Microsoft identity platform (v2.0) tokens
       - Select **Save**
 
 
@@ -174,7 +174,7 @@ If you want to register your apps manually, as a first step you'll need to:
    - in the manifest, search for **"accessTokenAcceptedVersion"**, and see that its value is **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
    - Select **Save**
 
-> Important: it's up to the Web API to decide which version of token (v1.0 or v2.0) it accepts. Then when clients request a token for your Web API using the v2.0 endpoint, they'll get a token which version is accepted by the Web API. The code validating the tokens in this sample was written to accept both versions.
+> Important: it's up to the Web API to decide which version of token (v1.0 or v2.0) it accepts. Then when clients request a token for your Web API using the Microsoft identity platform endpoint, they'll get a token which version is accepted by the Web API. The code validating the tokens in this sample was written to accept both versions.
 
 #### Register the client app (TodoListClient)
 
@@ -309,7 +309,7 @@ Update `Startup.cs` file:
 
   `AddProtectWebApiWithMicrosoftIdentityPlatformV2` does the following:
   - add the **Jwt**BearerAuthenticationScheme (Note the replacement of BearerAuthenticationScheme by **Jwt**BearerAuthenticationScheme)
-  - set the authority to be the Microsoft identity platform v2.0 identity
+  - set the authority to be the Microsoft identity platform identity
   - sets the audiences to validate
   - register an issuer validator that accepts issuers to be in the Microsoft identity platform clouds.
   - 
@@ -325,7 +325,7 @@ Update `Startup.cs` file:
   // Added
   services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
   {
-    // This is an Azure AD v2.0 Web API
+    // This is an Microsoft identity platform Web API
     options.Authority += "/v2.0";
 
     // The valid audiences are both the Client ID (options.Audience) and api://{ClientID}
