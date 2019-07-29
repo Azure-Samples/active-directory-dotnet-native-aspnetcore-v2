@@ -1,10 +1,10 @@
 ---
 languages:
-- csharp
+  - csharp
 products:
-- aspnet
-- azure
-- azure-active-directory
+  - aspnet
+  - azure
+  - azure-active-directory
 page_type: sample
 description: "A sample that shows how to call an ASP.NET Core Web API from a WPF application using Azure Active Directory V2."
 ---
