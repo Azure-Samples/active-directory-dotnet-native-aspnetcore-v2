@@ -107,10 +107,10 @@ namespace Microsoft.Identity.Web
         /// <remarks>See https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens#payload-claims </remarks>
         public static string GetDisplayName(this ClaimsPrincipal claimsPrincipal)
         {
-            // Attempting the claims brought by a v2.0 token first
+            // Attempting the claims brought by an Microsoft identity platform token first
             string displayName = claimsPrincipal.FindFirstValue(ClaimConstants.PreferredUserName);
 
-            // Otherwise falling back to the claims brought by a v1.0 token
+            // Otherwise falling back to the claims brought by an Azure AD v1.0 token
             if (string.IsNullOrWhiteSpace(displayName))
             {
                 displayName = claimsPrincipal.FindFirstValue(ClaimsIdentity.DefaultNameClaimType);
