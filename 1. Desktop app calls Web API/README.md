@@ -79,7 +79,7 @@ git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnet
 cd "aspnetcore-webapi\1. Desktop app calls Web API"
 ```
 
-or download and exact the repository .zip file.
+or download and extract the repository .zip file.
 
 > Given that the name of the sample is pretty long, and so are the name of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
