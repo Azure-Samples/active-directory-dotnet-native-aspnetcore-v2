@@ -1,5 +1,5 @@
 ﻿/*
- The MIT License (MIT)
+The MIT License (MIT)
 
 Copyright (c) 2015 Microsoft Corporation
 
@@ -41,14 +41,16 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// <summary>
         /// The HTTP context being used by this app
         /// </summary>
-        internal HttpContext HttpContext { get { return httpContextAccessor.HttpContext; } }
+        internal HttpContext HttpContext { get { return _httpContextAccessor.HttpContext; } }
 
-        IHttpContextAccessor httpContextAccessor;
+        IHttpContextAccessor _httpContextAccessor;
 
-        /// <summary>Initializes a new instance of the <see cref="MSALPerUserSessionTokenCache"/> class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MSALPerUserSessionTokenCache"/> class.
+        /// </summary>
         public MSALPerUserSessionTokenCacheProvider(IHttpContextAccessor httpContextAccessor)
         {
-            this.httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>Initializes the cache instance</summary>
@@ -62,9 +64,9 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
             {
                 throw new ArgumentNullException(nameof(tokenCache));
             }
-            tokenCache.SetBeforeAccess(this.UserTokenCacheBeforeAccessNotification);
-            tokenCache.SetAfterAccess(this.UserTokenCacheAfterAccessNotification);
-            tokenCache.SetBeforeWrite(this.UserTokenCacheBeforeWriteNotification);
+            tokenCache.SetBeforeAccess(UserTokenCacheBeforeAccessNotification);
+            tokenCache.SetAfterAccess(UserTokenCacheAfterAccessNotification);
+            tokenCache.SetBeforeWrite(UserTokenCacheBeforeWriteNotification);
         }
 
         /// <summary>
@@ -77,11 +79,11 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
             SessionLock.EnterWriteLock();
             try
             {
-                Debug.WriteLine($"INFO: Clearing session {this.HttpContext.Session.Id}, cacheId {cacheKey}");
+                Debug.WriteLine($"INFO: Clearing session {HttpContext.Session.Id}, cacheId {cacheKey}");
 
                 // Reflect changes in the persistent store
-                this.HttpContext.Session.Remove(cacheKey);
-                this.HttpContext.Session.CommitAsync().Wait();
+                HttpContext.Session.Remove(cacheKey);
+                HttpContext.Session.CommitAsync().Wait();
             }
             finally
             {
@@ -90,7 +92,7 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         }
 
         /// <summary>
-        /// if you want to ensure that no concurrent write take place, use this notification to place a lock on the entry
+        /// If you want to ensure that no concurrent write takes place, use this notification to place a lock on the entry
         /// </summary>
         /// <param name="args">Contains parameters used by the MSAL call accessing the cache.</param>
         private void UserTokenCacheBeforeWriteNotification(TokenCacheNotificationArgs args)
@@ -104,23 +106,25 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// <param name="args">Contains parameters used by the MSAL call accessing the cache.</param>
         private void UserTokenCacheAfterAccessNotification(TokenCacheNotificationArgs args)
         {
-            // if the access operation resulted in a cache update
+            // If the access operation resulted in a cache update
             if (args.HasStateChanged)
             {
-                string cacheKey = httpContextAccessor.HttpContext.User.GetMsalAccountId();
+                string cacheKey = _httpContextAccessor.HttpContext.Request.Headers["Authorization"];
 
                 if (string.IsNullOrWhiteSpace(cacheKey))
+                {
                     return;
+                }
 
                 SessionLock.EnterWriteLock();
                 try
                 {
-                    Debug.WriteLine($"INFO: Serializing session {this.HttpContext.Session.Id}, cacheId {cacheKey}");
+                    Debug.WriteLine($"INFO: Serializing session {HttpContext.Session.Id}, cacheId {cacheKey}");
 
                     // Reflect changes in the persistent store
                     byte[] blob = args.TokenCache.SerializeMsalV3();
-                    this.HttpContext.Session.Set(cacheKey, blob);
-                    this.HttpContext.Session.CommitAsync().Wait();
+                    HttpContext.Session.Set(cacheKey, blob);
+                    HttpContext.Session.CommitAsync().Wait();
                 }
                 finally
                 {
@@ -135,22 +139,25 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// <param name="args">Contains parameters used by the MSAL call accessing the cache.</param>
         private void UserTokenCacheBeforeAccessNotification(TokenCacheNotificationArgs args)
         {
-            this.HttpContext.Session.LoadAsync().Wait();
-            string cacheKey = httpContextAccessor.HttpContext.User.GetMsalAccountId();
+            HttpContext.Session.LoadAsync().Wait();
+            string cacheKey = _httpContextAccessor.HttpContext.Request.Headers["Authorization"];
+
             if (string.IsNullOrWhiteSpace(cacheKey))
+            {
                 return;
+            }
 
             SessionLock.EnterReadLock();
             try
             {
-                if (this.HttpContext.Session.TryGetValue(cacheKey, out byte[] blob))
+                if (HttpContext.Session.TryGetValue(cacheKey, out byte[] blob))
                 {
-                    Debug.WriteLine($"INFO: Deserializing session {this.HttpContext.Session.Id}, cacheId {cacheKey}");
+                    Debug.WriteLine($"INFO: Deserializing session {HttpContext.Session.Id}, cacheId {cacheKey}");
                     args.TokenCache.DeserializeMsalV3(blob, shouldClearExistingCache: true);
                 }
                 else
                 {
-                    Debug.WriteLine($"INFO: cacheId {cacheKey} not found in session {this.HttpContext.Session.Id}");
+                    Debug.WriteLine($"INFO: cacheId {cacheKey} not found in session {HttpContext.Session.Id}");
                 }
             }
             finally

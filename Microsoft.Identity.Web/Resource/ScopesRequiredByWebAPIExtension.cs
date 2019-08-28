@@ -1,7 +1,7 @@
-﻿/************************************************************************************************
+﻿/*
 The MIT License (MIT)
 
-Copyright (c) 2015 Microsoft Corporation
+Copyright (c) 2018 Microsoft Corporation
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,17 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-***********************************************************************************************/
+*/
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Text;
 
 namespace Microsoft.Identity.Web.Resource
 {
@@ -44,7 +41,7 @@ namespace Microsoft.Identity.Web.Resource
         /// <param name="acceptedScopes">Scopes accepted by this API</param>
         /// <exception cref="HttpRequestException"/> with a <see cref="HttpResponse.StatusCode"/> set to 
         /// <see cref="HttpStatusCode.Unauthorized"/>
-        public static void VerifyUserHasAnyAcceptedScope(this HttpContext context, params string[] acceptedScopes)
+        public static void VerifyUserHasAcceptedScope(this HttpContext context, params string[] acceptedScopes)
         {
             if (acceptedScopes == null)
             {

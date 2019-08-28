@@ -1,5 +1,5 @@
 ﻿/*
- The MIT License (MIT)
+The MIT License (MIT)
 
 Copyright (c) 2018 Microsoft Corporation
 
@@ -20,8 +20,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
- */
-#define ENABLE_OBO
+*/
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -56,17 +56,16 @@ namespace TodoListService.Controllers
         static readonly ConcurrentBag<TodoItem> TodoStore = new ConcurrentBag<TodoItem>();
 
         /// <summary>
-        /// The Web API will only accept tokens 1) for users, 2) having the user_impersonation scope for
-        /// this API (if you created the app using the App creation script) or 'access_as_user' if you created
-        /// it following the README.md.
+        /// The Web API will only accept tokens 1) for users, and 
+        /// 2) having the user_impersonation scope for this API
         /// </summary>
-        static string[] scopeRequiredByAPI = new string[] { "user_impersonation", "access_as_user" };
+        static readonly string[] scopeRequiredByApi = new string[] { "user_impersonation" };
 
         // GET: api/values
         [HttpGet]
         public IEnumerable<TodoItem> Get()
         {
-            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByAPI);
+            HttpContext.VerifyUserHasAcceptedScope(scopeRequiredByApi);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return TodoStore.Where(t => t.Owner == owner).ToList();
         }
@@ -75,10 +74,10 @@ namespace TodoListService.Controllers
         [HttpPost]
         public async void Post([FromBody]TodoItem todo)
         {
-            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByAPI);
+            HttpContext.VerifyUserHasAcceptedScope(scopeRequiredByApi);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             string ownerName;
-#if ENABLE_OBO
+
             // This is a synchronous call, so that the clients know, when they call Get, that the 
             // call to the downstream API (Microsoft Graph) has completed.
             try
@@ -91,7 +90,7 @@ namespace TodoListService.Controllers
             {
                 HttpContext.Response.ContentType = "text/plain";
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n"+ex.ErrorCode + "\n"+ ex.Message);
+                await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n" + ex.ErrorCode + "\n" + ex.Message);
             }
             catch (Exception ex)
             {
@@ -99,8 +98,6 @@ namespace TodoListService.Controllers
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await HttpContext.Response.WriteAsync("An error occurred while calling the downstream API\n" + ex.Message);
             }
-#endif
-
         }
 
         public async Task<string> CallGraphApiOnBehalfOfUser()
@@ -123,9 +120,7 @@ namespace TodoListService.Controllers
 
         private static async Task<dynamic> CallGraphApiOnBehalfOfUser(string accessToken)
         {
-            //
             // Call the Graph API and retrieve the user's profile.
-            //
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             HttpResponseMessage response = await client.GetAsync("https://graph.microsoft.com/v1.0/me");

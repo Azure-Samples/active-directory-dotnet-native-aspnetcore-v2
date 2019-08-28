@@ -1,4 +1,4 @@
-/************************************************************************************************
+/*
 The MIT License (MIT)
 
 Copyright (c) 2015 Microsoft Corporation
@@ -20,21 +20,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-***********************************************************************************************/
+*/
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Identity.Web.Client;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -114,7 +110,7 @@ namespace Microsoft.Identity.Web
         /// will be kept with the user's claims until the API calls a downstream API. Otherwise the account for the
         /// user is immediately added to the token cache</param>
         /// <returns></returns>
-        public static IServiceCollection AddProtectedApiCallsWebApis(this IServiceCollection services, IConfiguration configuration, IEnumerable<string> scopes = null)
+        public static IServiceCollection CreateContext(this IServiceCollection services)
         {
             services.AddTokenAcquisition();
             services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
@@ -123,25 +119,7 @@ namespace Microsoft.Identity.Web
                 // flow will be delayed (lazy construction of MSAL's application
                 options.Events.OnTokenValidated = async context =>
                 {
-                    if (scopes != null && scopes.Any())
-                    {
-                        var tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
-                        context.Success();
-                        tokenAcquisition.AddAccountToCacheFromJwt(context, scopes);
-                    }
-                    else
-                    {
-                        context.Success();
-
-                        // Todo : rather use options.SaveToken?
-                        JwtSecurityToken jwtSecurityToken = context.SecurityToken as JwtSecurityToken;
-                        if (jwtSecurityToken != null)
-                        {
-                            string rawData = (jwtSecurityToken.InnerToken != null) ? jwtSecurityToken.InnerToken.RawData : jwtSecurityToken.RawData;
-                            (context.Principal.Identity as ClaimsIdentity).AddClaim(new Claim("jwt", rawData));
-                        }
-                    }
-                    // Adds the token to the cache, and also handles the incremental consent and claim challenges
+                    context.Success();
                     await Task.FromResult(0);
                 };
             });

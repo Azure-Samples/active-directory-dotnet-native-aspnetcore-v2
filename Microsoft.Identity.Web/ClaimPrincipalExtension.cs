@@ -1,4 +1,4 @@
-﻿/************************************************************************************************
+﻿/*
 The MIT License (MIT)
 
 Copyright (c) 2015 Microsoft Corporation
@@ -20,46 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-***********************************************************************************************/
+*/
 
-using Microsoft.Identity.Client;
 using System.Security.Claims;
 
 namespace Microsoft.Identity.Web
 {
     public static class ClaimsPrincipalExtension
     {
-        /// <summary>
-        /// Gets the Account identifier for an MSAL.NET account from a <see cref="ClaimsPrincipal"/>
-        /// </summary>
-        /// <param name="claimsPrincipal">Claims principal</param>
-        /// <returns>A string corresponding to an account identifier as defined in <see cref="Microsoft.Identity.Client.AccountId.Identifier"/></returns>
-        public static string GetMsalAccountId(this ClaimsPrincipal claimsPrincipal)
-        {
-            string userObjectId = GetObjectId(claimsPrincipal);
-            string tenantId = GetTenantId(claimsPrincipal);
-            if (!string.IsNullOrWhiteSpace(userObjectId) && !string.IsNullOrWhiteSpace(tenantId))
-            {
-                return $"{userObjectId}.{tenantId}";
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the unique object ID associated with the <see cref="ClaimsPrincipal"/>
-        /// </summary>
-        /// <param name="claimsPrincipal">the <see cref="ClaimsPrincipal"/> from which to retrieve the unique object id</param>
-        /// <returns>Unique object ID of the identity, or <c>null</c> if it cannot be found</returns>
-        public static string GetObjectId(this ClaimsPrincipal claimsPrincipal)
-        {
-            string userObjectId = claimsPrincipal.FindFirstValue(ClaimConstants.Oid);
-            if (string.IsNullOrEmpty(userObjectId))
-                userObjectId = claimsPrincipal.FindFirstValue(ClaimConstants.ObjectId);
-
-            return userObjectId;
-        }
-
         /// <summary>
         /// Gets the Tenant ID associated with the <see cref="ClaimsPrincipal"/>
         /// </summary>
@@ -107,10 +75,10 @@ namespace Microsoft.Identity.Web
         /// <remarks>See https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens#payload-claims </remarks>
         public static string GetDisplayName(this ClaimsPrincipal claimsPrincipal)
         {
-            // Attempting the claims brought by an Microsoft identity platform token first
+            // Use the claims in an Microsoft identity platform token first
             string displayName = claimsPrincipal.FindFirstValue(ClaimConstants.PreferredUserName);
 
-            // Otherwise falling back to the claims brought by an Azure AD v1.0 token
+            // Otherwise fall back to the claims in an Azure AD v1.0 token
             if (string.IsNullOrWhiteSpace(displayName))
             {
                 displayName = claimsPrincipal.FindFirstValue(ClaimsIdentity.DefaultNameClaimType);
@@ -123,61 +91,6 @@ namespace Microsoft.Identity.Web
             }
 
             return displayName;
-        }
-
-        /// <summary>
-        /// Instantiate a ClaimsPrincipal from an account objectId and tenantId. This can
-        /// we useful when the Web app subscribes to another service on behalf of the user
-        /// and then is called back by a notification where the user is identified by his tenant
-        /// id and object id (like in Microsoft Graph Web Hooks)
-        /// </summary>
-        /// <param name="tenantId">Tenant Id of the account</param>
-        /// <param name="objectId">Object Id of the account in this tenant ID</param>
-        /// <returns>A ClaimsPrincipal containing these two claims</returns>
-        /// <example>
-        /// <code>
-        /// private async Task GetChangedMessagesAsync(IEnumerable<Notification> notifications)
-        /// {
-        ///  foreach (var notification in notifications)
-        ///  {
-        ///   SubscriptionStore subscription =
-        ///           subscriptionStore.GetSubscriptionInfo(notification.SubscriptionId);
-        ///  HttpContext.User = ClaimsPrincipalExtension.FromTenantIdAndObjectId(subscription.TenantId,
-        ///                                                                      subscription.UserId);
-        ///  string accessToken = await tokenAcquisition.GetAccessTokenOnBehalfOfUser(HttpContext, scopes);,
-        /// </code>
-        /// </example>
-        public static ClaimsPrincipal FromTenantIdAndObjectId(string tenantId, string objectId)
-        {
-            return new ClaimsPrincipal(
-                new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimConstants.Tid, tenantId),
-                    new Claim(ClaimConstants.Oid, objectId)
-                })
-            );
-        }
-
-        /// <summary>
-        /// Creates the <see cref="ClaimsPrincipal"/> from the values found in an <see cref="IAccount"/>
-        /// </summary>
-        /// <param name="account">The IAccount instance</param>
-        /// <returns>A <see cref="ClaimsPrincipal"/> built from IAccount</returns>
-        public static ClaimsPrincipal ToClaimsPrincipal(this IAccount account)
-        {
-            if (account != null)
-            {
-                return new ClaimsPrincipal(
-                    new ClaimsIdentity(new Claim[]
-                    {
-                        new Claim(ClaimConstants.Oid, account.HomeAccountId.ObjectId),
-                        new Claim(ClaimConstants.Tid, account.HomeAccountId.TenantId),
-                        new Claim(ClaimTypes.Upn, account.Username)
-                    })
-                );
-            }
-
-            return null;
         }
     }
 }

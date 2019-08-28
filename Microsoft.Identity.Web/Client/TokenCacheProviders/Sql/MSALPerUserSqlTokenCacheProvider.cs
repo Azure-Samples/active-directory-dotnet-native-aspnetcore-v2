@@ -1,7 +1,7 @@
-﻿/************************************************************************************************
+﻿/*
 The MIT License (MIT)
 
-Copyright (c) 2015 Microsoft Corporation
+Copyright (c) 2018 Microsoft Corporation
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-***********************************************************************************************/
+*/
 
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -54,7 +54,7 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// </summary>
         private IDataProtector DataProtector;
 
-        private IHttpContextAccessor httpContextAccesssor;
+        private IHttpContextAccessor httpContextAccessor;
 
         /// <summary>Initializes a new instance of the <see cref="EFMSALPerUserTokenCache"/> class.</summary>
         /// <param name="protectionProvider">The data protection provider. Requires the caller to have used serviceCollection.AddDataProtection();</param>
@@ -63,7 +63,7 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         public MSALPerUserSqlTokenCacheProvider(TokenCacheDbContext tokenCacheDbContext, IDataProtectionProvider protectionProvider, IHttpContextAccessor httpContext)
             : this(tokenCacheDbContext, protectionProvider, httpContext?.HttpContext?.User)
         {
-            this.httpContextAccesssor = httpContext;
+            httpContextAccessor = httpContext;
         }
 
         /// <summary>Initializes a new instance of the <see cref="MSALPerUserSqlTokenCacheProvider"/> class.</summary>
@@ -78,8 +78,8 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
                 throw new ArgumentNullException(nameof(protectionProvider), $"The app token cache needs an {nameof(IDataProtectionProvider)} to operate. Please use 'serviceCollection.AddDataProtection();' to add the data protection provider to the service collection");
             }
 
-            this.DataProtector = protectionProvider.CreateProtector("MSAL");
-            this.TokenCacheDb = tokenCacheDbContext;
+            DataProtector = protectionProvider.CreateProtector("MSAL");
+            TokenCacheDb = tokenCacheDbContext;
         }
 
         /// <summary>Initializes this instance of TokenCacheProvider with essentials to initialize themselves.</summary>
@@ -88,9 +88,9 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// <param name="user">The signed-in user for whom the cache needs to be established. Not needed by all providers.</param>
         public void Initialize(ITokenCache tokenCache, HttpContext httpcontext, ClaimsPrincipal user)
         {
-            tokenCache.SetBeforeAccess(this.UserTokenCacheBeforeAccessNotification);
-            tokenCache.SetAfterAccess(this.UserTokenCacheAfterAccessNotification);
-            tokenCache.SetBeforeWrite(this.UserTokenCacheBeforeWriteNotification);
+            tokenCache.SetBeforeAccess(UserTokenCacheBeforeAccessNotification);
+            tokenCache.SetAfterAccess(UserTokenCacheAfterAccessNotification);
+            tokenCache.SetBeforeWrite(UserTokenCacheBeforeWriteNotification);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// <param name="args">Contains parameters used by the MSAL call accessing the cache.</param>
         private void UserTokenCacheBeforeAccessNotification(TokenCacheNotificationArgs args)
         {
-            this.ReadCacheForSignedInUser(args);
+            ReadCacheForSignedInUser(args);
         }
 
         /// <summary>
@@ -121,32 +121,33 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// <param name="args">Contains parameters used by the MSAL call accessing the cache.</param>
         private void UserTokenCacheAfterAccessNotification(TokenCacheNotificationArgs args)
         {
-            string accountId = httpContextAccesssor.HttpContext.User.GetMsalAccountId();
+            //string accountId = httpContextAccessor.HttpContext.User.GetMsalAccountId();
+            string accountId = httpContextAccessor.HttpContext.Request.Headers["Authorization"];
 
             // if state changed, i.e. new token obtained
             if (args.HasStateChanged && !string.IsNullOrWhiteSpace(accountId))
             {
-                if (this.InMemoryCache == null)
+                if (InMemoryCache == null)
                 {
-                    this.InMemoryCache = new UserTokenCache
+                    InMemoryCache = new UserTokenCache
                     {
                         WebUserUniqueId = accountId
                     };
                 }
 
-                this.InMemoryCache.CacheBits = this.DataProtector.Protect(args.TokenCache.SerializeMsalV3());
-                this.InMemoryCache.LastWrite = DateTime.Now;
+                InMemoryCache.CacheBits = DataProtector.Protect(args.TokenCache.SerializeMsalV3());
+                InMemoryCache.LastWrite = DateTime.Now;
 
                 try
                 {
                     // Update the DB and the lastwrite
-                    this.TokenCacheDb.Entry(InMemoryCache).State = InMemoryCache.UserTokenCacheId == 0 ? EntityState.Added : EntityState.Modified;
-                    this.TokenCacheDb.SaveChanges();
+                    TokenCacheDb.Entry(InMemoryCache).State = InMemoryCache.UserTokenCacheId == 0 ? EntityState.Added : EntityState.Modified;
+                    TokenCacheDb.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     // Record already updated on a different thread, so just read the updated record
-                    this.ReadCacheForSignedInUser(args);
+                    ReadCacheForSignedInUser(args);
                 }
             }
         }
@@ -156,10 +157,12 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// </summary>
         private void ReadCacheForSignedInUser(TokenCacheNotificationArgs args)
         {
-            string accountId = httpContextAccesssor.HttpContext.User.GetMsalAccountId();
-            if (this.InMemoryCache == null) // first time access
+            //string accountId = httpContextAccessor.HttpContext.User.GetMsalAccountId();
+            string accountId = httpContextAccessor.HttpContext.Request.Headers["Authorization"];
+
+            if (InMemoryCache == null) // first time access
             {
-                this.InMemoryCache = GetLatestUserRecordQuery(accountId).FirstOrDefault();
+                InMemoryCache = GetLatestUserRecordQuery(accountId).FirstOrDefault();
             }
             else
             {
@@ -170,12 +173,12 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
                 if (lastwriteInDb > InMemoryCache.LastWrite)
                 {
                     // read from from storage, update in-memory copy
-                    this.InMemoryCache = GetLatestUserRecordQuery(accountId).FirstOrDefault();
+                    InMemoryCache = GetLatestUserRecordQuery(accountId).FirstOrDefault();
                 }
             }
 
             // Send data to the TokenCache instance
-            args.TokenCache.DeserializeMsalV3((InMemoryCache == null) ? null : this.DataProtector.Unprotect(InMemoryCache.CacheBits), shouldClearExistingCache: true);
+            args.TokenCache.DeserializeMsalV3((InMemoryCache == null) ? null : DataProtector.Unprotect(InMemoryCache.CacheBits), shouldClearExistingCache: true);
         }
 
         /// <summary>
@@ -184,14 +187,14 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         public void Clear(string accountId)
         {
             // Delete from DB
-            var cacheEntries = this.TokenCacheDb.UserTokenCache.Where(c => c.WebUserUniqueId == accountId);
-            this.TokenCacheDb.UserTokenCache.RemoveRange(cacheEntries);
-            this.TokenCacheDb.SaveChanges();
+            var cacheEntries = TokenCacheDb.UserTokenCache.Where(c => c.WebUserUniqueId == accountId);
+            TokenCacheDb.UserTokenCache.RemoveRange(cacheEntries);
+            TokenCacheDb.SaveChanges();
         }
 
         private IOrderedQueryable<UserTokenCache> GetLatestUserRecordQuery(string accountId)
         {
-            return this.TokenCacheDb.UserTokenCache
+            return TokenCacheDb.UserTokenCache
                                     .Where(c => c.WebUserUniqueId == accountId)
                                     .OrderByDescending(d => d.LastWrite);
         }

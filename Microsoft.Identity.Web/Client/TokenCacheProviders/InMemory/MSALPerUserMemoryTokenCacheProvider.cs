@@ -1,4 +1,4 @@
-﻿/************************************************************************************************
+﻿/*
 The MIT License (MIT)
 
 Copyright (c) 2015 Microsoft Corporation
@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-***********************************************************************************************/
+*/
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -47,34 +47,34 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// <summary>
         /// Enables the singleton object to access the right HttpContext
         /// </summary>
-        private IHttpContextAccessor httpContextAccessor;
+        private IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>Initializes a new instance of the <see cref="MSALPerUserMemoryTokenCache"/> class.</summary>
         /// <param name="cache">The memory cache instance</param>
         public MSALPerUserMemoryTokenCacheProvider(IMemoryCache cache, MSALMemoryTokenCacheOptions option, IHttpContextAccessor httpContextAccessor)
         {
-            this.memoryCache = cache;
-            this.httpContextAccessor = httpContextAccessor;
+            memoryCache = cache;
+            _httpContextAccessor = httpContextAccessor;
 
             if (option == null)
             {
-                this.CacheOptions = new MSALMemoryTokenCacheOptions();
+                CacheOptions = new MSALMemoryTokenCacheOptions();
             }
             else
             {
-                this.CacheOptions = option;
+                CacheOptions = option;
             }
         }
 
         /// <summary>Initializes this instance of TokenCacheProvider with essentials to initialize themselves.</summary>
         /// <param name="tokenCache">The token cache instance of MSAL application</param>
-        /// <param name="httpcontext">The Httpcontext whose Session will be used for caching.This is required by some providers.</param>
+        /// <param name="httpcontext">The Httpcontext whose Session will be used for caching. This is required by some providers.</param>
         /// <param name="user">The signed-in user for whom the cache needs to be established. Not needed by all providers.</param>
         public void Initialize(ITokenCache tokenCache, HttpContext httpcontext, ClaimsPrincipal user)
         {
-            tokenCache.SetBeforeAccess(this.UserTokenCacheBeforeAccessNotification);
-            tokenCache.SetAfterAccess(this.UserTokenCacheAfterAccessNotification);
-            tokenCache.SetBeforeWrite(this.UserTokenCacheBeforeWriteNotification);
+            tokenCache.SetBeforeAccess(UserTokenCacheBeforeAccessNotification);
+            tokenCache.SetAfterAccess(UserTokenCacheAfterAccessNotification);
+            tokenCache.SetBeforeWrite(UserTokenCacheBeforeWriteNotification);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// </summary>
         public void Clear(string accountId)
         {
-            this.memoryCache.Remove(accountId);
+            memoryCache.Remove(accountId);
         }
 
         /// <summary>
@@ -94,13 +94,15 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
             // if the access operation resulted in a cache update
             if (args.HasStateChanged)
             {
-                string cacheKey = httpContextAccessor.HttpContext.User.GetMsalAccountId();
+                string cacheKey = _httpContextAccessor.HttpContext.Request.Headers["Authorization"];
 
                 if (string.IsNullOrWhiteSpace(cacheKey))
+                {
                     return;
+                }
 
-                // Ideally, methods that load and persist should be thread safe.MemoryCache.Get() is thread safe.
-                this.memoryCache.Set(cacheKey, args.TokenCache.SerializeMsalV3(), this.CacheOptions.SlidingExpiration);
+                // Methods that load and persist should be thread safe.MemoryCache.Get() is thread safe.
+                memoryCache.Set(cacheKey, args.TokenCache.SerializeMsalV3(), CacheOptions.SlidingExpiration);
             }
         }
 
@@ -111,17 +113,19 @@ namespace Microsoft.Identity.Web.Client.TokenCacheProviders
         /// <param name="args">Contains parameters used by the MSAL call accessing the cache.</param>
         private void UserTokenCacheBeforeAccessNotification(TokenCacheNotificationArgs args)
         {
-            string cacheKey = httpContextAccessor.HttpContext.User.GetMsalAccountId();
+            string cacheKey = _httpContextAccessor.HttpContext.Request.Headers["Authorization"];
 
             if (string.IsNullOrWhiteSpace(cacheKey))
+            {
                 return;
+            }
 
-            byte[] tokenCacheBytes = (byte[])this.memoryCache.Get(cacheKey);
+            byte[] tokenCacheBytes = (byte[])memoryCache.Get(cacheKey);
             args.TokenCache.DeserializeMsalV3(tokenCacheBytes, shouldClearExistingCache: true);
         }
 
         /// <summary>
-        /// if you want to ensure that no concurrent write take place, use this notification to place a lock on the entry
+        /// If you want to ensure that no concurrent write takes place, use this notification to place a lock on the entry
         /// </summary>
         /// <param name="args">Contains parameters used by the MSAL call accessing the cache.</param>
         private void UserTokenCacheBeforeWriteNotification(TokenCacheNotificationArgs args)
