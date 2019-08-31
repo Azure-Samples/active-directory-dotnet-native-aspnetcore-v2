@@ -154,21 +154,12 @@ namespace Microsoft.Identity.Web.Client
                 throw new ArgumentNullException(nameof(scopes));
             }
 
-            try
-            {
-                // Use MSAL to get the right token to call the API
-                var application = GetOrBuildConfidentialClientApplication(context, context.User);
+            // Use MSAL to get the right token to call the API
+            var application = GetOrBuildConfidentialClientApplication(context, context.User);
 
-                var accounts = await application.GetAccountsAsync();
+            var accounts = await application.GetAccountsAsync();
 
-                var result = await application.AcquireTokenSilent(
-                    scopes.Except(scopesRequestedByMsalNet),
-                    accounts.FirstOrDefault())
-                    .ExecuteAsync();
-
-                return result.AccessToken;
-            }
-            catch (MsalException)
+            if (!accounts.Any())
             {
                 string authorizationHeader = context.Request.Headers["Authorization"];
 
@@ -183,6 +174,15 @@ namespace Microsoft.Identity.Web.Client
                     scopes.Except(scopesRequestedByMsalNet),
                     new UserAssertion(accessToken))
                                     .ExecuteAsync();
+
+                return result.AccessToken;
+            }
+            else
+            {
+                var result = await application.AcquireTokenSilent(
+                    scopes.Except(scopesRequestedByMsalNet),
+                    accounts.FirstOrDefault())
+                    .ExecuteAsync();
 
                 return result.AccessToken;
             }
