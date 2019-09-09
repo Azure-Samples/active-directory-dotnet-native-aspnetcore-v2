@@ -17,6 +17,7 @@
       "Name": "TodoListService (active-directory-dotnet-native-aspnetcore-v2)",
       "Kind": "WebApi",
       "HomePage": "https://localhost:44351/",
+      "ReplyUrls": "https://localhost:44351/",
       "PasswordCredentials": "Auto",
       "RequiredResourcesAccess": [
         {
@@ -37,10 +38,11 @@
       "Id": "client",
       "Name": "TodoListClient (active-directory-dotnet-native-aspnetcore-v2)",
       "Kind": "Desktop",
+      "ReplyUrls": "https://login.microsoftonline.com/common/oauth2/nativeclient",
       "RequiredResourcesAccess": [
         {
           "Resource": "service",
-          "DelegatedPermissions": [ "user_impersonation" ]
+          "DelegatedPermissions": [ "access_as_user" ]
         }
       ],
       "ManualSteps": [
@@ -97,7 +99,7 @@
         },
         {
           "key": "todo:TodoListScope",
-          "value": "service.Scope"
+          "value": "service.ScopeDefault"
         },
         {
           "key": "todo:TodoListBaseAddress",
