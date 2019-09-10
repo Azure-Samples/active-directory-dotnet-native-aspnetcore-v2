@@ -17,6 +17,7 @@
       "Name": "TodoListService (active-directory-dotnet-native-aspnetcore-v2)",
       "Kind": "WebApi",
       "HomePage": "https://localhost:44351/",
+      "ReplyUrls": "https://localhost:44351/",
       "PasswordCredentials": "Auto",
       "RequiredResourcesAccess": [
         {
@@ -27,9 +28,6 @@
       "ManualSteps": [
         {
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
-        },
-        {
-          "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
         }
       ]
     },
@@ -37,15 +35,19 @@
       "Id": "client",
       "Name": "TodoListClient (active-directory-dotnet-native-aspnetcore-v2)",
       "Kind": "Desktop",
+      "ReplyUrls": "https://login.microsoftonline.com/common/oauth2/nativeclient",
       "RequiredResourcesAccess": [
         {
           "Resource": "service",
-          "DelegatedPermissions": [ "user_impersonation" ]
+          "DelegatedPermissions": [ "access_as_user" ]
         }
       ],
       "ManualSteps": [
         {
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
+        },
+        {
+          "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
         }
       ]
     }
@@ -97,7 +99,7 @@
         },
         {
           "key": "todo:TodoListScope",
-          "value": "service.Scope"
+          "value": "service.ScopeDefault"
         },
         {
           "key": "todo:TodoListBaseAddress",
