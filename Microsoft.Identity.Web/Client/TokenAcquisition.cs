@@ -448,11 +448,14 @@ namespace Microsoft.Identity.Web.Client
                 }
             }
 
+
+            string consentUrl = $"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id={azureAdOptions.ClientId}"
+                +$"&response_type=code&redirect_uri={application.AppConfig.RedirectUri}"
+                +$"&response_mode=query&scope=offline_access%20{string.Join("%20", scopes)}";
+
             IDictionary<string, string> parameters = new Dictionary<string, string>()
                 {
-                    { "clientId", azureAdOptions.ClientId },
-                    { "claims", msalServiceException.Claims },
-                    { "scopes", string.Join(",", scopes) },
+                    { "consentUri", consentUrl },
                     { "proposedAction", proposedAction }
                 };
 
@@ -460,7 +463,6 @@ namespace Microsoft.Identity.Web.Client
             string scheme = "Bearer";
             StringValues v = new StringValues($"{scheme} {parameterString}");
 
-            //  StringValues v = new StringValues(new string[] { $"Bearer clientId=\"{jwtToken.Audiences.First()}\", claims=\"{ex.Claims}\", scopes=\" {string.Join(",", scopes)}\"" });
             var httpResponse = httpContext.Response;
             var headers = httpResponse.Headers;
             httpResponse.StatusCode = (int)HttpStatusCode.Forbidden;

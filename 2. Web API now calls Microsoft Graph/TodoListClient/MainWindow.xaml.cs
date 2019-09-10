@@ -202,6 +202,7 @@ namespace TodoListClient
             string claims = GetParameter(parameters, "claims");
             string[] scopes = GetParameter(parameters, "scopes")?.Split(',');
             string proposedAction = GetParameter(parameters, "proposedAction");
+            string consentUri = GetParameter(parameters, "consentUri");
 
             string loginHint = account?.Username;
             string domainHint = IsConsumerAccount(account) ? "consumers" : "organizations";
@@ -221,16 +222,12 @@ namespace TodoListClient
             }
             else if (proposedAction == "consent")
             {
-                IPublicClientApplication pca = PublicClientApplicationBuilder.Create(clientId)
-                .WithDefaultRedirectUri()
-                .Build();
-                await pca.AcquireTokenInteractive(scopes)
-                    .WithPrompt(Prompt.Consent)
-                    .WithLoginHint(loginHint)
-                    .WithExtraQueryParameters(extraQueryParameters)
-                    .WithAuthority(pca.Authority)
-                    .ExecuteAsync()
-                    .ConfigureAwait(false);
+                if (System.Windows.MessageBox.Show("You need to consent to the Web API. If you press Ok, you'll be redirected to a browser page to consent",
+                                                   "Consent needed for the Web API", 
+                                                   MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                {
+                    Process.Start(consentUri);
+                }
             }
         }
 
@@ -319,7 +316,7 @@ namespace TodoListClient
 
             // Call the To Do list service.
 
-            HttpResponseMessage response = await _httpClient.PostAsync(TodoListBaseAddress + "/api/todolist", content);
+            HttpResponseMessage response = await _httpClient.PostAsync(TodoListBaseAddress + "api/todolist", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -328,8 +325,14 @@ namespace TodoListClient
             }
             else
             {
-                string failureDescription = await response.Content.ReadAsStringAsync();
-                MessageBox.Show($"{response.ReasonPhrase}\n {failureDescription}", "An error occurred while posting to /api/todolist", MessageBoxButton.OK);
+                if (response.StatusCode == System.Net.HttpStatusCode.Forbidden && response.Headers.WwwAuthenticate.Any())
+                {
+                    await HandleChallengeFromWebApi(response, result.Account);
+                }
+                else
+                {
+                    await DisplayErrorMessage(response);
+                }
             }
         }
 
@@ -359,41 +362,53 @@ namespace TodoListClient
             //
             try
             {
-                // Force a sign-in (Prompt.SelectAccount), as the MSAL web browser might contain cookies for the current user
-                // and we don't necessarily want to re-sign-in the same user
-                var result = await _app.AcquireTokenInteractive(Scopes)
-                    .WithAccount(accounts.FirstOrDefault())
-                    .WithPrompt(Prompt.SelectAccount)
+                var result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync()
                     .ConfigureAwait(false);
-
-                Dispatcher.Invoke(() =>
-                {
-                    SignInButton.Content = ClearCacheString;
-                    SetUserName(result.Account);
-                    GetTodoList();
-                }
-                );
             }
-            catch (MsalException ex)
+            catch (MsalUiRequiredException ex1)
             {
-                if (ex.ErrorCode == "access_denied")
+                try
                 {
-                    // The user canceled sign in, take no action.
-                }
-                else
-                {
-                    // An unexpected error occurred.
-                    string message = ex.Message;
-                    if (ex.InnerException != null)
+                    // Force a sign-in (Prompt.SelectAccount), as the MSAL web browser might contain cookies for the current user
+                    // and we don't necessarily want to re-sign-in the same user
+                    var result = await _app.AcquireTokenInteractive(Scopes)
+                        .WithAccount(accounts.FirstOrDefault())
+                        .WithPrompt(Prompt.SelectAccount)
+                        .ExecuteAsync()
+                        .ConfigureAwait(false);
+
+                    Dispatcher.Invoke(() =>
                     {
-                        message += "Error Code: " + ex.ErrorCode + "Inner Exception : " + ex.InnerException.Message;
+                        SignInButton.Content = ClearCacheString;
+                        SetUserName(result.Account);
+                        GetTodoList();
+                    }
+                    );
+                }
+                catch (MsalException ex)
+                {
+                    if (ex.ErrorCode == "access_denied")
+                    {
+                        // The user canceled sign in, take no action.
+                    }
+                    else
+                    {
+                        // An unexpected error occurred.
+                        string message = ex.Message;
+                        if (ex.InnerException != null)
+                        {
+                            message += "Error Code: " + ex.ErrorCode + "Inner Exception : " + ex.InnerException.Message;
+                        }
+
+                        MessageBox.Show(message);
                     }
 
-                    MessageBox.Show(message);
+                    Dispatcher.Invoke(() =>
+                    {
+                        UserName.Content = Properties.Resources.UserNotSignedIn;
+                    });
                 }
-
-                UserName.Content = Properties.Resources.UserNotSignedIn;
             }
         }
 
