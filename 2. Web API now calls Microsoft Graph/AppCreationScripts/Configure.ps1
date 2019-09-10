@@ -380,10 +380,10 @@ Function ConfigureApplications
    Write-Host "- For 'service'"
    Write-Host "  - Navigate to '$servicePortalUrl'"
    Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'." -ForegroundColor Red 
-   Write-Host "  - [Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'" -ForegroundColor Red 
    Write-Host "- For 'client'"
    Write-Host "  - Navigate to '$clientPortalUrl'"
    Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'." -ForegroundColor Red 
+   Write-Host "  - [Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'" -ForegroundColor Red 
 
    Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
      

@@ -28,9 +28,6 @@
       "ManualSteps": [
         {
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
-        },
-        {
-          "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
         }
       ]
     },
@@ -48,6 +45,9 @@
       "ManualSteps": [
         {
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
+        },
+        {
+          "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
         }
       ]
     }
