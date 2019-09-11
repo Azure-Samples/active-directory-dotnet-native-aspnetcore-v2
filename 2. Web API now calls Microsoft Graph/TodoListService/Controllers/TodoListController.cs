@@ -39,13 +39,13 @@ namespace TodoListService.Controllers
         /// /// The Web API will only accept tokens 1) for users, and
         /// 2) having the access_as_user scope for this API
         /// </summary>
-        static readonly string[] scopeRequiredByAPI = new string[] { "access_as_user" };
+        static readonly string[] scopeRequiredByApi = new string[] { "access_as_user" };
 
         // GET: api/values
         [HttpGet]
         public IEnumerable<TodoItem> Get()
         {
-            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByAPI);
+            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return TodoStore.Where(t => t.Owner == owner).ToList();
         }
@@ -54,7 +54,7 @@ namespace TodoListService.Controllers
         [HttpPost]
         public async void Post([FromBody]TodoItem todo)
         {
-            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByAPI);
+            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             string ownerName;
 #if ENABLE_OBO
