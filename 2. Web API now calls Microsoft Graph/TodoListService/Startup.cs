@@ -47,6 +47,8 @@ namespace TodoListService
             {
                 app.UseHsts();
             }
+            app.UseDefaultFiles();
+            app.UseStaticFiles(); // For the wwwroot folder
 
             app.UseHttpsRedirection();
             app.UseAuthentication();
