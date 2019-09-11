@@ -188,7 +188,7 @@ namespace TodoListClient
             else if (proposedAction == "consent")
             {
                 if (System.Windows.MessageBox.Show("You need to consent to the Web API. If you press Ok, you'll be redirected to a browser page to consent",
-                                                   "Consent needed for the Web API", 
+                                                   "Consent needed for the Web API",
                                                    MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
                     Process.Start(consentUri);
@@ -331,13 +331,15 @@ namespace TodoListClient
                 }
                 );
             }
-            catch(MsalUiRequiredException)
+            catch (MsalUiRequiredException)
             {
-                var result = await _app.AcquireTokenInteractive(Scopes)
-                   .WithAccount(accounts.FirstOrDefault())
-                   .WithPrompt(Prompt.SelectAccount)
-                   .ExecuteAsync()
-                   .ConfigureAwait(false);
+                try
+                {
+                    var result = await _app.AcquireTokenInteractive(Scopes)
+                       .WithAccount(accounts.FirstOrDefault())
+                       .WithPrompt(Prompt.SelectAccount)
+                       .ExecuteAsync()
+                       .ConfigureAwait(false);
 
                     Dispatcher.Invoke(() =>
                     {
