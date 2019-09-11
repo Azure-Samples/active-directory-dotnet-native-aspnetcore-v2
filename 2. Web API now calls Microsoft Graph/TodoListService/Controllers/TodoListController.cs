@@ -71,7 +71,7 @@ namespace TodoListService.Controllers
             {
                 HttpContext.Response.ContentType = "text/plain";
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n"+ex.ErrorCode + "\n"+ ex.Message);
+                await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n" + ex.ErrorCode + "\n"+ ex.Message);
             }
             catch (Exception ex)
             {
@@ -103,9 +103,7 @@ namespace TodoListService.Controllers
 
         private static async Task<dynamic> CallGraphApiOnBehalfOfUser(string accessToken)
         {
-            //
             // Call the Graph API and retrieve the user's profile.
-            //
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             HttpResponseMessage response = await client.GetAsync("https://graph.microsoft.com/v1.0/me");

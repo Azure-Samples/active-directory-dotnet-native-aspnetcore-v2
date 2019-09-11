@@ -8,7 +8,7 @@ using Microsoft.Identity.Client;
 namespace TodoListClient
 {
     static class TokenCacheHelper
-    {
+    { 
         /// <summary>
         /// Path to the token cache
         /// </summary>

@@ -3,11 +3,9 @@
 
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
-// The following using statements were added for this sample.
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -25,7 +23,6 @@ namespace TodoListClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        //
         // The Client ID is used by the application to uniquely identify itself to Azure AD.
         // The Tenant is the name of the Azure AD tenant in which this application is registered.
         // The AAD Instance is the instance of Azure, for example public Azure or Azure China.
@@ -36,9 +33,10 @@ namespace TodoListClient
         private static readonly string Tenant = ConfigurationManager.AppSettings["ida:Tenant"];
         private static readonly string ClientId = ConfigurationManager.AppSettings["ida:ClientId"];
 
-        private static readonly string Authority = String.Format(CultureInfo.InvariantCulture, AadInstance, Tenant);
+        private static readonly string Authority = string.Format(CultureInfo.InvariantCulture, AadInstance, Tenant);
 
         // To authenticate to the To Do list service, the client needs to know the service's App ID URI and URL
+
         private static readonly string TodoListScope = ConfigurationManager.AppSettings["todo:TodoListScope"];
         private static readonly string TodoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListBaseAddress"];
         private static readonly string[] Scopes = { TodoListScope };
@@ -70,11 +68,6 @@ namespace TodoListClient
         private async Task GetTodoList(bool isAppStarting)
         {
             var accounts = (await _app.GetAccountsAsync()).ToList();
-            if (!accounts.Any())
-            {
-                SignInButton.Content = SignInString;
-                return;
-            }
 
             // Get an access token to call the To Do service.
             AuthenticationResult result = null;
@@ -128,7 +121,6 @@ namespace TodoListClient
 
                 Dispatcher.Invoke(() =>
                 {
-
                     TodoList.ItemsSource = toDoArray.Select(t => new { t.Title });
                 });
             }
@@ -238,9 +230,7 @@ namespace TodoListClient
                 return;
             }
 
-            //
             // Get an access token to call the To Do service.
-            //
             AuthenticationResult result = null;
             try
             {
@@ -275,11 +265,7 @@ namespace TodoListClient
                 return;
             }
 
-            //
-            // Call the To Do service.
-            //
-
-            // Once the token has been returned by ADAL, add it to the http authorization header, before making the call to access the To Do service.
+            // Once the token has been returned by MSAL, add it to the http authorization header, before making the call to access the To Do service.
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             // Forms encode Todo item, to POST to the todo list web api.
@@ -312,7 +298,6 @@ namespace TodoListClient
         private async void SignIn(object sender = null, RoutedEventArgs args = null)
         {
             var accounts = (await _app.GetAccountsAsync()).ToList();
-
             // If there is already a token in the cache, clear the cache and update the label on the button.
             if (SignInButton.Content.ToString() == ClearCacheString)
             {
@@ -337,7 +322,7 @@ namespace TodoListClient
                     .ExecuteAsync()
                     .ConfigureAwait(false);
             }
-            catch (MsalUiRequiredException ex1)
+            catch (MsalUiRequiredException)
             {
                 try
                 {
