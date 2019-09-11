@@ -36,11 +36,10 @@ namespace TodoListService.Controllers
         static readonly ConcurrentBag<TodoItem> TodoStore = new ConcurrentBag<TodoItem>();
 
         /// <summary>
-        /// The Web API will only accept tokens 1) for users, 2) having the user_impersonation scope for
-        /// this API (if you created the app using the App creation script) or 'access_as_user' if you created
-        /// it following the README.md.
+        /// /// The Web API will only accept tokens 1) for users, and
+        /// 2) having the access_as_user scope for this API
         /// </summary>
-        static string[] scopeRequiredByAPI = new string[] { "user_impersonation", "access_as_user" };
+        static readonly string[] scopeRequiredByAPI = new string[] { "access_as_user" };
 
         // GET: api/values
         [HttpGet]
@@ -71,7 +70,7 @@ namespace TodoListService.Controllers
             {
                 HttpContext.Response.ContentType = "text/plain";
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n" + ex.ErrorCode + "\n"+ ex.Message);
+                await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n" + ex.ErrorCode + "\n" + ex.Message);
             }
             catch (Exception ex)
             {

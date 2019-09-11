@@ -188,7 +188,7 @@ namespace TodoListClient
             else if (proposedAction == "consent")
             {
                 if (System.Windows.MessageBox.Show("You need to consent to the Web API. If you press Ok, you'll be redirected to a browser page to consent",
-                                                   "Consent needed for the Web API", 
+                                                   "Consent needed for the Web API",
                                                    MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
                     Process.Start(consentUri);
@@ -265,6 +265,7 @@ namespace TodoListClient
                 return;
             }
 
+            // Call the To Do service.
             // Once the token has been returned by MSAL, add it to the http authorization header, before making the call to access the To Do service.
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
@@ -321,6 +322,14 @@ namespace TodoListClient
                 var result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync()
                     .ConfigureAwait(false);
+
+                Dispatcher.Invoke(() =>
+                {
+                    SignInButton.Content = ClearCacheString;
+                    SetUserName(result.Account);
+                    GetTodoList();
+                }
+                );
             }
             catch (MsalUiRequiredException)
             {
