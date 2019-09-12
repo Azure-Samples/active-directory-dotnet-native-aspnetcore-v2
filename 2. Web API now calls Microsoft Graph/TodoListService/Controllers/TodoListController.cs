@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Web.Client;
+using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
 using Newtonsoft.Json;
 using System;
@@ -92,13 +92,13 @@ namespace TodoListService.Controllers
             // we use MSAL.NET to get a token to call the API On Behalf Of the current user
             try
             {
-                string accessToken = await _tokenAcquisition.GetAccessTokenOnBehalfOfUser(HttpContext, scopes);
+                string accessToken = await _tokenAcquisition.GetAccessTokenOnBehalfOfUserAsync(scopes);
                 dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
                 return me.userPrincipalName;
             }
             catch (MsalUiRequiredException ex)
             {
-                _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(HttpContext, scopes, ex);
+                _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(scopes, ex);
                 return string.Empty;
             }
         }

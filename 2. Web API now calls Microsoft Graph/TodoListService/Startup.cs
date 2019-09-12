@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.Client.TokenCacheProviders;
+using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
 
 namespace TodoListService
 {
@@ -23,7 +23,7 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddProtectWebApiWithMicrosoftIdentityPlatformV2(Configuration)
+            services.AddProtectedWebApi(Configuration)
                     .AddProtectedApiCallsWebApis(Configuration)
                     .AddInMemoryTokenCaches();
 

@@ -245,7 +245,7 @@ public class Startup
   // This method gets called by the runtime. Use this method to add services to the container.
    public void ConfigureServices(IServiceCollection services)
    {
-    services.AddProtectWebApiWithMicrosoftIdentityPlatformV2(Configuration)
+    services.AddProtectedWebApi(Configuration)
             .AddProtectedApiCallsWebApis(Configuration, new string[] { "user.read" })
             .AddInMemoryTokenCaches();
     services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -262,7 +262,7 @@ public class Startup
   ...
   public void ConfigureServices(IServiceCollection services)
   {
-      services.AddProtectWebApiWithMicrosoftIdentityPlatformV2(Configuration)
+      services.AddProtectedWebApi(Configuration)
               .AddProtectedApiCallsWebApis(Configuration, new string[] { "user.read", "offline_access" })
               .AddInMemoryTokenCaches();
   
