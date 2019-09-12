@@ -36,7 +36,7 @@ namespace TodoListService.Controllers
 
         /// <summary>
         /// The Web API will only accept tokens 1) for users, and 
-        /// 2) having the user_impersonation scope for this API
+        /// 2) having the access_as_user scope for this API
         /// </summary>
         static readonly string[] scopeRequiredByApi = new string[] { "access_as_user" };
 
