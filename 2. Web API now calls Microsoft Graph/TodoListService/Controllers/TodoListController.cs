@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+// The same code for the controller is used in both chapters of the tutorial. 
+// In the first chapter this is just a protected API (ENABLE_OBO is not set)
+// In this chapter, the Web API calls a downstream API on behalf of the user (OBO)
 #define ENABLE_OBO
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

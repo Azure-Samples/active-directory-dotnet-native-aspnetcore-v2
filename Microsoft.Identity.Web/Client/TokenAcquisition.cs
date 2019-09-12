@@ -442,7 +442,7 @@ namespace Microsoft.Identity.Web.Client
             string proposedAction = "consent";
             if (msalServiceException.ErrorCode == MsalError.InvalidGrantError)
             {
-                if (AcceptedTokenVersionIsNotTheSameAsTokenVersion(msalServiceException))
+                if (AcceptedTokenVersionMismatch(msalServiceException))
                 {
                     throw msalServiceException;
                 }
@@ -473,7 +473,7 @@ namespace Microsoft.Identity.Web.Client
             headers.Add(HeaderNames.WWWAuthenticate, v);
         }
 
-        private static bool AcceptedTokenVersionIsNotTheSameAsTokenVersion(MsalUiRequiredException msalSeviceException)
+        private static bool AcceptedTokenVersionMismatch(MsalUiRequiredException msalSeviceException)
         {
             // Normally app developers should not make decisions based on the internal AAD code
             // however until the STS sends sub-error codes for this error, this is the only
