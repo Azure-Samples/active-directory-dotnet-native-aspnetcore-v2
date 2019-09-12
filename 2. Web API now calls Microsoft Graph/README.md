@@ -323,12 +323,12 @@ Update `Startup.cs` file:
   by
 
   ```csharp
-  services.AddProtectWebApiWithMicrosoftIdentityPlatformV2(Configuration)
+  services.AddProtectedWebApi(Configuration)
           .AddProtectedApiCallsWebApis(Configuration, new string[] { "user.read" })
           .AddInMemoryTokenCaches();
   ```
 
-  `AddProtectWebApiWithMicrosoftIdentityPlatformV2` does the following:
+  `AddProtectedWebApi` does the following:
   - add the **Jwt**BearerAuthenticationScheme (Note the replacement of BearerAuthenticationScheme by **Jwt**BearerAuthenticationScheme)
   - set the authority to be the Microsoft identity platform identity
   - sets the audiences to validate
