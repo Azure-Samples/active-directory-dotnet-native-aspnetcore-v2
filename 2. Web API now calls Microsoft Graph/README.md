@@ -21,11 +21,9 @@ description: "A tutorial sample that shows how to use MSAL.NET to authenticate u
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
 > The sample in this folder is part of a multi-phase tutorial. This folder is about the second phase named **Web API now calls Microsoft Graph**.
-> The first phase is available from [1. Desktop app calls Web API](../1.%20Desktop%20app%20calls%20Web%20API).
+> The first phase is available from [1. Desktop app calls Web API](../1.%20Desktop%20app%20calls%20Web%20API) which illustrates a protected Web API.
 >
 > This article (README.md) contains the full instructions on how to configure the sample. If you have gone through Phase 1 and have already configured your Web API rather switch to the instructions for an incremental configuration in [README-incremental-instructions.md](README-incremental-instructions.md)
-
-> At that time, when using a Web API calling downstream APIs on behalf of users signed-in with a Microsoft Personal account, the registration will be a bit different. See the [Current limitations](#Current-limitations) section
 
 ## About this sample
 
@@ -163,10 +161,10 @@ If you want to register your apps manually, as a first step you'll need to:
    - Click the **Add a permission** button and then,
    - Ensure that the **Microsoft APIs** tab is selected
    - In the *Commonly used Microsoft APIs* section, click on **Microsoft Graph**
-   - In the **Delegated permissions** section, ensure that the right permissions are checked: **User.Read**. Use the search box if necessary.
+   - In the **Delegated permissions** section, ensure that the right permissions are checked: **User.Read** and **offline_access**. Use the search box if necessary.
    - Select the **Add permissions** button
    - [Optional] if you are a tenant admin, and agree to grant the admin consent to the web api, select **Grant admin consent for {your tenant domain}**. If you don't do
-    it, users will be presented a consent screen enabling them to consent to using the web api.
+    it, users will be presented a consent screen enabling them to consent to using the web api. The consent screen will also mention the permissions required by the web api itself.
 1. Select the **Expose an API** section, and:
    - Select **Add a scope**
    - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
@@ -204,7 +202,7 @@ If you want to register your apps manually, as a first step you'll need to:
    - In the **Delegated permissions** section, ensure that the right permissions are checked: **access_as_user**. Use the search box if necessary.
    - Select the **Add permissions** button
 
-> Important. If you don't want to sign-in users with their personal Microsoft accounts, even if you declared the permission in the application registration to be (middletier)/**access_as_user**, in the code, you will need to acquire a token for (middletier)/**.default** in order to let the user consent to the downstream API (Graph) as well as the TodoListService. See [Configure the TodoListClient C# project](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/master/2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md#configure-the-todolistclient-c-project) below
+> Important. Even if you declared the permission in the application registration to be (middletier)/**access_as_user**, in the code, you will need to acquire a token for (middletier)/**.default** in order to let the user consent to the downstream API (Graph) as well as the TodoListService. See [Configure the TodoListClient C# project](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/master/2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md#configure-the-todolistclient-c-project) below
 
 #### Register the client app as an known client application for the Web API
 
@@ -226,8 +224,8 @@ Back in the application registration for the Web API (TodoListService):
 
 #### Choose which users account to sign in
 
-By default the sample is configured to enable users to sign in with any work and school accounts (AAD) accounts.
-This constraint is ensured by `ida:Tenant` in `TodoListClient\App.Config` having the value `organizations`.
+By default the sample is configured to enable users to sign in with any work and school accounts (AAD) or personal Microsoft accounts.
+This constraint is ensured by `ida:Tenant` in `TodoListClient\App.Config` having the value `common`.
 
 ##### Important note
 
@@ -236,7 +234,7 @@ Accepted tenants can have the following values:
 
 Value | Meaning
 ----- | --------
-`common` | users can sign in with any Work and School account, or Microsoft Personal account. *It's tricky to use it in this part of the tutorial. See [Current Limitations](#Current-limitations)*
+`common` | users can sign in with any Work and School account, or Microsoft Personal account.
 `organizations` |  users can sign in with any Work and School account
 `consumers` |  users can sign in with a Microsoft Personal account. *Don't use it for the moment (same as common)*
 a GUID or domain name | users can only sign in with an account for a specific organization described by its tenant ID (GUID) or domain name
@@ -260,7 +258,7 @@ Note: if you used the setup scripts, the changes below will have been applied fo
 1. In the TodoListClient project, open `App.config`.
 1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the *TodoListClient-v2* app copied from the app registration page.
 1. Find the app key `todo:TodoListScope` and replace the value with the scope of the TodoListService-v2 application copied from the app registration in the **Expose an API** tab, but replace the scope by `.default` (of the form ``api://<Application ID of service>/.default`` if you followed the instructions above)
-   > Important: If you don't want to sign-in Microsoft personal accounts, use the `api://<Application ID of service>/.default` and not `api://<Application ID of service>/.access_as_user`, so that the permissions of the Web API get rolled-up in the client's consent screen. If you do want to sign-in users with personal accounts (TenantId=`common`), then keep `api://<Application ID of service>/.access_as_user`, but users who sign-in from other tenants or with personal account will need to consent to the Web API accessing their profile
+   > Important: Use the `api://<Application ID of service>/.default` and not `api://<Application ID of service>/.access_as_user`, so that the permissions of the Web API get rolled-up in the client's consent screen.
 
 1. [Optional] If you want your application to work only in your organization (only in your tenant) you'll also need to Find the app key `ida:Tenant` and replace the value with your AAD Tenant ID (GUID). Alternatively you can also use your AAD tenant Name (for example, contoso.onmicrosoft.com)
 1. [Optional] If you changed the default URL for your service application, find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project. You will need to do that when you deploy your Web API.
@@ -280,19 +278,10 @@ Explore the sample by signing in into the TodoList client, adding items to the T
 
 NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` sample. Each time you run the TodoListService API, your To-Do list will get emptied.
 
-### Current limitations
+### Alternative architecture
 
-The on-behalf-of flow works for Microsoft Personal accounts, but the consent is not rolled-up in the client for the user to consent to the Web API calling the downstream API (here Microsoft Graph). To make this work, the suggestion is:
+This part of the sample uses different client ID for the client and the service and uses the on-behalf-of flow. If you are the author of both the client and the service, you might alternatively want to use the same client ID in the Client and the Service. This approach is described in the third part of the tutorial [3.-Web-api-call-Microsoft-graph-for-personal-accounts](../3.-Web-api-call-Microsoft-graph-for-personal-accounts)
 
-- either to use the same client ID in the Client and the Service. This way the consent for the service will appear in the client. This approach is described in the third part of the tutorial [3.-Web-api-call-Microsoft-graph-for-personal-accounts](../3.-Web-api-call-Microsoft-graph-for-personal-accounts)
-- or have the user of a Microsoft personal account consent for the Web API to access Microsoft Graph (in the case of our sample). For this, you can:
-  - either provide a protected page on the Web API (which therefore also becomes a Web app) so that the user can have an interaction to consent.
-  - or inform the user to navigate to the following URL to consent for the Web API to access their profile. This is a kind of sign-up process:
-    ```Text
-    https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id={SERVICE_CLIENT_ID}&response_type=code&redirect_uri=https%3A%2F%2Flocalhost:44351%2F&response_mode=query&scope=offline_access%20user.read
-    ```
-    Of course you will have replaced the {SERVICE_CLIENT_ID} string by the actual clientId of the TodoListService
-  
 ## How was the code created
 
 For details about the way the code to protect the Web API was created, see [How was the code created](../1.%20Desktop%20app%20calls%20Web%20API/README.md#How-was-the-code-created) section, of the README.md file located in the sibling folder named **1. Desktop app calls Web API**.
@@ -324,7 +313,7 @@ Update `Startup.cs` file:
 
   ```csharp
   services.AddProtectedWebApi(Configuration)
-          .AddProtectedApiCallsWebApis(Configuration, new string[] { "user.read" })
+          .AddProtectedApiCallsWebApis(Configuration)
           .AddInMemoryTokenCaches();
   ```
 
@@ -333,15 +322,12 @@ Update `Startup.cs` file:
   - set the authority to be the Microsoft identity platform identity
   - sets the audiences to validate
   - register an issuer validator that accepts issuers to be in the Microsoft identity platform clouds.
-  - 
 
-  Here is an idea of the code: 
+  Here is an idea of the code (in the `WebApiServiceCollectionExtensions.cs` file)
 
   ```csharp
   services.AddAuthentication(AzureADDefaults.JwtBearerAuthenticationScheme)
           .AddAzureADBearer(options => configuration.Bind("AzureAd", options));
-
-  services.AddSession();
 
   // Added
   services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
@@ -363,7 +349,7 @@ Update `Startup.cs` file:
   });
   ```
 
-  The services that are added are:
+  The .NET Core "services" that are added are:
 
   - a token acquisition service leveraging MSAL.NET
   - an in memory token cache
@@ -379,27 +365,21 @@ Update `Startup.cs` file:
     // so that it can be used from the controllers.
     options.Events = new JwtBearerEvents();
 
-    // Subscribing to OnTokenValidated to add the token to the cache using the OnBehalfOf flow
+    // Subscribing to OnTokenValidated to verify that the token has at least the Scope, scp or roles claims
     options.Events.OnTokenValidated = async context =>
     {
-     var tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
-     var scopes = new string[] { "user.read" };
-     context.Success();
+        // This check is required to ensure that the Web API only accepts tokens from tenants where it has been consented and provisioned.
+        if (!context.Principal.Claims.Any(x => x.Type == ClaimConstants.Scope)
+        && !context.Principal.Claims.Any(y => y.Type == ClaimConstants.Scp)
+        && !context.Principal.Claims.Any(y => y.Type == ClaimConstants.Roles))
+        {
+            throw new UnauthorizedAccessException("Neither scope or roles claim was found in the bearer token.");
+        }
 
-     // Adds the token to the cache, and also handles the incremental consent and claim challenges
-     tokenAcquisition.AddAccountToCacheFromJwt(context, scopes);
-     await Task.FromResult(0);
+        await Task.FromResult(0);
     };
+
   });
-  ```
-
-- At the beginning of the `Configure` method, insert `app.UseSession()`. This code ensures that the session exists for the session-based token cache to work properly.
-
-  ```CSharp
-  public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-  {
-    app.UseSession();
-    ...
   ```
 
 ### Modify the TodoListController.cs file to add information to the todo item about its owner
@@ -439,7 +419,7 @@ This method is the following. It:
         }
         catch (MsalUiRequiredException ex)
         {
-            tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(HttpContext, scopes, ex);
+            tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(scopes, ex);
             return string.Empty;
         }
     }
@@ -459,7 +439,7 @@ This sample uses the `ReplyForbiddenWithWwwAuthenticateHeader` method of the `To
   - the scopes to request
   - the claims (for conditional access, MFA etc ...)
 
-The code for this method is available in [Microsoft.Identity.Web\Client\TokenAcquisition.cs L394-L427](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/2e5d34aedabbf20b583580a661433ad4b00bb035/Microsoft.Identity.Web/Client/TokenAcquisition.cs#L394-L427)
+The code for this method is available in [Microsoft.Identity.Web\Client\TokenAcquisition.cs L457-L493](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/4f9a9bc7f08e79f1a3e908cb513c59f1976470da/Microsoft.Identity.Web/TokenAcquisition.cs#L457-L493)
 
 #### On the client side
 
@@ -469,11 +449,11 @@ On the client side, when it calls the Web API and receives a 403 with a www-Auth
   - the consent URi
 - Navigate to the consent URI provided by the Web API.
 
-The code for `HandleChallengeFromWebApi` method is available from [TodoListClient\MainWindow.xaml.cs L180-L206](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/9be6d8b3705ada352caa9a47be0a5add8389b6f6/2.%20Web%20API%20now%20calls%20Microsoft%20Graph/TodoListClient/MainWindow.xaml.cs#L180-L206)
+The code for `HandleChallengeFromWebApi` method is available from [TodoListClient\MainWindow.xaml.cs L162-197](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/4f9a9bc7f08e79f1a3e908cb513c59f1976470da/2.%20Web%20API%20now%20calls%20Microsoft%20Graph/TodoListClient/MainWindow.xaml.cs#L162-L197)
 
 ## How to deploy this sample to Azure
 
-See section [How to deploy this sample to Azure](../1.%20Desktop%20app%20calls%20Web%20API/README.md#How-to-deploy-this-sample-to-Azure) in the first part of this tutorial, as the deployment is exactly the same.
+See section [How to deploy this sample to Azure](../1.%20Desktop%20app%20calls%20Web%20API/README.md#How-to-deploy-this-sample-to-Azure) in the first part of this tutorial, as the deployment is the same.
 
 ## Community Help and Support
 
@@ -495,19 +475,22 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 For more information, visit the following links:
 
-- To lean more about the application registration, visit:
+- to learn more about the scenario, see [Scenario: Web app that calls web APIs](https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-web-app-call-api-overview)
+
+- to learn more about Microsoft.Identity.Web, see [Microsoft.Identity.Web/README.md](../Microsoft.Identity.Web/README.md)
+
+- To learn more about the application registration, visit:
 
   - [Quickstart: Register an application with the Microsoft identity platform](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
   - [Quickstart: Configure a client application to access web APIs](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis)
   - [Quickstart: Quickstart: Configure an application to expose web APIs](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis)
 
 - To learn more about the code, visit [Conceptual documentation for MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki#conceptual-documentation) and in particular:
-  - [Acquiring tokens with authorization codes on web apps](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-with-authorization-codes-on-web-apps)
-  - [Customizing Token cache serialization](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/token-cache-serialization)
+  - [Acquiring tokens with the on-behalf-of flow](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/on-behalf-of)
 
 - Articles about the Microsoft identity platform endpoint [http://aka.ms/aaddevv2](http://aka.ms/aaddevv2), with a focus on:
   - [identity platform and OAuth 2.0 On-Behalf-Of flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols-oauth-on-behalf-of)
 
-- [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-2.1&tabs=visual-studio%2Caspnetcore2x)
+- [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-2.2&tabs=visual-studio%2Caspnetcore2x)
   - [AuthenticationBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationbuilder?view=aspnetcore-2.0)
-  - [Azure Active Directory with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.1)
+  - [Azure Active Directory with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.2)
