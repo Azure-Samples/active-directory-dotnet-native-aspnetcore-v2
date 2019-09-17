@@ -96,7 +96,7 @@ If you want to use this automation:
       - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
-   1. In tthe application registration page for the *TodoListClient-v2* application, select the **Manifest** section:
+   1. In the application registration page for the *TodoListClient-v2* application, select the **Manifest** section:
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
 
