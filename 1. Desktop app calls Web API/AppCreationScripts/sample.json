@@ -30,10 +30,11 @@
       "Id": "client",
       "Name": "TodoListClient (active-directory-dotnet-native-aspnetcore-v2)",
       "Kind": "Desktop",
+      "ReplyUrls": "https://login.microsoftonline.com/common/oauth2/nativeclient",
       "RequiredResourcesAccess": [
         {
           "Resource": "service",
-          "DelegatedPermissions": [ "user_impersonation" ]
+          "DelegatedPermissions": [ "access_as_user" ]
         }
       ],
       "ManualSteps": [
