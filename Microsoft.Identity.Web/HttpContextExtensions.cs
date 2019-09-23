@@ -13,7 +13,7 @@ namespace Microsoft.Identity.Web
         /// it can be used in the actions</param>
         public static void StoreTokenUsedToCallWebAPI(this HttpContext httpContext, JwtSecurityToken token)
         {
-            httpContext.Items.Add("token", token);
+            httpContext.Items.Add("JwtSecurityTokenUsedToCallWebAPI", token);
         }
 
         /// <summary>
@@ -23,27 +23,7 @@ namespace Microsoft.Identity.Web
         /// <returns><see cref="JwtSecurityToken"/> used to call the Web API</returns>
         public static JwtSecurityToken GetTokenUsedToCallWebAPI(this HttpContext httpContext)
         {
-            return httpContext.Items["token"] as JwtSecurityToken;
-        }
-
-        /// <summary>
-        /// Set the token cache key to be used in the upcoming token acquisition
-        /// </summary>
-        /// <param name="httpContext">Http context</param>
-        /// <param name="tokenCacheKey">Value of the token cache key as decided by the
-        /// Web app or Web API</param>
-        public static void SetTokenCacheKey(this HttpContext httpContext, string tokenCacheKey)
-        {
-            httpContext.Items.Add("tokenCacheKey", tokenCacheKey);
-        }
-
-        /// <summary>
-        /// GEt the token cache key to be used in the upcoming token acquisition
-        /// </summary>
-        /// <param name="httpContext">Http context</param>
-        public static string GetUserTokenCacheKey(this HttpContext httpContext)
-        {
-            return httpContext.Items["tokenCacheKey"] as string;
+            return httpContext.Items["JwtSecurityTokenUsedToCallWebAPI"] as JwtSecurityToken;
         }
     }
 }
