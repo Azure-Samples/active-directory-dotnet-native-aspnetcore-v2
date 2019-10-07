@@ -433,7 +433,7 @@ An interesting piece is how `MsalUiRequiredException` are handled. These excepti
 
 This sample uses the `ReplyForbiddenWithWwwAuthenticateHeader` method of the `TokenAcquisition` service. This method uses the HttpResponse to:
 
-- Send an HTTP 404 (Forbidden) to the client
+- Send an HTTP 403 (Forbidden) to the client
 - Set information in the www-Authenticate header of the HttpResponse with information that would enable a client to get more consent from the user that is:
   - the client ID of our Web API
   - the scopes to request
