@@ -6,7 +6,7 @@ namespace Microsoft.Identity.Web
     public static class HttpContextExtensions
     {
         /// <summary>
-        /// Keep the validated token in associated with the Http request
+        /// Keep the validated token associated with the Http request
         /// </summary>
         /// <param name="httpContext">Http context</param>
         /// <param name="token">Token to preserve after the token is validated so that
