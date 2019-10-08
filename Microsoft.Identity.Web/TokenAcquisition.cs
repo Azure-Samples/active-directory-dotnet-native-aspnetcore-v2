@@ -188,6 +188,7 @@ namespace Microsoft.Identity.Web
                 // Case of Web APIs: we need to do an on-behalf-of flow
                 if (validatedToken != null)
                 {
+                    // In the case the token is a JWE (encrypted token), we use the decrypted token.
                     string tokenUsedToCallTheWebApi = validatedToken.InnerToken == null ? validatedToken.RawData
                                                 : validatedToken.InnerToken.RawData;
                     var result = await application
