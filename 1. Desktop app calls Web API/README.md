@@ -244,6 +244,10 @@ Then you need to set the  `accessTokenAcceptedVersion` property of the Web API t
 
 ## How was the code created
 
+### Code for the WPF app
+
+The focus of this tutorial is on the Web API. The code for the desktop app is decribed in [Desktop app that calls web APIs - code configuration](https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-desktop-app-configuration)
+
 ### Code for the Web API (TodoListService)
 
 The code for the service was created in the following way:
