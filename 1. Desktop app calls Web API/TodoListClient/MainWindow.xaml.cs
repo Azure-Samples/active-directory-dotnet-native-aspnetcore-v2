@@ -220,7 +220,7 @@ namespace TodoListClient
             // Call the To Do service.
             //
 
-            // Once the token has been returned by ADAL, add it to the http authorization header, before making the call to access the To Do service.
+            // Once the token has been returned by MSAL, add it to the http authorization header, before making the call to access the To Do service.
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             // Forms encode Todo item, to POST to the todo list web api.
@@ -264,7 +264,6 @@ namespace TodoListClient
                 return;
             }
 
-            //
             // Get an access token to call the To Do list service.
             try
             {
