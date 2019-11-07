@@ -40,6 +40,15 @@ namespace TodoListClient
         private static readonly string TodoListScope = ConfigurationManager.AppSettings["todo:TodoListScope"];
         private static readonly string TodoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListBaseAddress"];
         private static readonly string[] Scopes = { TodoListScope };
+        private static string TodoListApiAddress
+        {
+            get
+            {
+                string baseAddress = TodoListBaseAddress;
+                return baseAddress.EndsWith("/") ? TodoListBaseAddress + "api/todolist"
+                                                 : TodoListBaseAddress + "/api/todolist";
+            }
+        }
 
         private readonly HttpClient _httpClient = new HttpClient();
         private readonly IPublicClientApplication _app;
@@ -68,6 +77,11 @@ namespace TodoListClient
         private async Task GetTodoList(bool isAppStarting)
         {
             var accounts = (await _app.GetAccountsAsync()).ToList();
+            if (!accounts.Any())
+            {
+                SignInButton.Content = SignInString;
+                return;
+            }
 
             // Get an access token to call the To Do service.
             AuthenticationResult result = null;
@@ -111,7 +125,7 @@ namespace TodoListClient
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             // Call the To Do list service.
-            HttpResponseMessage response = await _httpClient.GetAsync(TodoListBaseAddress + "/api/todolist");
+            HttpResponseMessage response = await _httpClient.GetAsync(TodoListApiAddress);
 
             if (response.IsSuccessStatusCode)
             {
@@ -237,8 +251,11 @@ namespace TodoListClient
                 result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync()
                     .ConfigureAwait(false);
-                SetUserName(result.Account);
-                UserName.Content = Properties.Resources.UserNotSignedIn;
+                Dispatcher.Invoke(() =>
+                {
+                    SetUserName(result.Account);
+                    UserName.Content = Properties.Resources.UserNotSignedIn;
+                });
             }
             // There is no access token in the cache, so prompt the user to sign-in.
             catch (MsalUiRequiredException)
@@ -276,7 +293,7 @@ namespace TodoListClient
 
             // Call the To Do list service.
 
-            HttpResponseMessage response = await _httpClient.PostAsync(TodoListBaseAddress + "api/todolist", content);
+            HttpResponseMessage response = await _httpClient.PostAsync(TodoListApiAddress, content);
 
             if (response.IsSuccessStatusCode)
             {
