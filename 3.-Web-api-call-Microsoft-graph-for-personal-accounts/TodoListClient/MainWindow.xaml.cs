@@ -1,26 +1,5 @@
-﻿/*
- The MIT License (MIT)
-
-Copyright (c) 2018 Microsoft Corporation
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
@@ -28,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
-// The following using statements were added for this sample.
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -46,7 +24,6 @@ namespace TodoListClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        //
         // The Client ID is used by the application to uniquely identify itself to Azure AD.
         // The Tenant is the name of the Azure AD tenant in which this application is registered.
         // The AAD Instance is the instance of Azure, for example public Azure or Azure China.
@@ -57,20 +34,27 @@ namespace TodoListClient
         private static readonly string Tenant = ConfigurationManager.AppSettings["ida:Tenant"];
         private static readonly string ClientId = ConfigurationManager.AppSettings["ida:ClientId"];
 
-        private static readonly string Authority = String.Format(CultureInfo.InvariantCulture, AadInstance, Tenant);
+        private static readonly string Authority = string.Format(CultureInfo.InvariantCulture, AadInstance, Tenant);
 
-        //
-        // To authenticate to the To Do list service, the client needs to know the service's App ID URI.
-        // To contact the To Do list service we need it's URL as well.
-        //
+        // To authenticate to the To Do list service, the client needs to know the service's App ID URI and URL
+
         private static readonly string TodoListScope = ConfigurationManager.AppSettings["todo:TodoListScope"];
         private static readonly string TodoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListBaseAddress"];
         private static readonly string[] Scopes = { TodoListScope };
+        private static string TodoListApiAddress
+        {
+            get
+            {
+                string baseAddress = TodoListBaseAddress;
+                return baseAddress.EndsWith("/") ? TodoListBaseAddress + "api/todolist"
+                                                 : TodoListBaseAddress + "/api/todolist";
+            }
+        }
 
         private readonly HttpClient _httpClient = new HttpClient();
         private readonly IPublicClientApplication _app;
 
-        // Button strings
+        // Button content
         const string SignInString = "Sign In";
         const string ClearCacheString = "Clear Cache";
 
@@ -88,7 +72,7 @@ namespace TodoListClient
 
         private void GetTodoList()
         {
-            GetTodoList(SignInButton.Content.ToString() != ClearCacheString);
+            GetTodoList(SignInButton.Content.ToString() != ClearCacheString).ConfigureAwait(false);
         }
 
         private async Task GetTodoList(bool isAppStarting)
@@ -99,9 +83,8 @@ namespace TodoListClient
                 SignInButton.Content = SignInString;
                 return;
             }
-            //
+
             // Get an access token to call the To Do service.
-            //
             AuthenticationResult result = null;
             try
             {
@@ -139,22 +122,20 @@ namespace TodoListClient
                 return;
             }
 
-            // Once the token has been returned by ADAL, add it to the http authorization header, before making the call to access the To Do list service.
+            // Once the token has been returned by MSAL, add it to the http authorization header, before making the call to access the To Do list service.
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             // Call the To Do list service.
-            HttpResponseMessage response = await _httpClient.GetAsync(TodoListBaseAddress + "/api/todolist");
+            HttpResponseMessage response = await _httpClient.GetAsync(TodoListApiAddress);
 
             if (response.IsSuccessStatusCode)
             {
-
                 // Read the response and data-bind to the GridView to display To Do items.
                 string s = await response.Content.ReadAsStringAsync();
                 List<TodoItem> toDoArray = JsonConvert.DeserializeObject<List<TodoItem>>(s);
 
                 Dispatcher.Invoke(() =>
                 {
-
                     TodoList.ItemsSource = toDoArray.Select(t => new { t.Title });
                 });
             }
@@ -195,7 +176,6 @@ namespace TodoListClient
         /// <returns></returns>
         private async Task HandleChallengeFromWebApi(HttpResponseMessage response, IAccount account)
         {
-
             AuthenticationHeaderValue bearer = response.Headers.WwwAuthenticate.First(v => v.Scheme == "Bearer");
             IEnumerable<string> parameters = bearer.Parameter.Split(',').Select(v => v.Trim()).ToList();
             string clientId = GetParameter(parameters, "clientId");
@@ -268,17 +248,18 @@ namespace TodoListClient
                 return;
             }
 
-            //
             // Get an access token to call the To Do service.
-            //
             AuthenticationResult result = null;
             try
             {
                 result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync()
                     .ConfigureAwait(false);
-                SetUserName(result.Account);
-                UserName.Content = Properties.Resources.UserNotSignedIn;
+                Dispatcher.Invoke(() =>
+                {
+                    SetUserName(result.Account);
+                    UserName.Content = Properties.Resources.UserNotSignedIn;
+                });
             }
             // There is no access token in the cache, so prompt the user to sign-in.
             catch (MsalUiRequiredException)
@@ -305,11 +286,8 @@ namespace TodoListClient
                 return;
             }
 
-            //
             // Call the To Do service.
-            //
-
-            // Once the token has been returned by ADAL, add it to the http authorization header, before making the call to access the To Do service.
+            // Once the token has been returned by MSAL, add it to the http authorization header, before making the call to access the To Do service.
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
             // Forms encode Todo item, to POST to the todo list web api.
@@ -319,7 +297,7 @@ namespace TodoListClient
 
             // Call the To Do list service.
 
-            HttpResponseMessage response = await _httpClient.PostAsync(TodoListBaseAddress + "/api/todolist", content);
+            HttpResponseMessage response = await _httpClient.PostAsync(TodoListApiAddress, content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -328,8 +306,7 @@ namespace TodoListClient
             }
             else
             {
-                string failureDescription = await response.Content.ReadAsStringAsync();
-                MessageBox.Show($"{response.ReasonPhrase}\n {failureDescription}", "An error occurred while posting to /api/todolist", MessageBoxButton.OK);
+                    await DisplayErrorMessage(response);
             }
         }
 
@@ -354,9 +331,23 @@ namespace TodoListClient
                 return;
             }
 
-            //
             // Get an access token to call the To Do list service.
-            //
+            try
+            {
+                var result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
+
+                Dispatcher.Invoke(() =>
+                {
+                    SignInButton.Content = ClearCacheString;
+                    SetUserName(result.Account);
+                    GetTodoList();
+                }
+                );
+            }
+            catch (MsalUiRequiredException)
+            {
             try
             {
                 // Force a sign-in (Prompt.SelectAccount), as the MSAL web browser might contain cookies for the current user
@@ -394,10 +385,13 @@ namespace TodoListClient
                     MessageBox.Show(message);
                 }
 
-                UserName.Content = Properties.Resources.UserNotSignedIn;
+                Dispatcher.Invoke(() =>
+                {
+                    UserName.Content = Properties.Resources.UserNotSignedIn;
+                });
             }
         }
-
+        }
         // Set user name to text box
         private void SetUserName(IAccount userInfo)
         {

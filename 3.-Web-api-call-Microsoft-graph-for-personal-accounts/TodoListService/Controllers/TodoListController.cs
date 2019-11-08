@@ -1,26 +1,9 @@
-﻿/*
- The MIT License (MIT)
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
-Copyright (c) 2018 Microsoft Corporation
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
- */
+// The same code for the controller is used in both chapters of the tutorial. 
+// In the first chapter this is just a protected API (ENABLE_OBO is not set)
+// In this chapter, the Web API calls a downstream API on behalf of the user (OBO)
 #define ENABLE_OBO
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -56,17 +39,16 @@ namespace TodoListService.Controllers
         static readonly ConcurrentBag<TodoItem> TodoStore = new ConcurrentBag<TodoItem>();
 
         /// <summary>
-        /// The Web API will only accept tokens 1) for users, 2) having the user_impersonation scope for
-        /// this API (if you created the app using the App creation script) or 'access_as_user' if you created
-        /// it following the README.md.
+        /// The Web API will only accept tokens 1) for users, and 
+        /// 2) having the access_as_user scope for this API
         /// </summary>
-        static string[] scopeRequiredByAPI = new string[] { "user_impersonation", "access_as_user" };
+        static readonly string[] scopeRequiredByApi = new string[] { "access_as_user" };
 
         // GET: api/values
         [HttpGet]
         public IEnumerable<TodoItem> Get()
         {
-            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByAPI);
+            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return TodoStore.Where(t => t.Owner == owner).ToList();
         }
@@ -75,7 +57,7 @@ namespace TodoListService.Controllers
         [HttpPost]
         public async void Post([FromBody]TodoItem todo)
         {
-            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByAPI);
+            HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             string ownerName;
 #if ENABLE_OBO
@@ -91,7 +73,7 @@ namespace TodoListService.Controllers
             {
                 HttpContext.Response.ContentType = "text/plain";
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n"+ex.ErrorCode + "\n"+ ex.Message);
+                await HttpContext.Response.WriteAsync("An authentication error occurred while acquiring a token for downstream API\n" + ex.ErrorCode + "\n" + ex.Message);
             }
             catch (Exception ex)
             {
@@ -123,9 +105,7 @@ namespace TodoListService.Controllers
 
         private static async Task<dynamic> CallGraphApiOnBehalfOfUser(string accessToken)
         {
-            //
             // Call the Graph API and retrieve the user's profile.
-            //
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             HttpResponseMessage response = await client.GetAsync("https://graph.microsoft.com/v1.0/me");
