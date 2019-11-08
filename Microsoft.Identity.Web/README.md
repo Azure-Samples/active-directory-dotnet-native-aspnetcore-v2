@@ -338,12 +338,49 @@ In order to troubleshoot your web API you can set the `subscribeToJwtBearerMiddl
 
 In both cases, you can set a breakpoint in the methods of the  `OpenIdConnectMiddlewareDiagnostics` and `JwtBearerMiddlewareDiagnostics` classes respectively to observe values under the debugger.
 
-## Learn more how the library works
+## More customizations
+
+If you want to customize the `OpenIdConnectOption` or `JwtBearerOption` but still want to benefit from the implementation provided by Microsoft.Identity.Web, you can easily do it from your `Startup.cs` file:
+
+Let's take for example the method `AddProtectedWebApi`. If you check the code inside it, you have this event setup:
+
+```
+options.Events.OnTokenValidated = async context =>
+{
+    // This check is required to ensure that the Web API only accepts tokens from tenants where it has been consented and provisioned.
+    if (!context.Principal.Claims.Any(x => x.Type == ClaimConstants.Scope)
+    && !context.Principal.Claims.Any(y => y.Type == ClaimConstants.Scp)
+    && !context.Principal.Claims.Any(y => y.Type == ClaimConstants.Roles))
+    {
+         throw new UnauthorizedAccessException("Neither scope or roles claim was found in the bearer token.");
+    }
+
+    await Task.FromResult(0);
+};
+```
+
+Let's say you want to augment the current `ClaimsPrincipal` by adding claims to it, and you have to do it on `OnTokenValidated `, however you don't want to lose this `UnauthorizedAccessException` check existing in the event. To do so, on your `Startup.cs` you would have:
+
+```
+services.AddProtectedWebApi(Configuration);
+services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options => 
+{
+  var existingOnTokenValidatedHandler = options.Events.OnTokenValidated ;
+  options.Events.OnTokenValidated = async context =>
+  {
+       await existingOnTokenValidatedHandler(context);
+      // your code to add extra claims that will be executed after the current event implementation.
+  }    
+}
+
+```
+
+## Learn more about how the library works
 
 You can learn more about the tokens by looking at the following articles in MSAL.NET's conceptual documentation:
 
 - The [Authorization code flow](https://aka.ms/msal-net-authorization-code), which is used, after the user signed-in with Open ID Connect, in order to get a token and cache it for a later use. See [TokenAcquisition L 107](https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/blob/f99e913cc032e16c59b748241111e97108e87918/Extensions/TokenAcquisition.cs#L107) for details of this code
-- [AcquireTokenSilent](https://aka.ms/msal-net-acquiretokensilent ), which is used by the controller to get an access token for the downstream API. See [TokenAcquisition L 168](https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/blob/f99e913cc032e16c59b748241111e97108e87918/Extensions/TokenAcquisition.cs#L168) for details of this code
+- [AcquireTokenSilent](https://aka.ms/msal-net-acquiretokensilent), which is used by the controller to get an access token for the downstream API. See [TokenAcquisition L 168](https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/blob/f99e913cc032e16c59b748241111e97108e87918/Extensions/TokenAcquisition.cs#L168) for details of this code
 - [Token cache serialization](msal-net-token-cache-serialization)
 
 The token validation is performed by the classes of the [Identity Model Extensions for DotNet](https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet) library. Learn about customizing

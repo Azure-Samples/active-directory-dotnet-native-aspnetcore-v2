@@ -29,8 +29,7 @@ namespace Microsoft.Identity.Web
         private readonly AzureADOptions _azureAdOptions;
         private readonly ConfidentialClientApplicationOptions _applicationOptions;
 
-        private readonly IMsalAppTokenCacheProvider _appTokenCacheProvider;
-        private readonly IMsalUserTokenCacheProvider _userTokenCacheProvider;
+        private readonly IMsalTokenCacheProvider _tokenCacheProvider;
 
         private IConfidentialClientApplication application;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -42,11 +41,10 @@ namespace Microsoft.Identity.Web
         /// This constructor is called by ASP.NET Core dependency injection
         /// </summary>
         /// <param name="configuration"></param>
-        /// <param name="appTokenCacheProvider">The App token cache provider</param>
+        /// <param name="tokenCacheProvider">The App token cache provider</param>
         /// <param name="userTokenCacheProvider">The User token cache provider</param>
         public TokenAcquisition(
-            IMsalAppTokenCacheProvider appTokenCacheProvider,
-            IMsalUserTokenCacheProvider userTokenCacheProvider,
+            IMsalTokenCacheProvider tokenCacheProvider,
             IHttpContextAccessor httpContextAccessor,
             IOptions<AzureADOptions> azureAdOptions,
             IOptions<ConfidentialClientApplicationOptions> applicationOptions)
@@ -54,8 +52,7 @@ namespace Microsoft.Identity.Web
             _httpContextAccessor = httpContextAccessor;
             _azureAdOptions = azureAdOptions.Value;
             _applicationOptions = applicationOptions.Value;
-            _appTokenCacheProvider = appTokenCacheProvider;
-            _userTokenCacheProvider = userTokenCacheProvider;
+            _tokenCacheProvider = tokenCacheProvider;
         }
 
         /// <summary>
@@ -170,6 +167,7 @@ namespace Microsoft.Identity.Web
                 throw new ArgumentNullException(nameof(scopes));
             }
 
+            // Use MSAL to get the right token to call the API
             var application = GetOrBuildConfidentialClientApplication();
             string accessToken;
 
@@ -232,7 +230,7 @@ namespace Microsoft.Identity.Web
             if (account != null)
             {
                 await app.RemoveAsync(account).ConfigureAwait(false);
-                _userTokenCacheProvider?.ClearAsync().ConfigureAwait(false);
+                _tokenCacheProvider?.ClearAsync().ConfigureAwait(false);
             }
         }
 
@@ -266,7 +264,7 @@ namespace Microsoft.Identity.Web
                 request.PathBase,
                 azureAdOptions.CallbackPath ?? string.Empty);
 
-            string authority = $"{azureAdOptions.Instance}{azureAdOptions.TenantId}/";
+            string authority = $"{applicationOptions.Instance}{applicationOptions.TenantId}/";
 
             var app = ConfidentialClientApplicationBuilder
                 .CreateWithApplicationOptions(applicationOptions)
@@ -275,8 +273,8 @@ namespace Microsoft.Identity.Web
                 .Build();
 
             // Initialize token cache providers
-            _appTokenCacheProvider?.InitializeAsync(app.AppTokenCache);
-            _userTokenCacheProvider?.InitializeAsync(app.UserTokenCache);
+            _tokenCacheProvider?.InitializeAsync(app.AppTokenCache);
+            _tokenCacheProvider?.InitializeAsync(app.UserTokenCache);
 
             return app;
         }
