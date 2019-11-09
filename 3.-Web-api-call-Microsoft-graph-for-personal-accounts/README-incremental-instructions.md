@@ -91,12 +91,12 @@ If you want to use this automation:
    > Other ways of running the scripts are described in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
 
 1. Once you've run the script, be sure to follow the manual steps. Indeed Azure AD PowerShell does not yet provide full control on applications consuming v2.0 tokens, even if this registration is already possible from the Azure portal:
-   1. In the list of pages for the application registration of the *TodoListService-v2* application, select **Manifest**
+   1. In the list of pages for the application registration of the *TodoListClient-and-Service* application, select **Manifest**
       - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
-   1. In the **Authentication** page for the *TodoListService-v2* application, check the `urn:ietf:wg:oauth:2.0:oob` reply URI so that the client can propose incremental consent to the user for the Web API when needed.
-   1. In tthe application registration page for the *TodoListClient-v2* application, select the **Manifest** section:
+   1. In the **Authentication** page for the *TodoListClient-and-Service* application, check the `urn:ietf:wg:oauth:2.0:oob` reply URI so that the client can propose incremental consent to the user for the Web API when needed.
+   1. In tthe application registration page for the *TodoListClient-and-Service* application, select the **Manifest** section:
       - search for **signInAudience** and make sure it's set to **AzureADandPersonalMicrosoftAccount**
       - Select **Save**
 
@@ -127,7 +127,7 @@ These instructions only show the differences with the first part.
    - Select the **Add permissions** button
    - [Optional] if you are a tenant admin, and agree to grant the admin consent to the web api, select **Grant admin consent for {your tenant domain}**.
 1. [Otherwise] If you have not granted admin consent to the Web API in the previous optional step, select **Authentication** in the list of pages and there:
-   - Check the `urn:ietf:wg:oauth:2.0:oob` Redirect URI checkbox. This is so that the client can propose incremental consent to the user for the downstream web apis used by our *TodoListService-v2* Web API.
+   - Check the `urn:ietf:wg:oauth:2.0:oob` Redirect URI checkbox. This is so that the client can propose incremental consent to the user for the downstream web apis used by our *TodoListService* Web API.
    - Select **Save**
 1. [Optional] Select the **Manifest** section and:
    - in the manifest, search for **"accessTokenAcceptedVersion"**, and see that its value is **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
@@ -147,8 +147,8 @@ This constrain is ensured by `ida:Tenant` in `TodoListClient\App.Config` having 
 #### Configure the TodoListService C# project
 
 1. Open the solution in Visual Studio.
-1. In the *TodoListService-v2* project, open the `appsettings.json` file.
-1. Find the `ClientSecret` property and replace the existing value with the key you saved during the creation of the `TodoListService-v2` app, in the Azure portal.
+1. In the *TodoListClient-and-Service* project, open the `appsettings.json` file.
+1. Find the `ClientSecret` property and replace the existing value with the key you saved during the creation of the `TodoListClient-and-Service` app, in the Azure portal.
 
 #### Configure the TodoListClient C# project
 
