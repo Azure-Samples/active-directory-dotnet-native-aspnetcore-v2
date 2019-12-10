@@ -62,6 +62,8 @@ Both applications use the Active Directory Authentication Library [MSAL.NET](htt
 
 ![Topology](./ReadmeFiles/topology.png)
 
+- Developers who wish to gain good familiarity of programming for Microsoft Graph are advised to go through the [An introduction to Microsoft Graph for developers](https://www.youtube.com/watch?v=EBbnpFdB92A) recorded session. 
+
 ### User experience when using this sample
 
 The Web API (TodoListService) maintains an in-memory collection of to-do items per authenticated user. Several applications signed-in under the same identities share the same to-do list.
