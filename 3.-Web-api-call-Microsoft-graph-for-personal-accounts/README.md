@@ -113,7 +113,7 @@ If you want to use this automation:
    ```
    > Other ways of running the scripts are described in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
 
-1. In the list of pages for the application registration of the `TodoListService-v2` application, select **Manifest**
+1. In the list of pages for the application registration of the `TodoListClient-and-Service` application, select **Manifest**
       - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
       - Select **Save**
 
@@ -194,9 +194,9 @@ Accepted tenants can have the following values:
 Note: if you used the setup scripts, the changes below will have been applied for you
 
 1. Open the solution in Visual Studio.
-1. In the *TodoListService-v2* project, open the `appsettings.json` file.
-1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the *TodoListService-v2* application, that you registered earlier.
-1. Find the `ClientSecret` property and replace the existing value with the key you saved during the creation of the `TodoListService-v2` app, in the Azure portal.
+1. In the *TodoListService* project, open the `appsettings.json` file.
+1. Find the `ClientId` property and replace the value with the Application ID (Client ID) property of the *TodoListClient-and-Service* application, that you registered earlier.
+1. Find the `ClientSecret` property and replace the existing value with the key you saved during the creation of the `TodoListClient-and-Service` app, in the Azure portal.
 1. [Optional] if you want to limit sign-in to users in your organization, also update the following properties:
 - `Domain`, replacing the existing value with your AAD tenant domain, for example, contoso.onmicrosoft.com.
 - `TenantId`, replacing the existing value with the Tenant ID.
@@ -205,9 +205,9 @@ Note: if you used the setup scripts, the changes below will have been applied fo
 
 Note: if you used the setup scripts, the changes below will have been applied for you
 
-1. In the TodoListClient project, open `App.config`.
-1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the *TodoListClient-v2* app copied from the app registration page.
-1. Find the app key `todo:TodoListScope` and replace the value with the scope of the TodoListService-v2 application copied from the app registration in the **Expose an API** tab, but replace the scope by `.default` (of the form ``api://<Application ID of service>/.default`` if you followed the instructions above)
+1. In the *TodoListClient* project, open `App.config`.
+1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the *TodoListClient-and-Service* app copied from the app registration page.
+1. Find the app key `todo:TodoListScope` and replace the value with the scope of the TodoListClient-and-Service application copied from the app registration in the **Expose an API** tab, but replace the scope by `.default` (of the form ``api://<Application ID of service>/.default`` if you followed the instructions above)
 1. [Optional] If you want your application to work only in your organization (only in your tenant) you'll also need to Find the app key `ida:Tenant` and replace the value with your AAD Tenant ID (GUID). Alternatively you can also use your AAD tenant Name (for example, contoso.onmicrosoft.com)
 1. [Optional] If you changed the default URL for your service application, find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
 
@@ -224,7 +224,7 @@ This behavior is expected as you are not authenticated. The WPF application will
 
 Explore the sample by signing in into the TodoList client, adding items to the To Do list, removing the user account (clearing the cache), and starting again.  As explained, if you stop the application without removing the user account, the next time you run the application, you won't be prompted to sign in again. That is because the sample implements a persistent cache for MSAL, and remembers the tokens from the previous run.
 
-NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` sample. Each time you run the TodoListService API, your To-Do list will get emptied.
+NOTE: Remember, the To-Do list is stored in memory in this *TodoListService* sample. Each time you run the TodoListService API, your To-Do list will get emptied.
 
 ## How was the code created
 
