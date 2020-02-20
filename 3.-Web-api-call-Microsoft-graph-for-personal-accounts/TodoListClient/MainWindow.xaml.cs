@@ -355,7 +355,6 @@ namespace TodoListClient
                 var result = await _app.AcquireTokenInteractive(Scopes)
                     .WithAccount(accounts.FirstOrDefault())
                     .WithPrompt(Prompt.SelectAccount)
-                    .WithExtraScopesToConsent(new[] { "user.read" })
                     .ExecuteAsync()
                     .ConfigureAwait(false);
 

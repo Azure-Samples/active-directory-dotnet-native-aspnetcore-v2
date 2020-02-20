@@ -14,7 +14,7 @@
   "AADApps": [
     {
       "Id": "service",
-      "Name": "TodoListService (active-directory-dotnet-native-aspnetcore-v2)",
+      "Name": "TodoListClient-and-Service",
       "Kind": "WebApi",
       "HomePage": "https://localhost:44351/",
       "PasswordCredentials": "Auto",
@@ -22,31 +22,24 @@
         {
           "Resource": "Microsoft Graph",
           "DelegatedPermissions": [ "User.Read" ]
-        }
+        },
+        {
+					"Resource": "service",
+					"DelegatedPermissions": [ "access_as_user" ]
+				}
       ],
       "ManualSteps": [
+        {
+          "Comment": "Navigate to the Authentication blade, click 'Add a platform' then check the option https://login.microsoftonline.com/common/oauth2/nativeclient"
+        },
         {
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
         },
         {
+          "Comment": "Navigate to the Manifest page and change 'accessTokenAcceptedVersion' to 2."
+        },
+        {
           "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
-        }
-      ]
-    },
-    {
-      "Id": "client",
-      "Name": "TodoListClient (active-directory-dotnet-native-aspnetcore-v2)",
-      "Kind": "Desktop",
-      "ReplyUrls": "https://login.microsoftonline.com/common/oauth2/nativeclient",
-      "RequiredResourcesAccess": [
-        {
-          "Resource": "service",
-          "DelegatedPermissions": [ "access_as_user" ]
-        }
-      ],
-      "ManualSteps": [
-        {
-          "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
         }
       ]
     }
@@ -69,10 +62,6 @@
           "value": "$tenantName"
         },
         {
-          "key": "TenantId",
-          "value": "$tenantId"
-        },
-        {
           "key": "ClientId",
           "value": "service.AppId"
         },
@@ -88,17 +77,13 @@
       "SettingKind": "XML",
       "SettingFile": "\\..\\TodoListClient\\App.Config",
       "Mappings": [
-        //{
-        //  "key": "ida:Tenant",
-        //  "value": "$tenantName"
-        //},
         {
           "key": "ida:ClientId",
-          "value": ".AppId"
+          "value": "service.AppId"
         },
         {
           "key": "todo:TodoListScope",
-          "value": "service.Scope"
+          "value": "service.AppId+\"/access_as_user\""
         },
         {
           "key": "todo:TodoListBaseAddress",
