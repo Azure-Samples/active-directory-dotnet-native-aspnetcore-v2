@@ -33,6 +33,9 @@
           "Comment": "Navigate to the Authentication blade, click 'Add a platform' then check the option https://login.microsoftonline.com/common/oauth2/nativeclient"
         },
         {
+          "Comment": "Navigate to the Expose an API blade and change the Application ID URI to use the https pattern. i.e. https://<tenant_domain>/<app_name>"
+        },
+        {
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
         },
         {
@@ -83,7 +86,7 @@
         },
         {
           "key": "todo:TodoListScope",
-          "value": "service.AppId+\"/access_as_user\""
+          "value": "'https://'+$tenantName+\"/TodoListClient-and-Service/access_as_user\""
         },
         {
           "key": "todo:TodoListBaseAddress",

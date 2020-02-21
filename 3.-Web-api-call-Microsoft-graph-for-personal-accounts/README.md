@@ -127,7 +127,7 @@ As a first step you'll need to:
     it, users will be presented a consent screen enabling them to consent to using the web api.
 1. Select the **Expose an API** section, and:
    - Select **Add a scope**
-   - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
+   - Change the Application ID URI to the https pattern, [check AzureADandPersonalMicrosoftAccount restrictions](https://docs.microsoft.com/en-us/azure/active-directory/develop/supported-accounts-validation), (https://{tenant-domain}/{app-name}) and select **Save and Continue**.
    - Enter the following parameters
      - for **Scope name** use `access_as_user`
      - Keep **Admins and users** for **Who can consent**
@@ -179,7 +179,7 @@ Note: if you used the setup scripts, the changes below will have been applied fo
 
 1. In the *TodoListClient* project, open `App.config`.
 1. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the *TodoListClient-and-Service* app copied from the app registration page.
-1. Find the app key `todo:TodoListScope` and replace the value with `<ClientId>/access_as_user`, i.e `986b487b-6dc0-492c-8b18-6224e35c5096/access_as_user`.
+1. and replace the value with the scope of the TodoListClient-and-Service application copied from the app registration in the **Expose an API** tab, i.e `https://contoso.onmicrosoft.com/TodoListClient-and-Service/access_as_user`.
 1. [Optional] If you changed the default URL for your service application, find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
 
 ### Step 4: Run the sample
@@ -259,11 +259,12 @@ There is one change in the WebApp.Config, and one thing to check
     <add key="ida:Tenant" value="common"/>
     ```
 
-- the thing to draw your attention to, is that you now have the same client ID (Application ID) for the client application and the service. This is not usually the case, which is why your attention is especially drawn here. Therefore the GUID used in `ida:ClientId` is the same as the one used in the Application ID URI for the service: `todo:TodoListScope`
+- The thing to draw your attention to, is that you now have the same client ID (Application ID) for the client application and the service. This is not usually the case, which is why your attention is especially drawn here.
+- The scope must use the https pattern, because of [AzureADandPersonalMicrosoftAccount restrictions](https://docs.microsoft.com/en-us/azure/active-directory/develop/supported-accounts-validation)
 
     ```XML
     <add key="ida:ClientId" value="01234567-89ab-cdef-0123-456789abcdef"/>
-    <add key="todo:TodoListScope" value="01234567-89ab-cdef-0123-456789abcdef/access_as_user"/>
+    <add key="todo:TodoListScope" value="https://contoso.onmicrosoft.com/TodoListClient-and-Service/access_as_user"/>
     ```
 
 ### Have the client let the user consent for the scopes required for the service
