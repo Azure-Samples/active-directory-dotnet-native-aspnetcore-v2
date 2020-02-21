@@ -8,12 +8,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.IdentityModel.Protocols.SignedHttpRequest;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.Identity.Web
@@ -23,6 +27,58 @@ namespace Microsoft.Identity.Web
     /// </summary>
     public static class WebApiServiceCollectionExtensions
     {
+        async static Task ValidatePopToken(TokenValidatedContext context, TokenValidationParameters tokenValidationParameters)
+        {
+            var signedHttpRequestValidator = new SignedHttpRequestHandler();
+
+            var message = context.HttpContext.Request;
+
+            HttpRequestData httpRequestData = new HttpRequestData()
+            {
+                Method = message.Method,
+               // Uri= "",
+               // Body = message.Body,
+               // Headers = message.Headers.ToDictionary()
+            };
+
+            // adjust the validation parameters/policy (if needed). Otherwise, this object may be omitted.
+            var popValidationParameters = new SignedHttpRequestValidationParameters()
+            {
+                ValidateB = false,
+                //...
+
+            };
+
+            var signedHttpRequestValiationContext = new SignedHttpRequestValidationContext((context.SecurityToken as JwtSecurityToken).RawData, 
+                                                                                           httpRequestData,
+                                                                                           tokenValidationParameters, 
+                                                                                           popValidationParameters);
+            var result = await signedHttpRequestValidator.ValidateSignedHttpRequestAsync(signedHttpRequestValiationContext, CancellationToken.None).ConfigureAwait(false);
+
+            if (!result.IsValid)
+            {
+                throw new SecurityTokenValidationException("PoP token not validated");
+            }
+        }
+
+        public static IServiceCollection AddPop(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            // Change the authentication configuration to accommodate the Microsoft identity platform endpoint (v2.0).
+            services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
+            {
+                var existingTokenValidatedHandler = options.Events.OnTokenValidated;
+
+                options.Events.OnTokenValidated = async context =>
+                {
+                    await ValidatePopToken(context, options.TokenValidationParameters) ;
+                    await existingTokenValidatedHandler(context);
+                };
+            });
+            return services;
+        }
+
         /// <summary>
         /// Protects the Web API with Microsoft identity platform (formerly Azure AD v2.0)
         /// This method expects the configuration file will have a section named "AzureAd" with the necessary settings to initialize authentication options.

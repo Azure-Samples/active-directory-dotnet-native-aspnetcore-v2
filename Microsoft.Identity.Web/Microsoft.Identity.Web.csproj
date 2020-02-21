@@ -57,5 +57,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureADB2C.UI" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.8.2" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.4.2-preview-10221031747" />
+    <PackageReference Include="Microsoft.IdentityModel.KeyVaultExtensions" Version="6.4.2-preview-10221031747" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.4.2-preview-10221031747" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="6.4.2-preview-10221031747" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.SignedHttpRequest" Version="6.4.2-preview-10221031747" />
   </ItemGroup>
 </Project>
