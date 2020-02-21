@@ -266,6 +266,52 @@ There is one change in the WebApp.Config, and one thing to check
     <add key="todo:TodoListScope" value="01234567-89ab-cdef-0123-456789abcdef/access_as_user"/>
     ```
 
+### Have the client let the user consent for the scopes required for the service
+
+The Web API (TodoList service) does not have the possibility of having an interaction with the user (by definition of a Web API), and therefore cannot let the user consent for the scopes it requests. Given that the Web API and the client have the same client ID, it's possible for the client to request a token for the Web API and let the user pre-consent to the scopes requested by the Web API (in this case "user.read")
+
+This is done in `MainWindow.xaml.cs` in the `SignIn` method, by replacing adding to the `AcquireTokenInteractive` call, a modifier `.WithExtraScopesToConsent(new[] { "user.read" })`. See [WithExtraScopeToConsent](https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-desktop-acquire-token#withextrascopetoconsent) for more details.
+
+```CSharp
+public class MainWindow
+{
+ private async void SignIn(object sender = null, RoutedEventArgs args = null)
+ {
+  ...
+  // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
+  // would re-sign-in the same user
+  var result = await _app.AcquireTokenInteractive(Scopes)
+      .WithAccount(accounts.FirstOrDefault())
+      .WithPrompt(Prompt.SelectAccount)
+      .ExecuteAsync()
+      .ConfigureAwait(false);
+   ...
+ }
+}
+```
+
+by
+
+```CSharp
+public class MainWindow
+{
+ private async void SignIn(object sender = null, RoutedEventArgs args = null)
+ {
+  ...
+  // Force a sign-in (PromptBehavior.Always), as the ADAL web browser might contain cookies for the current user, and using .Auto
+  // would re-sign-in the same user
+  var result = await _app.AcquireTokenInteractive(Scopes)
+      .WithAccount(accounts.FirstOrDefault())
+      .WithPrompt(Prompt.SelectAccount)
+      .WithExtraScopesToConsent(new[] { "user.read" })
+      .ExecuteAsync()
+      .ConfigureAwait(false);
+   ...
+ }
+}
+```
+
+
 ## How to deploy this sample to Azure
 
 See section [How to deploy this sample to Azure](../1.%20Desktop%20app%20calls%20Web%20API/README.md#How-to-deploy-this-sample-to-Azure) in the first part of this tutorial, as the deployment is exactly the same.
