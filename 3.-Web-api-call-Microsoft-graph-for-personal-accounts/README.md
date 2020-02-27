@@ -264,7 +264,7 @@ There is one change in the WebApp.Config, and one thing to check
 
     ```XML
     <add key="ida:ClientId" value="01234567-89ab-cdef-0123-456789abcdef"/>
-    <add key="todo:TodoListScope" value="https://contoso.onmicrosoft.com/TodoListClient-and-Service/access_as_user"/>
+    <add key="todo:TodoListScope" value="https://{your AAD domain}/TodoListClient-and-Service/access_as_user"/>
     ```
 
 ### Have the client let the user consent for the scopes required for the service
