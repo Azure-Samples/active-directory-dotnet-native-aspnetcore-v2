@@ -235,14 +235,14 @@ Function ConfigureApplications
     $user = Get-AzureADUser -ObjectId $creds.Account.Id
 
    # Create the service AAD application
-   Write-Host "Creating the AAD application (TodoListService (active-directory-dotnet-native-aspnetcore-v2))"
+   Write-Host "Creating the AAD application (TodoListClient-and-Service)"
    # Get a 2 years application key for the service Application
    $pw = ComputePassword
    $fromDate = [DateTime]::Now;
    $key = CreateAppKey -fromDate $fromDate -durationInYears 2 -pw $pw
    $serviceAppKey = $pw
    # create the application 
-   $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListService (active-directory-dotnet-native-aspnetcore-v2)" `
+   $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListClient-and-Service" `
                                                    -HomePage "https://localhost:44351/" `
                                                    -AvailableToOtherTenants $True `
                                                    -PasswordCredentials $key `
@@ -280,9 +280,9 @@ Function ConfigureApplications
         {
             # Add scope
             $scope = CreateScope -value "access_as_user"  `
-                -userConsentDisplayName "Access TodoListService (active-directory-dotnet-native-aspnetcore-v2)"  `
-                -userConsentDescription "Allow the application to access TodoListService (active-directory-dotnet-native-aspnetcore-v2) on your behalf."  `
-                -adminConsentDisplayName "Access TodoListService (active-directory-dotnet-native-aspnetcore-v2)"  `
+                -userConsentDisplayName "Access TodoListClient-and-Service"  `
+                -userConsentDescription "Allow the application to access TodoListClient-and-Service on your behalf."  `
+                -adminConsentDisplayName "Access TodoListClient-and-Service"  `
                 -adminConsentDescription "Allows the app to have the same access to information in the directory on behalf of the signed-in user."
             
             $scopes.Add($scope)
@@ -292,12 +292,12 @@ Function ConfigureApplications
     # add/update scopes
     Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -OAuth2Permission $scopes
 
-   Write-Host "Done creating the service application (TodoListService (active-directory-dotnet-native-aspnetcore-v2))"
+   Write-Host "Done creating the service application (TodoListClient-and-Service)"
 
    # URL of the AAD application in the Azure portal
    # Future? $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId+"/isMSAApp/"
    $servicePortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId+"/isMSAApp/"
-   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListService (active-directory-dotnet-native-aspnetcore-v2)</a></td></tr>" -Path createdApps.html
+   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListClient-and-Service</a></td></tr>" -Path createdApps.html
 
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
 
@@ -308,55 +308,21 @@ Function ConfigureApplications
 
    $requiredResourcesAccess.Add($requiredPermissions)
 
-
-   Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
-   Write-Host "Granted permissions."
-
-   # Create the client AAD application
-   Write-Host "Creating the AAD application (TodoListClient (active-directory-dotnet-native-aspnetcore-v2))"
-   # create the application 
-   $clientAadApplication = New-AzureADApplication -DisplayName "TodoListClient (active-directory-dotnet-native-aspnetcore-v2)" `
-                                                  -ReplyUrls "https://login.microsoftonline.com/common/oauth2/nativeclient" `
-                                                  -AvailableToOtherTenants $True `
-                                                  -PublicClient $True
-
-   # create the service principal of the newly created application 
-   $currentAppId = $clientAadApplication.AppId
-   $clientServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
-
-   # add the user running the script as an app owner if needed
-   $owner = Get-AzureADApplicationOwner -ObjectId $clientAadApplication.ObjectId
-   if ($owner -eq $null)
-   { 
-        Add-AzureADApplicationOwner -ObjectId $clientAadApplication.ObjectId -RefObjectId $user.ObjectId
-        Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($clientServicePrincipal.DisplayName)'"
-   }
-
-
-   Write-Host "Done creating the client application (TodoListClient (active-directory-dotnet-native-aspnetcore-v2))"
-
-   # URL of the AAD application in the Azure portal
-   # Future? $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId+"/isMSAApp/"
-   $clientPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId+"/isMSAApp/"
-   Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListClient (active-directory-dotnet-native-aspnetcore-v2)</a></td></tr>" -Path createdApps.html
-
-   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
-
-   # Add Required Resources Access (from 'client' to 'service')
-   Write-Host "Getting access from 'client' to 'service'"
-   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService (active-directory-dotnet-native-aspnetcore-v2)" `
+   # Add Required Resources Access (from 'service' to 'service')
+   Write-Host "Getting access from 'service' to 'service'"
+   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListClient-and-Service" `
                                                 -requiredDelegatedPermissions "access_as_user" `
 
    $requiredResourcesAccess.Add($requiredPermissions)
 
 
-   Set-AzureADApplication -ObjectId $clientAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
+   Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
    Write-Host "Granted permissions."
 
    # Configure known client applications for service 
    Write-Host "Configure known client applications for the 'service'"
    $knowApplications = New-Object System.Collections.Generic.List[System.String]
-    $knowApplications.Add($clientAadApplication.AppId)
+    $knowApplications.Add($serviceAadApplication.AppId)
    Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -KnownClientApplications $knowApplications
    Write-Host "Configured."
 
@@ -364,25 +330,25 @@ Function ConfigureApplications
    # Update config file for 'service'
    $configFile = $pwd.Path + "\..\TodoListService\appsettings.json"
    Write-Host "Updating the sample code ($configFile)"
-   $dictionary = @{ "Domain" = $tenantName;"TenantId" = $tenantId;"ClientId" = $serviceAadApplication.AppId;"ClientSecret" = $serviceAppKey };
+   $dictionary = @{ "Domain" = $tenantName;"ClientId" = $serviceAadApplication.AppId;"ClientSecret" = $serviceAppKey };
    UpdateTextFile -configFilePath $configFile -dictionary $dictionary
 
    # Update config file for 'client'
    $configFile = $pwd.Path + "\..\TodoListClient\App.Config"
    Write-Host "Updating the sample code ($configFile)"
-   ReplaceSetting -configFilePath $configFile -key "ida:ClientId" -newValue $clientAadApplication.AppId
-   ReplaceSetting -configFilePath $configFile -key "todo:TodoListScope" -newValue ("api://"+$serviceAadApplication.AppId+"/access_as_user")
-   ReplaceSetting -configFilePath $configFile -key "todo:TodoListBaseAddress" -newValue $serviceAadApplication.HomePage
+   ReplaceSetting -configFilePath $configFile -key "ida:ClientId" -newValue ($serviceAadApplication.AppId)
+   ReplaceSetting -configFilePath $configFile -key "todo:TodoListScope" -newValue ('https://'+$tenantName+"/TodoListClient-and-Service/access_as_user")
+   ReplaceSetting -configFilePath $configFile -key "todo:TodoListBaseAddress" -newValue ($serviceAadApplication.HomePage)
    Write-Host ""
    Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
    Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
    Write-Host "- For 'service'"
    Write-Host "  - Navigate to '$servicePortalUrl'"
+   Write-Host "  - Navigate to the Authentication blade, click 'Add a platform' then check the option https://login.microsoftonline.com/common/oauth2/nativeclient" -ForegroundColor Red 
+   Write-Host "  - Navigate to the Expose an API blade and change the Application ID URI to use the https pattern. i.e. https://<tenant_domain>/<app_name>" -ForegroundColor Red 
    Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'." -ForegroundColor Red 
+   Write-Host "  - Navigate to the Manifest page and change 'accessTokenAcceptedVersion' to 2." -ForegroundColor Red 
    Write-Host "  - [Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'" -ForegroundColor Red 
-   Write-Host "- For 'client'"
-   Write-Host "  - Navigate to '$clientPortalUrl'"
-   Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'." -ForegroundColor Red 
 
    Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
      

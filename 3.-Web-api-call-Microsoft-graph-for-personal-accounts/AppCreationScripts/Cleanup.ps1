@@ -49,9 +49,9 @@ This function removes the Azure AD applications for the sample. These applicatio
     # Removes the applications
     Write-Host "Cleaning-up applications from tenant '$tenantName'"
 
-    Write-Host "Removing 'service' (TodoListService (active-directory-dotnet-native-aspnetcore-v2)) if needed"
-    Get-AzureADApplication -Filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
-    $apps = Get-AzureADApplication -Filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'"
+    Write-Host "Removing 'service' (TodoListClient-and-Service) if needed"
+    Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient-and-Service'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
+    $apps = Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient-and-Service'"
     if ($apps)
     {
         Remove-AzureADApplication -ObjectId $apps.ObjectId
@@ -60,26 +60,10 @@ This function removes the Azure AD applications for the sample. These applicatio
     foreach ($app in $apps) 
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
-        Write-Host "Removed TodoListService (active-directory-dotnet-native-aspnetcore-v2).."
+        Write-Host "Removed TodoListClient-and-Service.."
     }
     # also remove service principals of this app
-    Get-AzureADServicePrincipal -filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'" | ForEach-Object {Remove-AzureADServicePrincipal -ObjectId $_.Id -Confirm:$false}
-    
-    Write-Host "Removing 'client' (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) if needed"
-    Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient (active-directory-dotnet-native-aspnetcore-v2)'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
-    $apps = Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient (active-directory-dotnet-native-aspnetcore-v2)'"
-    if ($apps)
-    {
-        Remove-AzureADApplication -ObjectId $apps.ObjectId
-    }
-
-    foreach ($app in $apps) 
-    {
-        Remove-AzureADApplication -ObjectId $app.ObjectId
-        Write-Host "Removed TodoListClient (active-directory-dotnet-native-aspnetcore-v2).."
-    }
-    # also remove service principals of this app
-    Get-AzureADServicePrincipal -filter "DisplayName eq 'TodoListClient (active-directory-dotnet-native-aspnetcore-v2)'" | ForEach-Object {Remove-AzureADServicePrincipal -ObjectId $_.Id -Confirm:$false}
+    Get-AzureADServicePrincipal -filter "DisplayName eq 'TodoListClient-and-Service'" | ForEach-Object {Remove-AzureADServicePrincipal -ObjectId $_.Id -Confirm:$false}
     
 }
 
