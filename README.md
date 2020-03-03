@@ -13,7 +13,6 @@ description: "A sample that shows how to call an ASP.NET Core Web API from a WPF
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
-
 ## About this sample
 
 ### Scenario
@@ -30,7 +29,7 @@ Sub folder                    | Description
 ----------------------------- | -----------
 [1. Desktop app calls Web API](https://aka.ms/msidentity-aspnetcore-webapi) | This first part, presents an ASP.NET Core 2.2 Web API protected by Azure Active Directory OAuth Bearer Authentication. This Web API is  exercised by a .NET Desktop WPF application. This subfolder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService) </p> ![Topology](1.%20Desktop%20app%20calls%20Web%20API/ReadmeFiles/topology.png)
 [2. Web API now calls Microsoft Graph](https://aka.ms/msidentity-aspnetcore-webapi-calls-msgraph)  | This second part presents an increment where the Web API now calls Microsoft Graph on-behalf of the user signed-in in the desktop application. In this part, the Web API uses the Microsoft Authentication Library for .NET (MSAL.NET) to acquire a token for Microsoft Graph using the [on-behalf-of](https://aka.ms/msal-net-on-behalf-of) flow </p>  ![Topology](2.%20Web%20API%20now%20calls%20Microsoft%20Graph/ReadmeFiles/topology.png)
-[3.-Web-api-call-Microsoft-same-client-id](3.-Web-api-call-Microsoft-graph-for-personal-accounts)  | This third part presents an increment where the Web API now calls Microsoft Graph on-behalf of the user signed-in in the desktop application, but with an alternative architecture. In this part, the Web API also uses the Microsoft Authentication Library for .NET (MSAL.NET) to acquire a token for Microsoft Graph using the [on-behalf-of](https://aka.ms/msal-net-on-behalf-of) flow, but the client ID of the desktop app and the Web API are the same </p>  ![Topology](3.-Web-api-call-Microsoft-graph-for-personal-accounts/ReadmeFiles/topology.png)
+[3.-Web-api-call-Microsoft-same-client-id](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/tree/master/3.-Web-api-call-Microsoft-graph-for-personal-accounts)  | This third part presents an increment where the Web API now calls Microsoft Graph on-behalf of the user signed-in in the desktop application, but with an alternative architecture. In this part, the Web API also uses the Microsoft Authentication Library for .NET (MSAL.NET) to acquire a token for Microsoft Graph using the [on-behalf-of](https://aka.ms/msal-net-on-behalf-of) flow, but the client ID of the desktop app and the Web API are the same </p>  ![Topology](3.-Web-api-call-Microsoft-graph-for-personal-accounts/ReadmeFiles/topology.png)
 
 > Note: Even if you'll probably get the most of this tutorial by going through the part in the proposed order, it's also possible to jump directly to the second part or third part.
 
@@ -78,7 +77,7 @@ git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnet
 cd aspnetcore-webapi
 ```
 
-> Given that the name of the sample is pretty long, that it has sub-folders and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
+> Given that the name of the sample is pretty long, that it has sub-folders and so are the name of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
 - Start by the first part [1. Desktop app calls Web API](1.%20Desktop%20app%20calls%20Web%20API) where you will learn how to protect a Web API with the Azure AD v2.0 endpoint.
 - or if you are interested in the Web API calling another downstream Web API using the on-behalf-of flow, go directly to [2. Web API now calls Microsoft Graph](2.%20Web%20API%20now%20calls%20Microsoft%20Graph)
@@ -89,7 +88,7 @@ Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get supp
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
 Make sure that your questions or comments are tagged with [`msal` `dotnet`].
 
-If you find a bug in the sample, please open an issue on [GitHub Issues](../../issues).
+If you find a bug in the sample, please open an issue on [GitHub Issues](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/issues).
 
 To provide a recommendation, visit the following [User Voice page](https://feedback.azure.com/forums/169401-azure-active-directory).
 
