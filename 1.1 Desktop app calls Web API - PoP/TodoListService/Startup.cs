@@ -23,7 +23,7 @@ namespace TodoListService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddProtectedWebApi(Configuration);
-
+            services.AddPop(Configuration);
             services.AddControllers();
         }
 

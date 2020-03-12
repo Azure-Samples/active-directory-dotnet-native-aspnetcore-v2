@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.Identity.Web.SignedHttpRequest;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -90,6 +91,18 @@ namespace Microsoft.Identity.Web
                     options.Events = JwtBearerMiddlewareDiagnostics.Subscribe(options.Events);
                 }
             });
+
+            return services;
+        }
+
+        public static IServiceCollection AddPop(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            string configSectionName = "SignedHttpRequest")
+        {
+            services.AddAuthentication(SignedHttpRequestDefaults.AuthenticationScheme)
+                    .AddSignedHttpRequest(options => configuration.Bind(configSectionName, options));
+            services.Configure<SignedHttpRequestOptions>(options => configuration.Bind(configSectionName, options));
 
             return services;
         }
