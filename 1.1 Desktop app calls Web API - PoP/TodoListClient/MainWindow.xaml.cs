@@ -229,7 +229,7 @@ namespace TodoListClient
             //
 
             // Once the token has been returned by MSAL, add it to the http authorization header, before making the call to access the To Do service.
-            request.Headers.Authorization = new AuthenticationHeaderValue(result.CreateAuthorizationHeader());
+            request.Headers.Add("Authorization", result.CreateAuthorizationHeader());
 
             // Forms encode Todo item, to POST to the todo list web api.
             TodoItem todoItem = new TodoItem() { Title = TodoText.Text };
