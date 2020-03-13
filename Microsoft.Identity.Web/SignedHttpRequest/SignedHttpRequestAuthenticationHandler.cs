@@ -39,21 +39,20 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            string signedHttpRequest = null;
             try
             {
                 // Give application opportunity to find from a different location, adjust, or reject token
                 var messageReceivedContext = new SignedHttpRequestMessageReceivedContext(Context, Scheme, Options);
 
                 // event can set the token
-                await Events.MessageReceived(messageReceivedContext);
+                //await Events.MessageReceived(messageReceivedContext);
                 if (messageReceivedContext.Result != null)
                 {
                     return messageReceivedContext.Result;
                 }
 
                 // If application retrieved token from somewhere else, use that.
-                signedHttpRequest = messageReceivedContext.Token;
+                string signedHttpRequest = messageReceivedContext.Token;
 
                 if (string.IsNullOrEmpty(signedHttpRequest))
                 {
@@ -123,7 +122,7 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
                         Exception = ex
                     };
 
-                    await Events.AuthenticationFailed(authenticationFailedContext);
+                    //await Events.AuthenticationFailed(authenticationFailedContext);
                     if (authenticationFailedContext.Result != null)
                     {
                         return authenticationFailedContext.Result;
@@ -143,7 +142,7 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
                     SignedHttpRequestValidationResult = signedHttpRequestValidationResult,
                 };
 
-                await Events.TokenValidated(tokenValidatedContext);
+                //await Events.TokenValidated(tokenValidatedContext);
                 if (tokenValidatedContext.Result != null)
                 {
                     return tokenValidatedContext.Result;
@@ -162,7 +161,7 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
                     Exception = ex
                 };
 
-                await Events.AuthenticationFailed(authenticationFailedContext);
+                //await Events.AuthenticationFailed(authenticationFailedContext);
                 if (authenticationFailedContext.Result != null)
                 {
                     return authenticationFailedContext.Result;
@@ -174,7 +173,7 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
 
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            throw new NotSupportedException();
+          
         }
     }
 }

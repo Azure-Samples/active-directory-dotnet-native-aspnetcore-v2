@@ -98,7 +98,7 @@ namespace Microsoft.Identity.Web
         public static IServiceCollection AddPop(
             this IServiceCollection services,
             IConfiguration configuration,
-            string configSectionName = "SignedHttpRequest")
+            string configSectionName = "AzureAd")
         {
             services.AddAuthentication(SignedHttpRequestDefaults.AuthenticationScheme)
                     .AddSignedHttpRequest(options => configuration.Bind(configSectionName, options));

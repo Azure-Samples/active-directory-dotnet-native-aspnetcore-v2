@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
 
 namespace TodoListService
 {
@@ -22,8 +23,10 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddProtectedWebApi(Configuration);
-            services.AddPop(Configuration);
+            services.AddProtectedWebApi(Configuration)
+                    .AddProtectedApiCallsWebApis(Configuration)
+                    .AddPop(Configuration)
+                    .AddInMemoryTokenCaches();
             services.AddControllers();
         }
 
