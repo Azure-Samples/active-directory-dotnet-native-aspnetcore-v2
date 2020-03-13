@@ -2,12 +2,16 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web.SignedHttpRequest.Events;
@@ -64,9 +68,9 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
                         return AuthenticateResult.NoResult();
                     }
 
-                    if (authorization.StartsWith(SignedHttpRequestConstants.AuthorizationHeader, StringComparison.OrdinalIgnoreCase))
+                    if (authorization.StartsWith(SignedHttpRequestConstants.AuthorizationHeaderSchemeName, StringComparison.OrdinalIgnoreCase))
                     {
-                        signedHttpRequest = authorization.Substring((SignedHttpRequestConstants.AuthorizationHeader + " ").Length).Trim();
+                        signedHttpRequest = authorization.Substring((SignedHttpRequestConstants.AuthorizationHeaderSchemeName + " ").Length).Trim();
                     }
 
                     // If no token found, no further work possible
@@ -92,34 +96,49 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
                 }
 
                 var signedHttpRequestHandler = new SignedHttpRequestHandler();
+
+                byte[] body = null;
+                using (var ms = new MemoryStream(2048))
+                {
+                    await Request.Body.CopyToAsync(ms);
+                    body = ms.ToArray();  // returns base64 encoded string JSON result
+                }
+
+                Dictionary<string, IEnumerable<string>> headers = new Dictionary<string, IEnumerable<string>>();
+
+                foreach (var keyValuePair in Request.Headers)
+                {
+                    headers.Add(keyValuePair.Key, keyValuePair.Value.AsEnumerable());
+                }
+    
                 var httpRequestData = new HttpRequestData()
                 {
                     Method = Request.Method,
-                    // Uri= Request.Path,
-                    // Body = Request.Body,
-                    // Headers = Request.Headers.ToDictionary()
+                    Uri = new Uri(UriHelper.GetEncodedUrl(Request)),
+                    Body = body,
+                    Headers = headers
                 };
                
                 var signedHttpRequestValidationContext = new SignedHttpRequestValidationContext(signedHttpRequest, httpRequestData, validationParameters, Options.SignedHttpRequestValidationParameters);
                 SignedHttpRequestValidationResult signedHttpRequestValidationResult = null;
                 
-                try
+             
+                signedHttpRequestValidationResult = await signedHttpRequestHandler.ValidateSignedHttpRequestAsync(signedHttpRequestValidationContext, CancellationToken.None).ConfigureAwait(false);
+
+
+                if (!signedHttpRequestValidationResult.IsValid)
                 {
-                    signedHttpRequestValidationResult = await signedHttpRequestHandler.ValidateSignedHttpRequestAsync(signedHttpRequestValidationContext, CancellationToken.None).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    Logger.TokenValidationFailed(ex);
+                    Logger.TokenValidationFailed(signedHttpRequestValidationResult.Exception);
                     // Refresh the configuration for exceptions that may be caused by key rollovers. The user can also request a refresh in the event.
                     if (Options.RefreshOnIssuerKeyNotFound && Options.ConfigurationManager != null
-                        && ex is SecurityTokenSignatureKeyNotFoundException)
+                        && signedHttpRequestValidationResult.Exception is SecurityTokenSignatureKeyNotFoundException)
                     {
                         Options.ConfigurationManager.RequestRefresh();
                     }
 
                     var authenticationFailedContext = new SignedHttpRequestAuthenticationFailedContext(Context, Scheme, Options)
                     {
-                        Exception = ex
+                        Exception = signedHttpRequestValidationResult.Exception
                     };
 
                     //await Events.AuthenticationFailed(authenticationFailedContext);

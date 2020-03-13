@@ -3,6 +3,9 @@
 
 using System;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.Identity.Web.SignedHttpRequest
 
@@ -20,6 +23,7 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
 
         public static AuthenticationBuilder AddSignedHttpRequest(this AuthenticationBuilder builder, string authenticationScheme, string displayName, Action<SignedHttpRequestOptions> configureOptions)
         {
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<SignedHttpRequestOptions>, SignedHttpRequestPostConfigureOptions>());
             return builder.AddScheme<SignedHttpRequestOptions, SignedHttpRequestAuthenticationHandler>(authenticationScheme, displayName, configureOptions);
         }
     }

@@ -21,9 +21,9 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
         /// <param name="options">The options instance to configure.</param>
         public void PostConfigure(string name, SignedHttpRequestOptions options)
         {
-            if (string.IsNullOrEmpty(options.AccessTokenValidationParameters.ValidAudience) && !string.IsNullOrEmpty(options.Audience))
+            if (string.IsNullOrEmpty(options.AccessTokenValidationParameters.ValidAudience) && !string.IsNullOrEmpty(options.ClientId))
             {
-                options.AccessTokenValidationParameters.ValidAudience = options.Audience;
+                options.AccessTokenValidationParameters.ValidAudience = options.ClientId;
             }
 
             if (options.ConfigurationManager == null)

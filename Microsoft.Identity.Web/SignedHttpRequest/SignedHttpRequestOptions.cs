@@ -37,7 +37,7 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
         /// <value>
         /// The expected audience for any received OpenIdConnect token.
         /// </value>
-        public string Audience { get; set; }
+        public string ClientId { get; set; }
 
         /// <summary>
         /// The object provided by the application to process events raised by the bearer authentication handler.
