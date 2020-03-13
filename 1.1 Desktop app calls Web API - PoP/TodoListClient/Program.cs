@@ -63,6 +63,7 @@ namespace ConsoleApp1
                                     .ExecuteAsync();
 
 
+                Console.WriteLine("Items");
                 response = await httpClient.SendAsync(readRequest);
                 if (response.IsSuccessStatusCode)
                 {
@@ -73,7 +74,6 @@ namespace ConsoleApp1
 
         private static async Task WriteItem(HttpRequestMessage writeRequest, HttpClient httpClient, string itemString)
         {
-            Console.WriteLine("Enter items");
             TodoItem todoItem = new TodoItem() { Title = itemString };
             string json = JsonConvert.SerializeObject(todoItem);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
