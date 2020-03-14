@@ -30,6 +30,10 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
         /// </summary>
         public string Authority { get; set; }
 
+        public string Instance { get; set; }
+
+        public string Domain { get; set; }
+
         /// <summary>
         /// Gets or sets a single valid audience value for any received OpenIdConnect token.
         /// This value is passed into TokenValidationParameters.ValidAudience if that property is empty.

@@ -109,6 +109,8 @@ namespace Microsoft.Identity.Web
             // Change the authentication configuration to accommodate the Microsoft identity platform endpoint (v2.0).
             services.Configure<SignedHttpRequestOptions>(SignedHttpRequestDefaults.AuthenticationScheme, options =>
             {
+                options.Authority = options.Instance + options.Domain;
+
                 // This is an Microsoft identity platform Web API
                 options.Authority += "/v2.0";
 
