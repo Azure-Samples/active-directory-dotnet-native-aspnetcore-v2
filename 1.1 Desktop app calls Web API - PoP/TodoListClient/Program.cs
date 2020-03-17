@@ -35,7 +35,7 @@ namespace ConsoleApp1
             var app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(Authority)
                 .WithDefaultRedirectUri()
-                .WithExperimentalFeatures()
+                .WithExperimentalFeatures() // Needed for PoP
                 .Build();
 
             AuthenticationResult result;
@@ -55,8 +55,9 @@ namespace ConsoleApp1
                 result = await app.AcquireTokenInteractive(Scopes)
                                     .WithProofOfPosession(writeRequest)
                                     .ExecuteAsync();
-
                 await WriteItem(writeRequest, httpClient, itemString);
+
+
                 HttpRequestMessage readRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(TodoListApiAddress));
                 result = await app.AcquireTokenInteractive(Scopes)
                                     .WithProofOfPosession(readRequest)
@@ -67,7 +68,7 @@ namespace ConsoleApp1
                 response = await httpClient.SendAsync(readRequest);
                 if (response.IsSuccessStatusCode)
                 {
-                    await WriteList(response);
+                    await ReadAndDisplayList(response);
                 }
             }
         }
@@ -82,14 +83,14 @@ namespace ConsoleApp1
             await httpClient.SendAsync(writeRequest);
         }
 
-        private static async Task WriteList(HttpResponseMessage response)
+        private static async Task ReadAndDisplayList(HttpResponseMessage response)
         {
             // Read the response and data-bind to the GridView to display To Do items.
             string s = await response.Content.ReadAsStringAsync();
             List<TodoItem> toDoArray = JsonConvert.DeserializeObject<List<TodoItem>>(s);
             foreach (TodoItem item in toDoArray)
             {
-                Console.WriteLine(item);
+                Console.WriteLine(item?.Title);
             }
         }
     }

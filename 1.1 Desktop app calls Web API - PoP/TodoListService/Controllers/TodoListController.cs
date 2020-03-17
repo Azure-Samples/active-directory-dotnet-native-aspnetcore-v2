@@ -43,7 +43,7 @@ namespace TodoListService.Controllers
         {
             HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            TodoStore.Add(new TodoItem { Owner = owner, Title = todo.Title });
+            TodoStore.Add(new TodoItem { Owner = owner, Title = todo?.Title });
         }
     }
 }
