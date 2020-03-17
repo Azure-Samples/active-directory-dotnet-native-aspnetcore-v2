@@ -28,6 +28,10 @@ namespace Microsoft.Identity.Web.Resource
                 throw new ArgumentNullException(nameof(acceptedScopes));
             }
             Claim scopeClaim = context?.User?.FindFirst("http://schemas.microsoft.com/identity/claims/scope");
+            if (scopeClaim == null)
+            {
+                scopeClaim = context?.User?.FindFirst("scp");
+            }
             if (scopeClaim == null || !scopeClaim.Value.Split(' ').Intersect(acceptedScopes).Any())
             {
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
