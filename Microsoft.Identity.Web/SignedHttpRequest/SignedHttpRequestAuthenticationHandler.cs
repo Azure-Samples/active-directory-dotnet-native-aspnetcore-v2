@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +10,7 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -97,12 +97,16 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
 
                 var signedHttpRequestHandler = new SignedHttpRequestHandler();
 
+                Request.EnableBuffering();
+
                 byte[] body = null;
                 using (var ms = new MemoryStream(2048))
                 {
                     await Request.Body.CopyToAsync(ms);
                     body = ms.ToArray();  // returns base64 encoded string JSON result
                 }
+
+                Request.Body.Position = 0;
 
                 Dictionary<string, IEnumerable<string>> headers = new Dictionary<string, IEnumerable<string>>();
 
@@ -188,11 +192,6 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
 
                 throw;
             }
-        }
-
-        protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
-        {
-          
         }
     }
 }
