@@ -3,20 +3,43 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using TodoListClient;
 
-namespace ConsoleApp1
+namespace TodoListClient
 {
     class Program
     {
+        /// <summary>
+        /// Instance of Cloud
+        /// </summary>
         private static readonly string AadInstance = "https://login.microsoftonline.com/{0}/v2.0";
+
+        /// <summary>
+        /// Tenant
+        /// </summary>
         private static readonly string Tenant = "msidentitysamplestesting.onmicrosoft.com";
+
+        /// <summary>
+        /// ClientID of the application
+        /// </summary>
         private static readonly string ClientId = "f9256f68-0a7a-4396-96c9-a900489b59f4";
+
+        /// <summary>
+        /// Authority
+        /// </summary>
         private static readonly string Authority = string.Format(CultureInfo.InvariantCulture, AadInstance, Tenant);
+
+        /// <summary>
+        /// Scope of the TodoList action
+        /// </summary>
         private static readonly string TodoListScope = "api://ceb39196-5baf-4ac6-b398-ca548d0b2af7/access_as_user";
+
+        /// <summary>
+        /// Base address of the todolist Web API
+        /// </summary>
         private static readonly string TodoListBaseAddress = "https://localhost:44351/";
         private static readonly string[] Scopes = { TodoListScope };
         private static string TodoListApiAddress
@@ -40,8 +63,6 @@ namespace ConsoleApp1
 
             AuthenticationResult result;
 
-//            Console.WriteLine($"Hello {result.Account.Username}");
-
             HttpClient httpClient = new HttpClient();
             HttpResponseMessage response;
 
@@ -50,19 +71,30 @@ namespace ConsoleApp1
                 Console.WriteLine("Enter an item");
                 string itemString;
                 itemString = Console.ReadLine();
+                IAccount account = (await app.GetAccountsAsync()).FirstOrDefault();
 
                 HttpRequestMessage writeRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(TodoListApiAddress));
-                result = await app.AcquireTokenInteractive(Scopes)
-                                    .WithProofOfPosession(writeRequest)
-                                    .ExecuteAsync();
+                try
+                {
+                    result = await app.AcquireTokenSilent(Scopes, account)
+                                        .WithProofOfPosession(writeRequest)
+                                        .ExecuteAsync();
+                }
+                catch(MsalUiRequiredException)
+                {
+                    result = await app.AcquireTokenInteractive(Scopes)
+                                         .WithProofOfPosession(writeRequest)
+                                         .ExecuteAsync();
+                    account = result.Account;
+                }
+ 
                 await WriteItem(writeRequest, httpClient, itemString);
 
 
                 HttpRequestMessage readRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(TodoListApiAddress));
-                result = await app.AcquireTokenInteractive(Scopes)
+                result = await app.AcquireTokenSilent(Scopes, account)
                                     .WithProofOfPosession(readRequest)
                                     .ExecuteAsync();
-
 
                 Console.WriteLine("Items");
                 response = await httpClient.SendAsync(readRequest);
