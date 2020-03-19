@@ -60,6 +60,7 @@ namespace TodoListClient
                 .WithDefaultRedirectUri()
                 .WithExperimentalFeatures() // Needed for PoP
                 .Build();
+            TokenCacheHelper.EnableSerialization(app.UserTokenCache);
 
             AuthenticationResult result;
 

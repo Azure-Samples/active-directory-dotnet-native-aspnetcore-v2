@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="TodoItem.cs" />
+    <Compile Include="TokenCacheHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
