@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -15,17 +16,17 @@ namespace TodoListClient
         /// <summary>
         /// Instance of Cloud
         /// </summary>
-        private static readonly string AadInstance = "https://login.microsoftonline.com/{0}/v2.0";
+        private static readonly string AadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
 
         /// <summary>
         /// Tenant
         /// </summary>
-        private static readonly string Tenant = "msidentitysamplestesting.onmicrosoft.com";
+        private static readonly string Tenant = ConfigurationManager.AppSettings["ida:Tenant"];
 
         /// <summary>
         /// ClientID of the application
         /// </summary>
-        private static readonly string ClientId = "f9256f68-0a7a-4396-96c9-a900489b59f4";
+        private static readonly string ClientId = ConfigurationManager.AppSettings["ida:ClientId"];
 
         /// <summary>
         /// Authority
@@ -35,12 +36,12 @@ namespace TodoListClient
         /// <summary>
         /// Scope of the TodoList action
         /// </summary>
-        private static readonly string TodoListScope = "api://ceb39196-5baf-4ac6-b398-ca548d0b2af7/access_as_user";
+        private static readonly string TodoListScope = ConfigurationManager.AppSettings["todo:TodoListScope"];
 
         /// <summary>
         /// Base address of the todolist Web API
         /// </summary>
-        private static readonly string TodoListBaseAddress = "https://localhost:44351/";
+        private static readonly string TodoListBaseAddress = ConfigurationManager.AppSettings["todo:TodoListBaseAddress"];
         private static readonly string[] Scopes = { TodoListScope };
         private static string TodoListApiAddress
         {
@@ -54,7 +55,6 @@ namespace TodoListClient
 
         static async Task Main(string[] args)
         {
-
             var app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(Authority)
                 .WithDefaultRedirectUri()
