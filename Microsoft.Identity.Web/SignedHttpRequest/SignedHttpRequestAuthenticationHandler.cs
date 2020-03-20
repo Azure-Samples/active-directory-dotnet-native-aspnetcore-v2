@@ -100,21 +100,29 @@ namespace Microsoft.Identity.Web.SignedHttpRequest
                 Request.EnableBuffering();
 
                 byte[] body = null;
-                using (var ms = new MemoryStream(2048))
+                // Only extract the body if it will be validated.
+                if (Options.SignedHttpRequestValidationParameters.ValidateB)
                 {
-                    await Request.Body.CopyToAsync(ms);
-                    body = ms.ToArray();  // returns base64 encoded string JSON result
+                    using (var ms = new MemoryStream(2048))
+                    {
+                        await Request.Body.CopyToAsync(ms);
+                        body = ms.ToArray();  // returns base64 encoded string JSON result
+                    }
                 }
-
+             
                 Request.Body.Position = 0;
 
                 Dictionary<string, IEnumerable<string>> headers = new Dictionary<string, IEnumerable<string>>();
 
-                foreach (var keyValuePair in Request.Headers)
+                // Only extract the headers if they will be validated.
+                if (Options.SignedHttpRequestValidationParameters.ValidateH)
                 {
-                    headers.Add(keyValuePair.Key, keyValuePair.Value.AsEnumerable());
+                    foreach (var keyValuePair in Request.Headers)
+                    {
+                        headers.Add(keyValuePair.Key, keyValuePair.Value.AsEnumerable());
+                    }
                 }
-    
+              
                 var httpRequestData = new HttpRequestData()
                 {
                     Method = Request.Method,
