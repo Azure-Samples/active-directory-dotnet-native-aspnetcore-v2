@@ -7,6 +7,11 @@ using Microsoft.Identity.Client;
 
 namespace TodoListClient
 {
+    /// <summary>
+    /// Token cache helper for Windows.
+    /// For linux and Mac, you want to use cross platform token cache
+    /// See https://github.com/AzureAD/microsoft-authentication-extensions-for-dotnet/wiki/Cross-platform-Token-Cache
+    /// </summary>
     static class TokenCacheHelper
     { 
         /// <summary>
