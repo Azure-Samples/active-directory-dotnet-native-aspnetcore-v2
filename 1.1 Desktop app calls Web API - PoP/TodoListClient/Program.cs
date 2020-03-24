@@ -105,10 +105,7 @@ namespace TodoListClient
         /// <param name="httpClient">HttpClient used to communicate with the Web API</param>
         private async static Task AddItemToList(IPublicClientApplication app, HttpClient httpClient)
         {
-            Console.WriteLine("Enter an item");
-            string itemString;
-            itemString = Console.ReadLine();
-            var account = (await app.GetAccountsAsync()).FirstOrDefault();
+            TodoItem todoItem = ReadItemFromConsole();
 
             // Result is not strickly necessary here, but you might want to have a look at it
             // under debugger
@@ -116,6 +113,7 @@ namespace TodoListClient
             HttpRequestMessage writeRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(TodoListApiAddress));
             try
             {
+                var account = (await app.GetAccountsAsync()).FirstOrDefault();
                 result = await app.AcquireTokenSilent(Scopes, account)
                                     .WithProofOfPosession(writeRequest)
                                     .ExecuteAsync();
@@ -126,7 +124,20 @@ namespace TodoListClient
                                      .WithProofOfPosession(writeRequest)
                                      .ExecuteAsync();
             }
-            await SendItemToWebAPI(writeRequest, httpClient, itemString);
+            await SendItemToWebAPI(writeRequest, httpClient, todoItem);
+        }
+
+        /// <summary>
+        /// Reads a list item from the console
+        /// </summary>
+        /// <returns></returns>
+        private static TodoItem ReadItemFromConsole()
+        {
+            Console.WriteLine("Enter an item");
+            string itemString;
+            itemString = Console.ReadLine();
+            TodoItem todoItem = new TodoItem() { Title = itemString };
+            return todoItem;
         }
 
         /// <summary>
@@ -136,9 +147,8 @@ namespace TodoListClient
         /// <param name="httpClient">Http client used to communicate with the Web API</param>
         /// <param name="itemString">content of the item</param>
         /// <returns></returns>
-        private static async Task SendItemToWebAPI(HttpRequestMessage writeRequest, HttpClient httpClient, string itemString)
+        private static async Task SendItemToWebAPI(HttpRequestMessage writeRequest, HttpClient httpClient, TodoItem todoItem)
         {
-            TodoItem todoItem = new TodoItem() { Title = itemString };
             string json = JsonConvert.SerializeObject(todoItem);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
             writeRequest.Content = content;
