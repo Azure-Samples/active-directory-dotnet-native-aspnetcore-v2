@@ -73,7 +73,7 @@ From your shell or command line:
 
 ```Shell
 git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git aspnetcore-webapi
-cd "aspnetcore-webapi\1.1 Desktop app calls Web API - PoP"
+cd "aspnetcore-webapi\4.-Console-app-calls-web-API-with-PoP"
 ```
 
 or download and extract the repository .zip file.

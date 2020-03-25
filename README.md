@@ -60,6 +60,11 @@ The second phase of the tutorials modifies the Web API so that the todo-items al
 
 The experience in the third phase is the same as in the second phase, but users can sign-in with their personal Microsoft account
 
+#### In the fourth part of the tutorial
+
+The desktop application is a console application
+
+<img src="4.-Console-app-calls-web-API-with-PoP/ReadmeFiles/todolist-client.png" alt="TodoList console app with PoP" with="320"/>
 ## How to run this sample
 
 ### Pre-requisites
