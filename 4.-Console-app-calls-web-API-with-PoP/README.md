@@ -7,7 +7,7 @@ client: .NET Desktop (WPF)
 service: ASP.NET Core Web API
 endpoint: Microsoft identity platform
 ---
-# Calling an ASP.NET Core Web API from a WPF application using Microsoft identity platform
+# Calling an ASP.NET Core Web API from a console application using Proof of Possession tokens on the Microsoft Identity Platform
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
@@ -33,11 +33,11 @@ endpoint: Microsoft identity platform
 ### Scenario
 
 You expose a Web API and you want to protect it so that only authenticated users can access it. You want to enable authenticated users with both work and school accounts
-or Microsoft personal accounts (formerly live account) to use your Web API. You want to protect the access token from being replayed by enabling **Proof of possession tokens**
+or Microsoft personal accounts (formerly live account) to use your Web API. You want to protect the access token from being replayed by enabling [Proof of possession tokens](https://tools.ietf.org/html/draft-ietf-oauth-signed-http-request-03#page-9)
 
 ### Overview
 
-This sample presents a Web API running on ASP.NET Core 2.2, protected by Azure AD OAuth Bearer Authentication. The Web API is exercised by a .NET Desktop WPF application.
+This sample presents a Web API running on ASP.NET Core, protected by Azure AD Proof of Possession (PoP) Authentication. The Web API is exercised by a .NET Desktop Console application.
 The .Net application uses the Active Directory Authentication Library [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) to obtain a JWT access token through the [OAuth 2.0](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The access token is sent to the ASP.NET Core Web API, which authenticates the user using the ASP.NET JWT Bearer Authentication middleware.
 
 ![Topology](./ReadmeFiles/topology.png)
@@ -49,7 +49,7 @@ The .Net application uses the Active Directory Authentication Library [MSAL.NET]
 
 The Web API (TodoListService) maintains an in-memory collection of to-do items per authenticated user. Several applications signed-in under the same identities share the same to-do list.
 
-The WPF application (TodoListClient) enables a user to:
+The desktop application (TodoListClient) enables a user to:
 
 - Enter an item. The first time the user enters an item, she signs in, a consent screen is presented letting the user consent for the application accessing the TodoList Service and the Azure Active Directory.
 - Each time, the user enters an item, she sees the list of to-do items exposed by Web API for the signed-in identity
@@ -306,7 +306,7 @@ public void ConfigureServices(IServiceCollection services)
     services.AddControllers();
 }
 
-`AddPop`, really leverages the `SignedHttpRequest` feature in `Identity.Model` (middleware library). The incoming tokens ends-up being handled by an ASP.NET Core handler named `SignedHttpRequestAuthenticationHandler`.
+`AddPop`, really leverages the `SignedHttpRequest` feature in `Identity.Model` (middleware library). The incoming tokens ends-up being handled by an ASP.NET Core handler named `SignedHttpRequestAuthenticationHandler`. For details see [SignedHttpRequestAuthenticationHandler.cs](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/7d999f6180ea90171b9a90ca931a0d3de2c035f5/Microsoft.Identity.Web/SignedHttpRequest/SignedHttpRequestAuthenticationHandler.cs#L44) from line 44.
 
 ### Update the `TodoListClient` to call the `TodoListService` running in Azure Web Sites
 
