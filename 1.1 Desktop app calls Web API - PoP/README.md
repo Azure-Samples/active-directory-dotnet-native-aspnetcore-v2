@@ -306,7 +306,7 @@ public void ConfigureServices(IServiceCollection services)
     services.AddControllers();
 }
 
-
+`AddPop`, really leverages the `SignedHttpRequest` feature in `Identity.Model` (middleware library). The incoming tokens ends-up being handled by an ASP.NET Core handler named `SignedHttpRequestAuthenticationHandler`.
 
 ### Update the `TodoListClient` to call the `TodoListService` running in Azure Web Sites
 
