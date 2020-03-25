@@ -243,11 +243,11 @@ Then you need to set the  `accessTokenAcceptedVersion` property of the Web API t
 
 ### Code for the Console app
 
-The focus of this tutorial is Pop (Proof of Possession).
+The focus of this tutorial is PoP (Proof of Possession).
 
-With PoP, the programming model is a bit different than the way MSAL.NET usually works, as a Pop token contains information about the URL it's for, as well as the HTTP verb (POST, GET). Therefore to get a Pop token you will provide to MSAL an `HttpRequestMessage` and MSAL.NET will automatically populate the Authorization header of this message with a Pop token. You'll need to:
+With PoP, the programming model is a bit different from the way MSAL.NET usually works, as a PoP token contains information about the URL it's for, as well as the HTTP verb (POST, GET). Therefore, to get a PoP token you will provide to MSAL an `HttpRequestMessage` and MSAL.NET will automatically populate the Authorization header of this message with a PoP token. You'll need to:
 
-- Instantiate a `IPublicClientApplication` specifying `WithExperimentalFeatures()` as PoP is still an experimental feature for MSAL.NET (and not implemented for all the flows, only public client applications on .NET Framework)
+- Instantiate a `IPublicClientApplication` specifying `WithExperimentalFeatures()` as PoP is still an experimental feature for MSAL.NET (and not implemented for all the flows, only public client applications on .NET Framework).
 
    ```csharp
     var app = PublicClientApplicationBuilder.Create(ClientId)
@@ -257,7 +257,7 @@ With PoP, the programming model is a bit different than the way MSAL.NET usually
         .Build();
    ```
 
-- Create an `HttpRequestMessage` passing the verb (for instance `HttpMethod.Post`) and the URL of the Web API to call
+- Create an `HttpRequestMessage` passing the verb (for instance `HttpMethod.Post`) and the URL of the Web API to call.
    ```csharp
     HttpRequestMessage writeRequest =
        new HttpRequestMessage(HttpMethod.Post, new Uri(TodoListApiAddress));
@@ -306,7 +306,7 @@ public void ConfigureServices(IServiceCollection services)
     services.AddControllers();
 }
 
-`AddPop`, really leverages the `SignedHttpRequest` feature in `Identity.Model` (middleware library). The incoming tokens ends-up being handled by an ASP.NET Core handler named `SignedHttpRequestAuthenticationHandler`. For details see [SignedHttpRequestAuthenticationHandler.cs](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/7d999f6180ea90171b9a90ca931a0d3de2c035f5/Microsoft.Identity.Web/SignedHttpRequest/SignedHttpRequestAuthenticationHandler.cs#L44) from line 44.
+`AddPop()` really leverages the [`SignedHttpRequest`](https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/SignedHttpRequest-aka-PoP-(Proof-of-Possession))feature in `IdentityModel` (middleware library). The incoming token ends-up being handled by an ASP.NET Core handler named `SignedHttpRequestAuthenticationHandler`. For details, see [SignedHttpRequestAuthenticationHandler.cs](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/7d999f6180ea90171b9a90ca931a0d3de2c035f5/Microsoft.Identity.Web/SignedHttpRequest/SignedHttpRequestAuthenticationHandler.cs#L44) from line 44.
 
 ### Update the `TodoListClient` to call the `TodoListService` running in Azure Web Sites
 
