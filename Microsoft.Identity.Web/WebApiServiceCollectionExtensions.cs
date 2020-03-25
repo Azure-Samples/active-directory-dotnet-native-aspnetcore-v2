@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.Identity.Web.SignedHttpRequest;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -91,6 +92,39 @@ namespace Microsoft.Identity.Web
                 }
             });
 
+            return services;
+        }
+
+        public static IServiceCollection AddPop(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            string configSectionName = "AzureAd")
+        {
+            services.AddAuthentication(SignedHttpRequestDefaults.AuthenticationScheme)
+                    .AddSignedHttpRequest(options => configuration.Bind(configSectionName, options));
+            services.Configure<SignedHttpRequestOptions>(options => configuration.Bind(configSectionName, options));
+
+            services.AddHttpContextAccessor();
+
+            // Change the authentication configuration to accommodate the Microsoft identity platform endpoint (v2.0).
+            services.Configure<SignedHttpRequestOptions>(SignedHttpRequestDefaults.AuthenticationScheme, options =>
+            {
+                options.Authority = options.Instance + options.Domain;
+
+                // This is an Microsoft identity platform Web API
+                options.Authority += "/v2.0";
+
+                // The valid audiences are both the Client ID (options.Audience) and api://{ClientID}
+                options.AccessTokenValidationParameters.ValidAudiences = new string[]
+                {
+                    options.ClientId, $"api://{options.ClientId}"
+                };
+
+                // Instead of using the default validation (validating against a single tenant, as we do in line of business apps),
+                // we inject our own multi-tenant validation logic (which even accepts both v1.0 and v2.0 tokens)
+                options.AccessTokenValidationParameters.IssuerValidator = AadIssuerValidator.GetIssuerValidator(options.Authority).Validate;
+            });
+                
             return services;
         }
 
