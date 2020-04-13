@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Identity.Web" Version="1.0.0-localbuild" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.0.0-preview" />
   </ItemGroup>
 
 </Project>
