@@ -92,7 +92,7 @@ namespace TodoListService.Controllers
             // we use MSAL.NET to get a token to call the API On Behalf Of the current user
             try
             {
-                string accessToken = await _tokenAcquisition.GetAccessTokenOnBehalfOfUserAsync(scopes);
+                string accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
                 dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
                 return me.userPrincipalName;
             }
