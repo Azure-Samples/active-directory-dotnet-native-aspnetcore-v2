@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Microsoft.Identity.Web.InstanceDiscovery
+namespace Microsoft.Identity.Web.Future
 {
     /// <summary>
     /// Model child class to hold alias information parsed from the Azure AD issuer endpoint.
