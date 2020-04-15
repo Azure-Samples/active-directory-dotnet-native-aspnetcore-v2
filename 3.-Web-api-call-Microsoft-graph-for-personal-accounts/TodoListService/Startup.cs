@@ -24,7 +24,7 @@ namespace TodoListService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddProtectedWebApi(Configuration)
-                    .AddProtectedApiCallsWebApis(Configuration)
+                    .AddProtectedWebApiCallsProtectedWebApi(Configuration)
                     .AddInMemoryTokenCaches();
             services.AddControllers();
         }

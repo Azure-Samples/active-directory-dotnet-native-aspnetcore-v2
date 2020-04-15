@@ -2,7 +2,7 @@
   <PropertyGroup>
 
     <!--This should be passed from the VSTS build-->
-    <ClientSemVer Condition="'$(ClientSemVer)' == ''">1.0.0-localbuild</ClientSemVer>
+    <ClientSemVer Condition="'$(ClientSemVer)' == ''">1.0.0-preview</ClientSemVer>
     <!--This will generate AssemblyVersion, AssemblyFileVersion and AssemblyInformationVersion-->
     <Version>$(ClientSemVer)</Version>
 
@@ -27,34 +27,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="InstanceDiscovery\**" />
-    <Compile Remove="Resource\**" />
-    <Compile Remove="TokenCacheProviders\**" />
-    <EmbeddedResource Remove="InstanceDiscovery\**" />
-    <EmbeddedResource Remove="Resource\**" />
-    <EmbeddedResource Remove="TokenCacheProviders\**" />
-    <None Remove="InstanceDiscovery\**" />
-    <None Remove="Resource\**" />
-    <None Remove="TokenCacheProviders\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="AccountExtensions.cs" />
-    <Compile Remove="AuthorizeForScopesAttribute.cs" />
-    <Compile Remove="ClaimConstants.cs" />
-    <Compile Remove="ClaimsPrincipalExtensions.cs" />
-    <Compile Remove="ClaimsPrincipalFactory.cs" />
-    <Compile Remove="Extensions.cs" />
-    <Compile Remove="HttpContextExtensions.cs" />
-    <Compile Remove="InternalsVisibleTo.cs" />
-    <Compile Remove="ITokenAcquisition.cs" />
-    <Compile Remove="OidcConstants.cs" />
-    <Compile Remove="ServiceCollectionExtensions.cs" />
-    <Compile Remove="TokenAcquisition.cs" />
-    <Compile Remove="WebAppServiceCollectionExtensions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="NuGet.Config" />
     <None Remove="README.md" />
   </ItemGroup>
@@ -68,21 +40,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <CodeAnalysisRuleSet>Microsoft.Identity.Web.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-
-  
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CodeAnalysisRuleSet>Microsoft.Identity.Web.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureAD.UI" Version="3.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureADB2C.UI" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.3" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.10.0" />
     <PackageReference Include="Microsoft.Identity.Web" Version="0.1.0-preview" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.SignedHttpRequest" Version="6.5.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />

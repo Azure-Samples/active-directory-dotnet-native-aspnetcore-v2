@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.IdentityModel.Protocols;
 using Newtonsoft.Json;
 
-namespace Microsoft.Identity.Web.InstanceDiscovery
+namespace Microsoft.Identity.Web.Future
 {
     /// <summary>
     /// An implementation of IConfigurationRetriever geared towards Azure AD issuers metadata />

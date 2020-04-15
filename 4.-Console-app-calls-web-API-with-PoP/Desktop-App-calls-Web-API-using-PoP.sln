@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Identity.Web.Future", "..\Microsoft.Identity.Web\Microsoft.Identity.Web.Future.csproj", "{F29C8FF6-5725-4C26-B0B4-682FCF218E6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Identity.Web.Future", "Microsoft.Identity.Web.Future\Microsoft.Identity.Web.Future.csproj", "{CBA23165-BA0B-469A-B3A4-3299989AAECD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,10 +28,10 @@ Global
 		{443FB1A8-4F29-4D18-A4EB-23C3D764580C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{443FB1A8-4F29-4D18-A4EB-23C3D764580C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{443FB1A8-4F29-4D18-A4EB-23C3D764580C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F29C8FF6-5725-4C26-B0B4-682FCF218E6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F29C8FF6-5725-4C26-B0B4-682FCF218E6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F29C8FF6-5725-4C26-B0B4-682FCF218E6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F29C8FF6-5725-4C26-B0B4-682FCF218E6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBA23165-BA0B-469A-B3A4-3299989AAECD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBA23165-BA0B-469A-B3A4-3299989AAECD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBA23165-BA0B-469A-B3A4-3299989AAECD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBA23165-BA0B-469A-B3A4-3299989AAECD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
