@@ -12,5 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.Identity.Web\Microsoft.Identity.Web.Future.csproj" />
+    <ProjectReference Include="..\Microsoft.Identity.Web.Future\Microsoft.Identity.Web.Future.csproj" />
   </ItemGroup>
 </Project>

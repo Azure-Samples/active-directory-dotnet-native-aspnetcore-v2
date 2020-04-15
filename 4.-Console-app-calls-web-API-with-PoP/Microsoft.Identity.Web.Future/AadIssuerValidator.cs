@@ -9,14 +9,14 @@ using System.Linq;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Identity.Web.InstanceDiscovery;
+using Microsoft.Identity.Web.Future;
 
-namespace Microsoft.Identity.Web.Resource
+namespace Microsoft.Identity.Future
 {
     /// <summary>
     /// Generic class that validates token issuer from the provided Azure AD authority. Use the <see cref="AadIssuerValidatorFactory"/> to create instances of this class.
     /// </summary>
-    public class AadIssuerValidator
+    internal class AadIssuerValidator
     {
         private const string AzureADIssuerMetadataUrl = "https://login.microsoftonline.com/common/discovery/instance?authorization_endpoint=https://login.microsoftonline.com/common/oauth2/v2.0/authorize&api-version=1.1";
         private const string FallbackAuthority = "https://login.microsoftonline.com/";
@@ -71,6 +71,7 @@ namespace Microsoft.Identity.Web.Resource
                 var aliases = issuerMetadata.Metadata
                     .Where(m => m.Aliases.Any(a => string.Equals(a, authority, StringComparison.OrdinalIgnoreCase)))
                     .SelectMany(m => m.Aliases)
+                    .Append(authority) // For b2c scenarios, the alias will be the authorityHost itself
                     .Distinct();
                 s_issuerValidators[authority] = new AadIssuerValidator(aliases);
                 return s_issuerValidators[authority];
@@ -94,7 +95,7 @@ namespace Microsoft.Identity.Web.Resource
         /// <exception cref="SecurityTokenInvalidIssuerException">if the issuer </exception>
         public string Validate(string actualIssuer, SecurityToken securityToken, TokenValidationParameters validationParameters)
         {
-            if (String.IsNullOrEmpty(actualIssuer))
+            if (string.IsNullOrEmpty(actualIssuer))
                 throw new ArgumentNullException(nameof(actualIssuer));
 
             if (securityToken == null)
@@ -159,18 +160,40 @@ namespace Microsoft.Identity.Web.Resource
         /// <remarks>Only <see cref="JwtSecurityToken"/> and <see cref="JsonWebToken"/> are acceptable types.</remarks>
         private static string GetTenantIdFromToken(SecurityToken securityToken)
         {
+            string tid = "tid";
             if (securityToken is JwtSecurityToken jwtSecurityToken)
             {
-                if (jwtSecurityToken.Payload.TryGetValue(ClaimConstants.Tid, out object tenantId))
+                if (jwtSecurityToken.Payload.TryGetValue(tid, out object tenantId))
                     return tenantId as string;
+
+                // Since B2C doesn't have TID as default, get it from issuer
+                return GetTenantIdFromIss(jwtSecurityToken.Issuer);
             }
 
-            // brentsch - todo, TryGetPayloadValue is available in 5.5.0
             if (securityToken is JsonWebToken jsonWebToken)
             {
-                var tid = jsonWebToken.GetPayloadValue<string>(ClaimConstants.Tid);
-                if (tid != null)
-                    return tid;
+                jsonWebToken.TryGetPayloadValue(tid, out string tid2);
+                if (tid2 != null)
+                    return tid2;
+
+                // Since B2C doesn't have TID as default, get it from issuer
+                return GetTenantIdFromIss(jsonWebToken.Issuer);
+            }
+
+            return string.Empty;
+        }
+
+        // The AAD iss claims contains the tenantId in its value. The uri is {domain}/{tid}/v2.0
+        private static string GetTenantIdFromIss(string iss)
+        {
+            if (string.IsNullOrEmpty(iss))
+                return string.Empty;
+
+            var uri = new Uri(iss);
+
+            if (uri.Segments.Length > 1)
+            {
+                return uri.Segments[1].TrimEnd('/');
             }
 
             return string.Empty;
