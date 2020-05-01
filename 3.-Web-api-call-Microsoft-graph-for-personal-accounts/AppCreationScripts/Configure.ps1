@@ -2,7 +2,9 @@
 param(
     [PSCredential] $Credential,
     [Parameter(Mandatory=$False, HelpMessage='Tenant ID (This is a GUID which represents the "Directory ID" of the AzureAD tenant into which you want to create the apps')]
-    [string] $tenantId
+    [string] $tenantId,
+    [Parameter(Mandatory=$False, HelpMessage='Azure environment to use while running the script (it defaults to AzureCloud)')]
+    [string] $azureEnvironmentName
 )
 
 <#
@@ -201,6 +203,11 @@ Function ConfigureApplications
    so that they are consistent with the Applications parameters
 #> 
     $commonendpoint = "common"
+    
+    if (!$azureEnvironmentName)
+    {
+        $azureEnvironmentName = "AzureCloud"
+    }
 
     # $tenantId is the Active Directory Tenant. This is a GUID which represents the "Directory ID" of the AzureAD tenant
     # into which you want to create the apps. Look it up in the Azure portal in the "Properties" of the Azure AD.
@@ -209,17 +216,17 @@ Function ConfigureApplications
     # you'll need to sign-in with creds enabling your to create apps in the tenant)
     if (!$Credential -and $TenantId)
     {
-        $creds = Connect-AzureAD -TenantId $tenantId
+        $creds = Connect-AzureAD -TenantId $tenantId -AzureEnvironmentName $azureEnvironmentName
     }
     else
     {
         if (!$TenantId)
         {
-            $creds = Connect-AzureAD -Credential $Credential
+            $creds = Connect-AzureAD -Credential $Credential -AzureEnvironmentName $azureEnvironmentName
         }
         else
         {
-            $creds = Connect-AzureAD -TenantId $tenantId -Credential $Credential
+            $creds = Connect-AzureAD -TenantId $tenantId -Credential $Credential -AzureEnvironmentName $azureEnvironmentName
         }
     }
 
@@ -227,6 +234,8 @@ Function ConfigureApplications
     {
         $tenantId = $creds.Tenant.Id
     }
+
+    
 
     $tenant = Get-AzureADTenantDetail
     $tenantName =  ($tenant.VerifiedDomains | Where { $_._Default -eq $True }).Name
@@ -337,15 +346,14 @@ Function ConfigureApplications
    $configFile = $pwd.Path + "\..\TodoListClient\App.Config"
    Write-Host "Updating the sample code ($configFile)"
    ReplaceSetting -configFilePath $configFile -key "ida:ClientId" -newValue ($serviceAadApplication.AppId)
-   ReplaceSetting -configFilePath $configFile -key "todo:TodoListScope" -newValue ('https://'+$tenantName+"/TodoListClient-and-Service/access_as_user")
+   ReplaceSetting -configFilePath $configFile -key "todo:TodoListScope" -newValue (("api://"+$serviceAadApplication.AppId+"/access_as_user"))
    ReplaceSetting -configFilePath $configFile -key "todo:TodoListBaseAddress" -newValue ($serviceAadApplication.HomePage)
    Write-Host ""
    Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
    Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
    Write-Host "- For 'service'"
    Write-Host "  - Navigate to '$servicePortalUrl'"
-   Write-Host "  - Navigate to the Authentication blade, click 'Add a platform' then check the option https://login.microsoftonline.com/common/oauth2/nativeclient" -ForegroundColor Red 
-   Write-Host "  - Navigate to the Expose an API blade and change the Application ID URI to use the https pattern. i.e. https://<tenant_domain>/<app_name>" -ForegroundColor Red 
+   Write-Host "  - Navigate to the Authentication blade, click 'Add a platform' then select 'Mobile and desktop applications' and check the option https://login.microsoftonline.com/common/oauth2/nativeclient" -ForegroundColor Red 
    Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'." -ForegroundColor Red 
    Write-Host "  - Navigate to the Manifest page and change 'accessTokenAcceptedVersion' to 2." -ForegroundColor Red 
    Write-Host "  - [Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'" -ForegroundColor Red 
