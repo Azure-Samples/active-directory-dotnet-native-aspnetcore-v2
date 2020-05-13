@@ -11,7 +11,7 @@ endpoint: Microsoft identity platform
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
-> The sample in this folder is part of a multi-phase tutorial. This folder is about the third phase named **Web API now calls Microsoft Graph including personal accounts**.
+> The sample in this folder is part of a multi-phase tutorial. This folder is about the third phase named **Web API now calls Microsoft Graph using [MS Graph SDK](https://docs.microsoft.com/en-us/graph/sdks/sdks-overview) including personal accounts**.
 > The second phase is available from [2. Web API now calls Microsoft Graph](../2.%20Web%20API%20now%20calls%20Microsoft%20Graph).
 >
 > This article (README.md) contains the full instructions on how to configure the sample. If you have gone through Phase 1 and have already configured your Web API rather switch to the instructions for an incremental configuration in [README-incremental-instructions.md](README-incremental-instructions.md)
@@ -40,7 +40,7 @@ Contrary to the previous chapter, this one shows how to enable users to sign in 
 ### Scenario
 
 You expose a Web API and you want to protect it so that only authenticated user can access it. You want to enable authenticated users with both work and school accounts
-or Microsoft personal accounts (formerly live account) to use your Web API. Your API calls a downstream API (Microsoft Graph) to provide added value to its client apps.
+or Microsoft personal accounts (formerly live account) to use your Web API. Your API calls a downstream API (Microsoft Graph) using MS Graph SDK to provide added value to its client apps.
 
 ### Overview
 
