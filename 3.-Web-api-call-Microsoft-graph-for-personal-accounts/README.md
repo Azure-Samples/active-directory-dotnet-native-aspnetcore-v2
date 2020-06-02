@@ -268,7 +268,31 @@ public class MainWindow
  }
 }
 ```
+### Changes to the service side (TodoListService)
 
+### Startup.cs
+
+The change is to ensure that the Web API allows access to it's own client.
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{      
+    ...
+    services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme,options => {
+        var existingEventHandler = options.Events.OnTokenValidated;
+        options.Events.OnTokenValidated = async context =>
+        {
+            await existingEventHandler(context);
+        
+            if (context.Principal.Claims.Any(x => x.Type == "azp" && x.Value != Configuration["AzureAd:ClientId"]))
+            {
+                throw new UnauthorizedAccessException("Client is not authorized to access the resource.");
+            }
+        };
+    });
+   ...
+}
+```
 
 ## How to deploy this sample to Azure
 

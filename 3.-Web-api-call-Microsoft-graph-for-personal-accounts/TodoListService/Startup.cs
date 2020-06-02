@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
+using System;
+using System.Linq;
 
 namespace TodoListService
 {
@@ -26,6 +29,21 @@ namespace TodoListService
             services.AddProtectedWebApi(Configuration)
                     .AddProtectedWebApiCallsProtectedWebApi(Configuration)
                     .AddInMemoryTokenCaches();
+            services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                var existingEventHandler = options.Events.OnTokenValidated;
+                options.Events.OnTokenValidated = async context =>
+                {
+                    //Existing event handler is invoked.
+                    await existingEventHandler(context);
+
+                    // This check is required to ensure that the Web API only accepts token from it's own client.
+                    if (context.Principal.Claims.Any(x => x.Type == "azp" && x.Value != Configuration["AzureAd:ClientId"]))
+                    {
+                        throw new UnauthorizedAccessException("Client is not authorized to access the resource.");
+                    }
+                };
+            });
             services.AddControllers();
         }
 
