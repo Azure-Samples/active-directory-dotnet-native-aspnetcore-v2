@@ -7,6 +7,8 @@ param(
     [string] $azureEnvironmentName
 )
 
+#Requires -Modules AzureAD
+
 <#
  This script creates the Azure AD applications needed for this sample and updates the configuration files
  for the visual Studio projects from the data in the Azure AD applications.
@@ -353,7 +355,6 @@ Function ConfigureApplications
    Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
    Write-Host "- For 'service'"
    Write-Host "  - Navigate to '$servicePortalUrl'"
-   Write-Host "  - Navigate to the Authentication blade, click 'Add a platform' then select 'Mobile and desktop applications' and check the option https://login.microsoftonline.com/common/oauth2/nativeclient" -ForegroundColor Red 
    Write-Host "  - Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'." -ForegroundColor Red 
    Write-Host "  - Navigate to the Manifest page and change 'accessTokenAcceptedVersion' to 2." -ForegroundColor Red 
    Write-Host "  - [Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'" -ForegroundColor Red 

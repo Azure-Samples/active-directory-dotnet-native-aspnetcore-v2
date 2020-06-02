@@ -30,9 +30,6 @@
       ],
       "ManualSteps": [
         {
-          "Comment": "Navigate to the Authentication blade, click 'Add a platform' then select 'Mobile and desktop applications' and check the option https://login.microsoftonline.com/common/oauth2/nativeclient"
-        },
-        {
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
         },
         {
