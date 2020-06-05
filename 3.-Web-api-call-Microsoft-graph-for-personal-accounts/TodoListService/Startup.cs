@@ -26,24 +26,30 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddProtectedWebApi(Configuration)
-                    .AddProtectedWebApiCallsProtectedWebApi(Configuration)
-                    .AddInMemoryTokenCaches();
-            services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            services.AddProtectedWebApi(options =>
             {
-                var existingEventHandler = options.Events.OnTokenValidated;
+                Configuration.Bind("AzureAd", options);
+                options.Events = new JwtBearerEvents();
                 options.Events.OnTokenValidated = async context =>
                 {
-                    //Existing event handler is invoked.
-                    await existingEventHandler(context);
-
                     // This check is required to ensure that the Web API only accepts token from it's own client.
-                    if (context.Principal.Claims.Any(x => x.Type == "azp" && x.Value != Configuration["AzureAd:ClientId"]))
+                    if (context.Principal.Claims.Any(x => (x.Type == "azp" || x.Type == "appid") && x.Value != Configuration["AzureAd:ClientId"]))
                     {
                         throw new UnauthorizedAccessException("Client is not authorized to access the resource.");
                     }
+                    else
+                    {
+                        throw new UnauthorizedAccessException("Application ID claim does not exist for the client.");
+                    }
                 };
-            });
+            }, 
+            options =>
+            {
+                Configuration.Bind("AzureAd", options);
+            })
+                .AddProtectedWebApiCallsProtectedWebApi(Configuration)
+                .AddInMemoryTokenCaches();
+
             services.AddControllers();
         }
 
