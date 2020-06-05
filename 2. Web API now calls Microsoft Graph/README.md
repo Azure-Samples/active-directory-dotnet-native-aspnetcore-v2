@@ -14,16 +14,11 @@ products:
   - azure-active-directory  
   - aspnet-core
   - office-ms-graph
-description: "A tutorial sample that shows how to use MSAL.NET to authenticate users. A WPF desktop application calls a web API which then calls Microsoft Graph."
+description: "A tutorial sample that shows how to use MSAL.NET to authenticate users in a WPF desktop application that also calls a web API which in turn calls Microsoft Graph."
 ---
-# ASP.NET Core Web API calling Microsoft Graph, itself called from a WPF application using Microsoft identity platform
+# Sign-in a user using Microsoft identity platform in a WPF Desktop application and call an ASP.NET Core Web API, which in turn calls Microsoft Graph
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
-
-> The sample in this folder is part of a multi-phase tutorial. This folder is about the second phase named **Web API now calls Microsoft Graph**.
-> The first phase is available from [1. Desktop app calls Web API](../1.%20Desktop%20app%20calls%20Web%20API) which illustrates a protected Web API.
->
-> This article (README.md) contains the full instructions on how to configure the sample. If you have gone through Phase 1 and have already configured your Web API rather switch to the instructions for an incremental configuration in [README-incremental-instructions.md](README-incremental-instructions.md)
 
 ## About this sample
 
@@ -47,22 +42,23 @@ description: "A tutorial sample that shows how to use MSAL.NET to authenticate u
 
 ### Scenario
 
-You expose a Web API and you want to protect it so that only authenticated user can access it. You want to enable authenticated users with both work and school accounts
-or Microsoft personal accounts (formerly live account) to use your Web API. Your API calls a downstream API (Microsoft Graph) to provide added value to its client apps.
+In this scenario, you expose a Web API and protect it so that only authenticated users can access it. The protected API can work with authenticated users with both **work and school accounts** or **Microsoft personal accounts (formerly live account)** . Your API calls then also calls a downstream API (Microsoft Graph) to provide added value to its client apps.
 
 ### Overview
 
-This sample presents a Web API running on ASP.NET Core 2.2, protected by Azure AD OAuth Bearer Authentication. The Web API calls the Microsoft Graph, and is exercised by a .NET Desktop WPF application.
-Both applications use the Active Directory Authentication Library [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) to obtain a JWT access token through the [OAuth 2.0](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The desktop application:
+This sample presents a Web API running on ASP.NET Core, protected by Azure AD OAuth Bearer Authentication. The Web API calls the Microsoft Graph. A WPF desktop client application is also present that signs-in users and obtains an Access token for your Web API.
 
-1. acquires an access token for the Web API
-2. Calls the ASP.NET Core Web API adding the access token as a bearer token in the authentication header of the Http request. the Web API  authenticates the user using the ASP.NET JWT Bearer Authentication middleware.
-3. When the client calls the Web API, the Web API acquires another token to call the Microsoft Graph (3)
-4. then the Web API calls the graph
+Both applications use the Microsoft Authentication Library [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) to sign-in user and obtain a JWT access token through the [OAuth 2.0](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The desktop application:
+
+1. Signs-in users using the MSAL library.
+1. Acquires an access token for the Web API
+1. Calls the ASP.NET Core Web API by using the access token as a bearer token in the authentication header of the Http request. The Web API authorizes the caller (user) using the ASP.NET JWT Bearer Authentication middleware.
+1. When the client calls the Web API, the Web API acquires another token to call the Microsoft Graph using the on-behalf-of flow.
+1. The Web API then uses this new Access token to call Microsoft Graph
 
 ![Topology](./ReadmeFiles/topology.png)
 
-- Developers who wish to gain good familiarity of programming for Microsoft Graph are advised to go through the [An introduction to Microsoft Graph for developers](https://www.youtube.com/watch?v=EBbnpFdB92A) recorded session. 
+- Developers who wish to gain good familiarity of programming for Microsoft Graph are advised to go through the [An introduction to Microsoft Graph for developers](https://www.youtube.com/watch?v=EBbnpFdB92A) recorded session.
 
 ### User experience when using this sample
 
@@ -82,9 +78,9 @@ Next time a user runs the application, the user is signed-in with the same ident
 
 ### Pre-requisites
 
-- Install .NET Core for Windows by following the instructions at [dot.net/core](https://dot.net/core), which will include [Visual Studio 2017](https://aka.ms/vsdownload).
+- Install .NET Core for Windows by following the instructions at [dot.net/core](https://dot.net/core), which will include [Visual Studio 2019](https://aka.ms/vsdownload).
 - An Internet connection
-- An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/en-us/documentation/articles/active-directory-howto-tenant/)
+- An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/documentation/articles/active-directory-howto-tenant/)
 - A user account in your Azure AD tenant, or a Microsoft personal account
 
 ### Step 1:  Clone or download this repository
@@ -94,11 +90,12 @@ From your shell or command line:
 ```Shell
 git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git aspnetcore-webapi
 cd "aspnetcore-webapi\2. Web API now calls Microsoft Graph"
+
 ```
 
-or download and exact the repository .zip file.
+or download and extract the repository .zip file.
 
-> Given that the name of the sample is pretty long, and so are the name of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
+> Given that the name of the sample is quiet long, and so are the names of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid the 256 character path length limitation on Windows.
 
 ### Step 2:  Register the sample application with your Azure Active Directory tenant
 
@@ -106,41 +103,42 @@ There are two projects in this sample. Each needs to be separately registered in
 
 - either follow the steps [Step 2: Register the sample with your Azure Active Directory tenant](#step-2-register-the-sample-with-your-azure-active-directory-tenant) and [Step 3:  Configure the sample to use your Azure AD tenant](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
 - or use PowerShell scripts that:
-  - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you
+  - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you. Note that this works for Visual Studio only.
   - modify the Visual Studio projects' configuration files.
   
-  > Note however that the automation will not, at this point, allow you to sign-in with a personal Microsoft account. If you want to allow sign in with personal Microsoft accounts, use the manual instructions. 
+<details>
+  <summary>Expand this section if you want to use this automation:</summary>
 
-If you want to use this automation:
-1. On Windows run PowerShell and navigate to the root of the cloned directory
+1. On Windows, run PowerShell and navigate to the root of the cloned directory
 1. In PowerShell run:
+
    ```PowerShell
    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
    ```
-1. Run the script to create your Azure AD application and configure the code of the sample application accordinly. 
+
+1. Run the script to create your Azure AD application and configure the code of the sample application accordingly.
+1. In PowerShell run:
+
    ```PowerShell
-   .\AppCreationScripts\Configure.ps1
+   cd .\AppCreationScripts\
+   .\Configure.ps1
    ```
+
    > Other ways of running the scripts are described in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
+   > The scripts also provide a guide to automated application registration, configuration and removal which can help in your CI/CD scenarios.
 
-1. In the list of pages for the application registration of the `TodoListService-v2` application, select **Manifest**
-      - in the manifest, search for **"accessTokenAcceptedVersion"**, and replace **null** by **2**. This property lets Azure AD know that the Web API accepts Microsoft identity platform (v2.0) tokens
-      - Select **Save**
+1. Open the Visual Studio solution and click start to run the code.
 
+</details>
 
-   > Tip: Get directly to the app registration portal page for a give app, you can navigate to the links provided in the [AppCreationScripts\createdApps.html](AppCreationScripts\createdApps.html). This file is generated by the scripts during the app registration and configuration.
-
-5. Open the Visual Studio solution and click start
-
-If you don't want to use this automation, follow the steps below
+Follow the steps below to manually walk through the steps to register and configure the applications in the Azure portal.
 
 #### Choose the Azure AD tenant where you want to create your applications
 
-If you want to register your apps manually, as a first step you'll need to:
+As a first step you'll need to:
 
 1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
-1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory**.
-   Change your portal session to the desired Azure AD tenant.
+1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page. Then select **switch directory** to change your portal session to the desired Azure AD tenant.
 
 #### Register the service app (TodoListService)
 
@@ -211,6 +209,7 @@ If you want to register your apps manually, as a first step you'll need to:
 In order for the user to be able to consent to the Web API and its downstream API, we need to register the client (TodolistClient) as an known client application for the service. Here is how to do:
 
 Back in the application registration for the Web API (TodoListService):
+
 1. In the list of pages for the app, select **Manifest**
 2. In the manifest editor, change the `"knownClientApplications": []` line so that the array contains the Client ID of your client application (the ClientID of the TodoListClient application).
    For instance:
@@ -220,6 +219,7 @@ Back in the application registration for the Web API (TodoListService):
 		"ca8dca8d-f828-4f08-82f5-325e1a1c6428"
  	],
    ```
+
 - **Save** the changes to the manifest
 
 ### Step 3:  Configure the sample code to use your Azure AD tenant
