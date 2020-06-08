@@ -7,7 +7,8 @@ client: .NET Desktop (WPF)
 service: ASP.NET Core Web API, Microsoft Graph
 endpoint: Microsoft identity platform
 ---
-# ASP.NET Core Web API calling Microsoft Graph including personal accounts, itself called from a WPF application using the Microsoft identity platform
+
+# Sign-in a user with Microsoft Personal accounts, using Microsoft identity platform in a WPF Desktop application and call an ASP.NET Core Web API, which in turn calls Microsoft Graph
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
