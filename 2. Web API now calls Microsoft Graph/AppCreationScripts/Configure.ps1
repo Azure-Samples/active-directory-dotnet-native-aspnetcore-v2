@@ -246,14 +246,14 @@ Function ConfigureApplications
     $user = Get-AzureADUser -ObjectId $creds.Account.Id
 
    # Create the service AAD application
-   Write-Host "Creating the AAD application (TodoListService(native-aspnetcore-v2))"
+   Write-Host "Creating the AAD application (TodoListService(ms-identity-dotnet-native-aspnetcore-v2))"
    # Get a 2 years application key for the service Application
    $pw = ComputePassword
    $fromDate = [DateTime]::Now;
    $key = CreateAppKey -fromDate $fromDate -durationInYears 2 -pw $pw
    $serviceAppKey = $pw
    # create the application 
-   $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListService(native-aspnetcore-v2)" `
+   $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListService(ms-identity-dotnet-native-aspnetcore-v2)" `
                                                    -HomePage "https://localhost:44351/" `
                                                    -ReplyUrls "https://localhost:44351/" `
                                                    -AvailableToOtherTenants $True `
@@ -292,9 +292,9 @@ Function ConfigureApplications
         {
             # Add scope
             $scope = CreateScope -value "access_as_user"  `
-                -userConsentDisplayName "Access TodoListService(native-aspnetcore-v2)"  `
-                -userConsentDescription "Allow the application to access TodoListService(native-aspnetcore-v2) on your behalf."  `
-                -adminConsentDisplayName "Access TodoListService(native-aspnetcore-v2)"  `
+                -userConsentDisplayName "Access TodoListService(ms-identity-dotnet-native-aspnetcore-v2)"  `
+                -userConsentDescription "Allow the application to access TodoListService(ms-identity-dotnet-native-aspnetcore-v2) on your behalf."  `
+                -adminConsentDisplayName "Access TodoListService(ms-identity-dotnet-native-aspnetcore-v2)"  `
                 -adminConsentDescription "Allows the app to have the same access to information in the directory on behalf of the signed-in user."
             
             $scopes.Add($scope)
@@ -304,12 +304,12 @@ Function ConfigureApplications
     # add/update scopes
     Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -OAuth2Permission $scopes
 
-   Write-Host "Done creating the service application (TodoListService(native-aspnetcore-v2))"
+   Write-Host "Done creating the service application (TodoListService(ms-identity-dotnet-native-aspnetcore-v2))"
 
    # URL of the AAD application in the Azure portal
    # Future? $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId+"/isMSAApp/"
    $servicePortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId+"/isMSAApp/"
-   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListService(native-aspnetcore-v2)</a></td></tr>" -Path createdApps.html
+   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListService(ms-identity-dotnet-native-aspnetcore-v2)</a></td></tr>" -Path createdApps.html
 
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
 
@@ -325,9 +325,9 @@ Function ConfigureApplications
    Write-Host "Granted permissions."
 
    # Create the client AAD application
-   Write-Host "Creating the AAD application (TodoListClient(native-aspnetcore-v2))"
+   Write-Host "Creating the AAD application (TodoListClient(ms-identity-dotnet-native-aspnetcore-v2))"
    # create the application 
-   $clientAadApplication = New-AzureADApplication -DisplayName "TodoListClient(native-aspnetcore-v2)" `
+   $clientAadApplication = New-AzureADApplication -DisplayName "TodoListClient(ms-identity-dotnet-native-aspnetcore-v2)" `
                                                   -ReplyUrls "https://login.microsoftonline.com/common/oauth2/nativeclient" `
                                                   -AvailableToOtherTenants $True `
                                                   -PublicClient $True
@@ -345,18 +345,18 @@ Function ConfigureApplications
    }
 
 
-   Write-Host "Done creating the client application (TodoListClient(native-aspnetcore-v2))"
+   Write-Host "Done creating the client application (TodoListClient(ms-identity-dotnet-native-aspnetcore-v2))"
 
    # URL of the AAD application in the Azure portal
    # Future? $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId+"/isMSAApp/"
    $clientPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId+"/isMSAApp/"
-   Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListClient(native-aspnetcore-v2)</a></td></tr>" -Path createdApps.html
+   Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListClient(ms-identity-dotnet-native-aspnetcore-v2)</a></td></tr>" -Path createdApps.html
 
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
 
    # Add Required Resources Access (from 'client' to 'service')
    Write-Host "Getting access from 'client' to 'service'"
-   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService(native-aspnetcore-v2)" `
+   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService(ms-identity-dotnet-native-aspnetcore-v2)" `
                                                 -requiredDelegatedPermissions "access_as_user" `
 
    $requiredResourcesAccess.Add($requiredPermissions)

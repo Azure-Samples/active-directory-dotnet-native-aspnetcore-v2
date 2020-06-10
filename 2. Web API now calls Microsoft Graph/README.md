@@ -233,21 +233,25 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 
 1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService(native-aspnetcore-v2) project (by default `https://localhost:44351/`).
 
-#### Register the client app as a known client application for the Web API
+#### Configure Known Client Applications for service (TodoListService(ms-identity-dotnet-native-aspnetcore-v2))
 
-In order for the user to be able to consent to the Web API and its downstream API, we need to register the client (TodolistClient) as an known client application for the service. Here is how to do:
+For a middle tier Web API (`TodoListService(ms-identity-dotnet-native-aspnetcore-v2)`) to be able to call a downstream Web API, the middle tier app needs to be granted the required permissions as well.
+However, since the middle tier cannot interact with the signed-in user, it needs to be explicitly bound to the client app in its Azure AD registration.
+This binding merges the permissions required by both the client and the middle tier Web Api and presents it to the end user in a single consent dialog. The user then consent to this combined set of permissions.
 
-Back in the application registration for the Web API (TodoListService):
+To achieve this, you need to add the **Application Id** of the client app, in the Manifest of the Web API in the `knownClientApplications` property. Here's how:
 
-1. In the app's registration screen, select **Manifest** in the menu
-2. In the manifest editor, change the `"knownClientApplications": []` line so that the array contains the Client ID of your client application (the ClientID of the TodoListClient application).
-   For instance:
+1. In the [Azure portal](https://portal.azure.com), navigate to your `TodoListService(ms-identity-dotnet-native-aspnetcore-v2)` app registration, and select **Manifest** section.
+1. In the manifest editor, change the `"knownClientApplications": []` line so that the array contains 
+   the Client ID of the client application (`TodoListClient(ms-identity-dotnet-native-aspnetcore-v2)`) as an element of the array.
+
+    For instance:
 
     ```json
     "knownClientApplications": ["ca8dca8d-f828-4f08-82f5-325e1a1c6428"],
     ```
 
-3. **Save** the changes to the manifest.
+1. **Save** the changes to the manifest.
 
 ### Step 3: Configure the sample code to use your Azure AD tenant
 
