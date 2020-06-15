@@ -2,20 +2,14 @@
 services: active-directory
 platforms: dotnet
 author: jmprieur
-level: 400
+level: 300
 client: .NET Desktop (WPF)
 service: ASP.NET Core Web API, Microsoft Graph
-endpoint: AAD v2.0
+endpoint: Microsoft identity platform
 ---
-# ASP.NET Core Web API calling Microsoft Graph, itself called from a WPF application using Microsoft identity platform
+# Sign a user into a Desktop application using Microsoft Identity Platform and call a protected ASP.NET Core Web API, which calls Microsoft Graph on-behalf of the user
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
-
-> The sample in this folder is part of a multi-phase tutorial. This folder is about the second phase named **Web API now calls Microsoft Graph**.
-> The first phase is available from [1. Desktop app calls Web API](../1.%20Desktop%20app%20calls%20Web%20API).
->
-> This article [README-incremental-instructions.md](README-incremental-instructions.md) builds on top of the README.md of the first part. If you want to see the full instructions on how to configure the sample, see [README.md](README.md)
-
 
 ## About this sample
 
@@ -39,12 +33,10 @@ endpoint: AAD v2.0
 
 ### Scenario
 
-You expose a Web API and you want to protect it so that only authenticated user can access it. You want to enable authenticated users with both work and school accounts
-or Microsoft personal accounts (formerly live account) to use your Web API. Your API calls a downstream API (Microsoft Graph) to provide added value to its client apps.
-
+In this scenario, you expose a Web API and protect it so that only authenticated users can access it. You want to enable authenticated users with Work and School accounts to use your Web API. Your API then also calls a downstream API (Microsoft Graph) to provide additional value to its client apps.									
 ### Overview
 
-With respect to the previous part of the tutorial, this part adds the following steps:
+With respect to the previous chapter of the tutorial, this chapter adds the following steps:
 3. When the client calls the Web API, the Web API acquires another token to call the Microsoft Graph (3)
 4. then the Web API calls the graph
 
@@ -52,7 +44,7 @@ With respect to the previous part of the tutorial, this part adds the following 
 
 ### User experience when using this sample
 
-The user experience on the client application is similar to the one in the first part, except that, when the signed-in user adds todo list items, the Web API appends the name of the user to the todo item (between parenthesis). This is done by calling Microsoft Graph (even if in this particular case, this would not be strictly necessary)
+The user experience on the client application is similar to the one in the first chapter, except that, when the signed-in user adds todo list items, the Web API appends the name of the user to the todo item (between parenthesis). This is done by calling Microsoft Graph (even if in this particular case, this would not be strictly necessary)
 
 ![TodoList Client](./ReadmeFiles/todolist-client.png)
 
@@ -113,18 +105,19 @@ These instructions only show the differences with the first part.
 #### Register the service app (TodoListService)
 
 1. In **App registrations** page, find the *TodoListService-2* app
-1. From the **Certificates & secrets** page, in the **Client secrets** section, choose **New client secret**:
-   - Type a key description (of instance `app secret`),
-   - Select a key duration of either **In 1 year**, **In 2 years**, or **Never Expires**.
-   - When you press the **Add** button, the key value will be displayed, copy, and save the value in a safe location.
-   - You'll need this key later to configure the project in Visual Studio. This key value will not be displayed again, nor retrievable by any other means,
-     so record it as soon as it is visible from the Azure portal.
-1. Select the **API permissions** section
+1. In the app's registration screen, click on the **Certificates & secrets** blade in the left to open the page where we can generate secrets and upload certificates.
+1. In the **Client secrets** section, click on **New client secret**:
+   - Type a key description (for instance `app secret`),
+   - Select one of the available key durations (**In 1 year**, **In 2 years**, or **Never Expires**) as per your security concerns.
+   - The generated key value will be displayed when you click the **Add** button. Copy the generated value for use in the steps later.
+   - You'll need this key later in your code's configuration files. This key value will not be displayed again, and is not retrievable by any other means, so make sure to note it from the Azure portal before navigating to any other screen or blade.
+																 
+1. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the Apis that your application needs.
    - Click the **Add a permission** button and then,
-   - Ensure that the **Microsoft APIs** tab is selected
+   - Ensure that the **Microsoft APIs** tab is selected.
    - In the *Commonly used Microsoft APIs* section, click on **Microsoft Graph**
-   - In the **Delegated permissions** section, ensure that the right permissions are checked: **User.Read** and **offline_access**. Use the search box if necessary.
-   - Select the **Add permissions** button
+   - In the **Delegated permissions** section, select the **User.Read** in the list. Use the search box if necessary.
+   - Click on the **Add permissions** button at the bottom.
    - [Optional] if you are a tenant admin, and agree to grant the admin consent to the web api, select **Grant admin consent for {your tenant domain}**. If you don't do
     it, users will be presented a consent screen enabling them to consent to using the web api. The consent screen will also mention the permissions required by the web api itself.
 1. [Optional] Select the **Manifest** section and:
@@ -137,7 +130,7 @@ These instructions only show the differences with the first part.
 
 Nothing more to do more here. All was done in the first part
 
-### Step 3:  Configure the sample to use your Azure AD tenant
+### Step 3: Configure the sample code to use your Azure AD tenant
 
 By default the sample is configured to enable users to sign in with any work and school accounts (AAD) or personal Microsoft accounts.
 This constraint is ensured by `ida:Tenant` in `TodoListClient\App.Config` having the value `common`.
@@ -149,7 +142,7 @@ This constraint is ensured by `ida:Tenant` in `TodoListClient\App.Config` having
 1. Find the `ClientSecret` property and replace the existing value with the key you saved during the creation of the `TodoListService-v2` app, in the Azure portal.
    > Note
    > In chapter 1, the protected Web API did not call any downstrream API. In this chapter it does, and thus
-   > it needs to acquire s token, and becomes a confidential client. Therefore it needs to prove its identity to
+   > it needs to acquire an access token, and becomes a confidential client. Therefore it needs to prove its identity to
    > Azure AD through a client secret (or a certificate)
 
 #### Configure the TodoListClient C# project

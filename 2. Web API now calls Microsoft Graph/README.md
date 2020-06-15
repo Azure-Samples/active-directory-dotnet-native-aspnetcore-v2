@@ -2,7 +2,7 @@
 services: active-directory
 platforms: dotnet
 author: jmprieur
-level: 400
+level: 300
 client: .NET Desktop (WPF)
 service: ASP.NET Core Web API, Microsoft Graph
 endpoint: Microsoft identity platform
@@ -14,9 +14,9 @@ products:
   - azure-active-directory  
   - aspnet-core
   - office-ms-graph
-description: "A tutorial sample that shows how to use MSAL.NET to authenticate users in a WPF desktop application that also calls a web API which in turn calls Microsoft Graph."
+description: "Sign a user into a Desktop application using Microsoft Identity Platform and call a protected ASP.NET Core Web API, which calls Microsoft Graph on-behalf of the user."
 ---
-# Sign-in a user using Microsoft identity platform in a WPF Desktop application and call an ASP.NET Core Web API, which in turn calls Microsoft Graph
+# Sign a user into a Desktop application using Microsoft Identity Platform and call a protected ASP.NET Core Web API, which calls Microsoft Graph on-behalf of the user
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
@@ -42,7 +42,7 @@ description: "A tutorial sample that shows how to use MSAL.NET to authenticate u
 
 ### Scenario
 
-In this scenario, you expose a Web API and protect it so that only authenticated users can access it. You want to enable authenticated users with Work and School accounts to use your Web API. Your API then also calls a downstream API (Microsoft Graph) to provide additional value to its client apps.
+In this scenario, you protect a Web API using the Microsoft Identity Platform so that only authenticated users can access it. The API will support authenticated users with Work and School accounts. Further on the API will also call a downstream API (Microsoft Graph) on-behalf of the signed-in user to provide additional value to its client apps.
 
 ### Overview
 
@@ -50,15 +50,17 @@ This sample presents a Web API running on ASP.NET Core, protected by Azure AD OA
 
 Both applications use the Microsoft Authentication Library [MSAL.NET](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet) to sign-in user and obtain a JWT access token through the [OAuth 2.0](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The desktop application:
 
-1. Signs-in users using the MSAL library.
+The WPF client application:
+
+1. Signs-in users using the MSAL.NET library.
 1. Acquires an access token for the Web API
 1. Calls the ASP.NET Core Web API by using the access token as a bearer token in the authentication header of the Http request.
 
-The Web API application:
+The Web API:
 
-1. Authorizes the caller (user) using the ASP.NET JWT Bearer Authentication middleware.
-1. Acquires another token to call the Microsoft Graph using the on-behalf-of flow.
-1. The Web API then uses this new Access token to call Microsoft Graph
+1. Authorizes the caller (user) using the ASP.NET JWT Bearer Authorization middleware.
+2. Acquires another access token on-behalf-of the signed-in user using the [on-behalf of flow](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow).
+3. The Web API then uses this new Access token to call Microsoft Graph
 
 ![Topology](./ReadmeFiles/topology.png)
 
@@ -92,8 +94,8 @@ Next time a user runs the application, the user is signed-in with the same ident
 From your shell or command line:
 
 ```Shell
-git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git aspnetcore-webapi
-cd "aspnetcore-webapi\2. Web API now calls Microsoft Graph"
+git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git
+cd "2. Web API now calls Microsoft Graph"
 
 ```
 
@@ -253,25 +255,6 @@ To achieve this, you need to add the **Application Id** of the client app, in th
 
 1. **Save** the changes to the manifest.
 
-### Step 3: Configure the sample code to use your Azure AD tenant
-
-#### Choose which users account to sign in
-
-By default the sample is configured to enable users to sign in with any work and school accounts (AAD) or personal Microsoft accounts.
-This constraint is ensured by `ida:Tenant` in `TodoListClient\App.Config` having the value `common`.
-
-##### Important note
-
-`common` is **not** a proper tenant. It's just a **convention** to express that the accepted tenants are any Work and School organizations, or Personal Microsoft account (consumer accounts).
-Accepted tenants can have the following values:
-
-Value | Meaning
------ | --------
-`common` | users can sign in with any Work and School account, or Microsoft Personal account.
-`organizations` |  users can sign in with any Work and School account
-`consumers` |  users can sign in with a Microsoft Personal account. *Don't use it for the moment (same as common)*
-a GUID or domain name | users can only sign in with an account for a specific organization described by its tenant ID (GUID) or domain name
-
 ### Step 4: Run the sample
 
 Clean the solution, rebuild, and run it. You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
@@ -289,7 +272,7 @@ NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` 
 
 ### Alternative architecture
 
-This part of the sample uses different client ID for the client and the service and uses the on-behalf-of flow. If you are the author of both the client and the service, you might alternatively want to use the same client ID in the Client and the Service. This approach is described in the third part of the tutorial [3.-Web-api-call-Microsoft-graph-for-personal-accounts](../3.-Web-api-call-Microsoft-graph-for-personal-accounts)
+This part of the sample uses different client ID for the client and the service and uses the on-behalf-of flow. If you are the author of both the client and the service, you might alternatively want to use the same client ID in the Client and the Service. This approach is described in the third part of the tutorial [3.-Web-api-call-Microsoft-graph-for-personal-accounts](../3.-Web-api-call-Microsoft-graph-for-personal-accounts/README.md)
 
 ## How was the code created
 
