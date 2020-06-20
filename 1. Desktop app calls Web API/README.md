@@ -351,7 +351,7 @@ namespace Microsoft.AspNetCore.Authentication
 
             // Extracting the tenant ID
             string tenantId = jwtToken.Claims.FirstOrDefault(c => c.Type == "tid")?.Value;
-            if (jwtToken == null)
+            if (string.IsNullOrEmpty(tenantId))
             {
                 throw new SecurityTokenInvalidIssuerException("Expecting a tid claim from Azure Active Directory.");
             }
@@ -399,7 +399,7 @@ This code validates that the issuer of the token sent, by its client, to the Web
 
 #### Modify the startup.cs file so that the Web API becomes v2.0 multi-tenant app
 
-Currently the ASP.NET Core templates create Azure AD v1.0 Web APIs. However you can easylly change them to use the Microsoft identity platform endpoint. To update them, make the following changes in the `Startup.cs` file.
+Currently the ASP.NET Core templates create Azure AD v1.0 Web APIs. However you can easily change them to use the Microsoft identity platform endpoint. To update them, make the following changes in the `Startup.cs` file.
 
 Add a using for `Microsoft.AspNetCore.Authentication.JwtBearer`
 
