@@ -13,7 +13,7 @@ namespace Microsoft.Identity.Web
     /// </summary>
     public static class WebApiServiceCollectionExtensions
     {
-        public static IServiceCollection AddPop(
+        public static IServiceCollection AddProofOfPosession(
             this IServiceCollection services,
             IConfiguration configuration,
             string configSectionName = "AzureAd")
