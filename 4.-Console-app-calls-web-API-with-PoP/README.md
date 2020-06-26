@@ -280,17 +280,17 @@ With PoP, the programming model is a bit different from the way MSAL.NET usually
 
 ### Code for the Web API (TodoListService)
 
-The code for the TodoListService starts in Startup.cs, where you will call `AddPop()`
+The code for the TodoListService starts in Startup.cs, where you will call `AddProofOfPosession()`
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddProtectedWebApi(Configuration)
             .AddProtectedApiCallsWebApis(Configuration)
-            .AddPop(Configuration)
+            .AddProofOfPosession(Configuration)
             .AddInMemoryTokenCaches();
     services.AddControllers();
 }
 
-`AddPop()` really leverages the [`SignedHttpRequest`](https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/SignedHttpRequest-aka-PoP-(Proof-of-Possession))feature in `IdentityModel` (middleware library). The incoming token ends-up being handled by an ASP.NET Core handler named `SignedHttpRequestAuthenticationHandler`. For details, see [SignedHttpRequestAuthenticationHandler.cs](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/7d999f6180ea90171b9a90ca931a0d3de2c035f5/Microsoft.Identity.Web/SignedHttpRequest/SignedHttpRequestAuthenticationHandler.cs#L44) from line 44.
+`AddProofOfPosession()` really leverages the [`SignedHttpRequest`](https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/SignedHttpRequest-aka-PoP-(Proof-of-Possession))feature in `IdentityModel` (middleware library). The incoming token ends-up being handled by an ASP.NET Core handler named `SignedHttpRequestAuthenticationHandler`. For details, see [SignedHttpRequestAuthenticationHandler.cs](https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/blob/7d999f6180ea90171b9a90ca931a0d3de2c035f5/Microsoft.Identity.Web/SignedHttpRequest/SignedHttpRequestAuthenticationHandler.cs#L44) from line 44.
 
 ### Update the `TodoListClient` to call the `TodoListService` running in Azure Web Sites
 

@@ -25,7 +25,7 @@ namespace TodoListService
         {
             services.AddProtectedWebApi(Configuration)
                     .AddProtectedWebApiCallsProtectedWebApi(Configuration)
-                    .AddPop(Configuration)
+                    .AddProofOfPosession(Configuration)
                     .AddInMemoryTokenCaches();
             services.AddControllers();
         }
