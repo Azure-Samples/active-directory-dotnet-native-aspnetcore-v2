@@ -98,7 +98,7 @@ namespace TodoListService.Controllers
             }
             catch (MsalUiRequiredException ex)
             {
-                _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(scopes, ex);
+                await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
                 return string.Empty;
             }
         }
