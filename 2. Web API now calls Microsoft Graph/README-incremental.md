@@ -187,12 +187,12 @@ Update `Startup.cs` file:
   by
 
   ```csharp
-  services.AddProtectedWebApi(Configuration)
-          .AddProtectedApiCallsWebApis(Configuration)
+  services.AddMicrosoftWebApiAuthentication(Configuration)
+          .AddMicrosoftWebApiCallsWebApi(Configuration)
           .AddInMemoryTokenCaches();
   ```
 
-  `AddProtectedWebApi` does the following:
+  `AddMicrosoftWebApiAuthentication` does the following:
   - add the **Jwt**BearerAuthenticationScheme (Note the replacement of BearerAuthenticationScheme by **Jwt**BearerAuthenticationScheme)
   - set the authority to be the Microsoft identity platform identity
   - sets the audiences to validate
@@ -231,7 +231,7 @@ Update `Startup.cs` file:
 
   The implementations of these classes are in the Microsoft.Identity.Web library (and folder), and they are designed to be reusable in your applications (Web apps and Web apis)
 
-  `AddProtectedApiCallsWebApis` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and, in this event, adds the user account into MSAL.NET's user token cache by using the AcquireTokenOnBehalfOfUser method. This is done by the `AddAccountToCacheFromJwt` method of the `ITokenAcquisition` micro-service, which wraps MSAL.NET
+  `AddMicrosoftWebApiCallsWebApi` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and, in this event, adds the user account into MSAL.NET's user token cache by using the AcquireTokenOnBehalfOfUser method. This is done by the `AddAccountToCacheFromJwt` method of the `ITokenAcquisition` micro-service, which wraps MSAL.NET
 
   ```CSharp
   services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
@@ -293,7 +293,7 @@ This method is the following. It:
         }
         catch (MsalUiRequiredException ex)
         {
-            tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(scopes, ex);
+            await tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
             return string.Empty;
         }
     }
@@ -305,7 +305,7 @@ This method is the following. It:
 
 An interesting piece is how `MsalUiRequiredException` are handled. These exceptions are typically sent by Azure AD when there is a need for a user interaction. This can be the case when the user needs to re-sign-in, or needs to grant some additional consent, or to obtain additional claims. For instance, the user might need to do multi-factor authentication required specifically by a specific downstream API. When these exceptions happen, given that the Web API does not have any UI, it needs to challenge the client passing all the information enabling this client to handle the interaction with the user.
 
-This sample uses the `ReplyForbiddenWithWwwAuthenticateHeader` method of the `TokenAcquisition` service. This method uses the HttpResponse to:
+This sample uses the `ReplyForbiddenWithWwwAuthenticateHeaderAsync` method of the `TokenAcquisition` service. This method uses the HttpResponse to:
 
 - Send an HTTP 404 (Forbidden) to the client
 - Set information in the www-Authenticate header of the HttpResponse with information that would enable a client to get more consent from the user that is:
