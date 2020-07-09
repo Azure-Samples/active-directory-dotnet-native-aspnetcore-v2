@@ -178,7 +178,7 @@ public class Startup
   public void ConfigureServices(IServiceCollection services)
   {
    ...
-   services.AddProtectedWebApi(Configuration);
+   services.AddMicrosoftWebApiAuthentication(Configuration);
    ...
   }
   ...
@@ -205,8 +205,8 @@ public class Startup
   public void ConfigureServices(IServiceCollection services)
   {
    ...
-   services.AddProtectedWebApi(Configuration)
-           .AddProtectedApiCallsWebApis()
+   services.AddMicrosoftWebApiAuthentication(Configuration)
+           .AddMicrosoftWebApiCallsWebApi()
            .AddInMemoryTokenCaches();
    ...
   }
@@ -331,7 +331,7 @@ In order to troubleshoot your web app you can set the `subscribeToOpenIdConnectM
 
 <img alt="OpenIdConnectMiddlewareDiagnostics" src="https://user-images.githubusercontent.com/13203188/62538366-75ac0380-b807-11e9-9ce0-d0eec9381b78.png" width="75%"/>
 
-In order to troubleshoot your web API you can set the `subscribeToJwtBearerMiddlewareDiagnosticsEvents` optional boolean to `true` when you call `AddProtectedWebApi`. Enabling these diagnostics will display on the output window the progression of the OAuth 2.0 message through the JWTBearer middleware (from the reception of the message from Azure Active directory to the availability of the user identity in `HttpContext.User`)  
+In order to troubleshoot your web API you can set the `subscribeToJwtBearerMiddlewareDiagnosticsEvents` optional boolean to `true` when you call `AddMicrosoftWebApiAuthentication`. Enabling these diagnostics will display on the output window the progression of the OAuth 2.0 message through the JWTBearer middleware (from the reception of the message from Azure Active directory to the availability of the user identity in `HttpContext.User`)  
 
 <img alt="JwtBearerMiddlewareDiagnostics" src="https://user-images.githubusercontent.com/13203188/62538382-7d6ba800-b807-11e9-9540-560e7129197b.png" width="65%"/>
 
@@ -341,7 +341,7 @@ In both cases, you can set a breakpoint in the methods of the  `OpenIdConnectMid
 
 If you want to customize the `OpenIdConnectOption` or `JwtBearerOption` but still want to benefit from the implementation provided by Microsoft.Identity.Web, you can easily do it from your `Startup.cs` file:
 
-Let's take for example the method `AddProtectedWebApi`. If you check the code inside it, you have this event setup:
+Let's take for example the method `AddMicrosoftWebApiAuthentication`. If you check the code inside it, you have this event setup:
 
 ```
 options.Events.OnTokenValidated = async context =>
@@ -361,7 +361,7 @@ options.Events.OnTokenValidated = async context =>
 Let's say you want to augment the current `ClaimsPrincipal` by adding claims to it, and you have to do it on `OnTokenValidated `, however you don't want to lose this `UnauthorizedAccessException` check existing in the event. To do so, on your `Startup.cs` you would have:
 
 ```
-services.AddProtectedWebApi(Configuration);
+services.AddMicrosoftWebApiAuthentication(Configuration);
 services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options => 
 {
   var existingOnTokenValidatedHandler = options.Events.OnTokenValidated ;

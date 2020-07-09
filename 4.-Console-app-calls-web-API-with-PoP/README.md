@@ -283,10 +283,10 @@ With PoP, the programming model is a bit different from the way MSAL.NET usually
 The code for the TodoListService starts in Startup.cs, where you will call `AddProofOfPosession()`
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddProtectedWebApi(Configuration)
-            .AddProtectedApiCallsWebApis(Configuration)
-            .AddProofOfPosession(Configuration)
+    services.AddMicrosoftWebApiAuthentication(Configuration)
+            .AddMicrosoftWebApiCallsWebApi(Configuration)
             .AddInMemoryTokenCaches();
+    services.AddProofOfPosession(Configuration);
     services.AddControllers();
 }
 
