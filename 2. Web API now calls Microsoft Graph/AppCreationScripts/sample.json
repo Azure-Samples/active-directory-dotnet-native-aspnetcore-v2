@@ -1,6 +1,6 @@
 {
   "Sample": {
-    "Title": "A WPF application that calls a Web API running on ASP.NET Core 2.0 protected by Azure AD using OAuth 2.0 access tokens. ",
+    "Title": "A WPF application that calls an ASP.NET Core Web API protected by Azure AD using OAuth 2.0 access tokens. ",
     "Level": 200,
     "Client": ".NET Desktop (WPF)",
     "Service": "ASP.NET Core Web API",
@@ -14,7 +14,7 @@
   "AADApps": [
     {
       "Id": "service",
-      "Name": "TodoListService (active-directory-dotnet-native-aspnetcore-v2)",
+      "Name": "TodoListService(ms-identity-dotnet-native-aspnetcore-v2)",
       "Kind": "WebApi",
       "HomePage": "https://localhost:44351/",
       "ReplyUrls": "https://localhost:44351/",
@@ -33,7 +33,7 @@
     },
     {
       "Id": "client",
-      "Name": "TodoListClient (active-directory-dotnet-native-aspnetcore-v2)",
+      "Name": "TodoListClient(ms-identity-dotnet-native-aspnetcore-v2)",
       "Kind": "Desktop",
       "ReplyUrls": "https://login.microsoftonline.com/common/oauth2/nativeclient",
       "RequiredResourcesAccess": [
@@ -47,7 +47,7 @@
           "Comment": "Navigate to the Manifest page and change 'signInAudience' to 'AzureADandPersonalMicrosoftAccount'."
         },
         {
-          "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permisions page and select 'Grant admin consent for (your tenant)'"
+          "Comment": "[Optional] If you are a tenant admin, you can navigate to the API Permissions page and select 'Grant admin consent for (your tenant)'"
         }
       ]
     }

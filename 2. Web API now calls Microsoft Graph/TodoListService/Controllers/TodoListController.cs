@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
@@ -94,7 +95,7 @@ namespace TodoListService.Controllers
             {
                 string accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
                 dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
-                return me.userPrincipalName;
+                return me.UserPrincipalName;
             }
             catch (MsalUiRequiredException ex)
             {
@@ -106,17 +107,14 @@ namespace TodoListService.Controllers
         private static async Task<dynamic> CallGraphApiOnBehalfOfUser(string accessToken)
         {
             // Call the Graph API and retrieve the user's profile.
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            HttpResponseMessage response = await client.GetAsync("https://graph.microsoft.com/v1.0/me");
-            string content = await response.Content.ReadAsStringAsync();
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                dynamic me = JsonConvert.DeserializeObject(content);
-                return me;
-            }
+            GraphServiceClient graphServiceClient = new GraphServiceClient(new DelegateAuthenticationProvider((requestMessage) => {
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                return Task.FromResult(0);
+            }));
 
-            throw new Exception(content);
+            User graphUser = await graphServiceClient.Me.Request().GetAsync();
+            
+            return graphUser;
         }
     }
 }

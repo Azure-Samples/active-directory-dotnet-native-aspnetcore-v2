@@ -14,32 +14,37 @@ endpoint: Microsoft identity platform
 ## About this sample
 
 ### Table of content
+
 - [About this sample](#about-this-sample)
-  - [Scenario](#scenario)
-  - [Overview](#overview)
-  - [User experience when using this sample](#user-experience-when-using-this-sample)
+    - [Scenario](#scenario)
+    - [Overview](#overview)
+    - [User experience when using this sample](#user-experience-when-using-this-sample)
 - [How to run this sample](#how-to-run-this-sample)
-  - [Pre-requisites](#pre-requisites)
-  - [Step 1:  Clone or download this repository](#step-1-clone-or-download-this-repository)
-  - [Step 2:  Register the sample application with your Azure Active Directory tenant](#step-2-register-the-sample-application-with-your-azure-active-directory-tenant)
-  - [Step 4: Run the sample](#step-4-run-the-sample)
+    - [Step 1:  In the downloaded folder](#step-1--in-the-downloaded-folder)
+    - [Step 2:  Register the sample application with your Azure Active Directory tenant](#step-2--register-the-sample-application-with-your-azure-active-directory-tenant)
+    - [Step 3:  Configure the sample to use your Azure AD tenant](#step-3--configure-the-sample-to-use-your-azure-ad-tenant)
+    - [Step 4: Run the sample](#step-4-run-the-sample)
+    - [Troubleshooting](#troubleshooting)
+- [How was the code created](#how-was-the-code-created)
 - [Choosing which scopes to expose](#choosing-which-scopes-to-expose)
+- [Next chapter of the tutorial: the Web API itself calls another downstream Web API](#next-chapter-of-the-tutorial-the-web-api-itself-calls-another-downstream-web-api)
+- [How to deploy this sample to Azure](#how-to-deploy-this-sample-to-azure)
 - [Community Help and Support](#community-help-and-support)
 - [Contributing](#contributing)
 - [More information](#more-information)
 
 ### Scenario
 
-In this sample, we would protect an ASP.Net Core Web API using the Microsoft Identity Platform. The Web API will be protected using Azure Active Directory OAuth Bearer Authorization.
+In the first chapter, we would protect an ASP.Net Core Web API using the Microsoft Identity Platform. The Web API will be protected using Azure Active Directory OAuth Bearer Authorization.
 
 An on-demand video was created for the Build 2018 event, featuring this scenario and a previous version of this sample. See the video [Building Web API Solutions with Authentication](https://channel9.msdn.com/Events/Build/2018/THR5000), and the associated [PowerPoint deck](http://video.ch9.ms/sessions/c1f9c808-82bc-480a-a930-b340097f6cc1/BuildWebAPISolutionswithAuthentication.pptx)
 
 ### Overview
 
-This sample presents an ASP.NET core Web API, protected by Azure AD OAuth Bearer Authorization. The Web API is called by a .NET Desktop WPF application.
+This sample presents a Web API running on ASP.NET Core, protected by Azure AD OAuth Bearer Authorization. The Web API is called by a .NET Desktop WPF application.
 The .Net application uses the Microsoft Authentication Library [MSAL.NET](https://aka.ms/msal-net) to obtain a JWT [Access Token](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) through the [OAuth 2.0](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The access token is sent to the ASP.NET Core Web API, which authorizes the user using the ASP.NET JWT Bearer Authentication middleware.
 
- This sub-folder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService).
+This sub-folder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService).
 
 ![Topology](./ReadmeFiles/topology.png)
 
@@ -59,28 +64,13 @@ Next time a user runs the application, the user is signed-in with the same ident
 
 ## How to run this sample
 
-### Pre-requisites
-
-- [Visual Studio 2019](https://aka.ms/vsdownload) or just the [.NET Core SDK](https://www.microsoft.com/net/learn/get-started)
-- An Internet connection
-- A Windows machine (necessary if you want to run the app on Windows)
-- An OS X machine (necessary if you want to run the app on Mac)
-- A Linux machine (necessary if you want to run the app on Linux)
-- An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/documentation/articles/active-directory-howto-tenant/)
-- A user account in your Azure AD tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
-
-### Step 1:  Clone or download this repository
+### Step 1:  In the downloaded folder
 
 From your shell or command line:
 
 ```Shell
-git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git
 cd "1. Desktop app calls Web API"
 ```
-
-or download and extract the repository .zip file.
-
-> Given that the name of the sample is quiet long, and so are the names of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
 ### Step 2:  Register the sample application with your Azure Active Directory tenant
 
@@ -159,9 +149,9 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 >In the steps below, "ClientID" is the same as "Application ID" or "AppId".						   					
 
 1. Open the `TodoListService\appsettings.json` file
-1. Find the app key `Domain` and replace the existing value with your Azure AD tenant name.
-1. Find the app key `TenantId` and replace the existing value with your Azure AD tenant ID.
-1. Find the app key `ClientId` and replace the existing value with the application ID (clientId) of the `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Azure portal.
+2. Find the app key `Domain` and replace the existing value with your Azure AD tenant name.
+3. Find the app key `TenantId` and replace the existing value with your Azure AD tenant ID.
+4. Find the app key `ClientId` and replace the existing value with the application ID (clientId) of the `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Azure portal.
 
 #### Register the client app (TodoListClient (active-directory-dotnet-native-aspnetcore-v2))
 
@@ -175,8 +165,9 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 1. In the app's registration screen, select **Authentication** in the menu.
    - If you don't have a platform added, select **Add a platform** and select the **Public client (mobile & desktop)** option.
    - In the **Redirect URIs** | **Suggested Redirect URIs for public clients (mobile, desktop)** section, select **https://login.microsoftonline.com/common/oauth2/nativeclient**
+
 1. Select **Save** to save your changes.
-1. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the APIs that your application needs.
+1. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the Apis that your application needs.
    - Click the **Add a permission** button and then,
    - Ensure that the **My APIs** tab is selected.
    - In the list of APIs, select the API `TodoListService (active-directory-dotnet-native-aspnetcore-v2)`.
@@ -192,7 +183,7 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListClient (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Azure portal.
 1. Find the app key `todo:TodoListScope` and replace the existing value with Scope.
 1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService (active-directory-dotnet-native-aspnetcore-v2) project (by default `https://localhost:44351/`).
-   
+
 ### Step 4: Run the sample
 
 Clean the solution, rebuild the solution, and run it. You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
@@ -208,7 +199,7 @@ Explore the sample by signing in into the TodoList client, adding items to the T
 
 NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` sample. Each time you run the TodoListService API, your To-Do list will get emptied.
 
-> Did the sample not work for you as expected? Did you encounter issues trying this sample? Then please reach out to us using the [GitHub Issues](../../../../issues) page.	
+> Did the sample not work for you as expected? Did you encounter issues trying this sample? Then please reach out to us using the [GitHub Issues](../../../../issues) page. 
 
 ## How was the code created
 
@@ -335,13 +326,17 @@ If a token has delegated permission scopes, they will be in the `scp` or `http:/
 
 You can also expose app-only permissions if parts of your API needs to be accessed independently of a user (that is by a [daemon application](https://github.com/Azure-Samples/ms-identity-dotnetcore-daemon)).
 
+## Next chapter of the tutorial: the Web API itself calls another downstream Web API
+
+In the next chapter, we will enhance this Web API to call another downstream Web API (Microsoft Graph) on behalf of the user signed in to the WPF application. 
+
+See [2. Web API now calls Microsoft Graph](../2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README-Incremental.md)
+
 ## Community Help and Support
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
 Make sure that your questions or comments are tagged with [`msal` `dotnet`].
-
-If you find a bug in the sample, please raise the issue on [GitHub Issues](../../../issues).
 
 To provide a recommendation, visit the following [User Voice page](https://feedback.azure.com/forums/169401-azure-active-directory).
 

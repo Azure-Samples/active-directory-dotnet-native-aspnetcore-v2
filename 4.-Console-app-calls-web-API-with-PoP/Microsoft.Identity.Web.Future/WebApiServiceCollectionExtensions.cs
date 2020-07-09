@@ -42,7 +42,7 @@ namespace Microsoft.Identity.Web
                 // we inject our own multi-tenant validation logic (which even accepts both v1.0 and v2.0 tokens)
                 options.AccessTokenValidationParameters.IssuerValidator = AadIssuerValidator.GetIssuerValidator(options.Authority).Validate;
             });
-                
+
             return services;
         }
     }
