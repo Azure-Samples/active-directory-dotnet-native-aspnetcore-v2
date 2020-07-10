@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+// The following using statements were added for this sample.
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace TodoListClient
     /// </summary>
     public partial class MainWindow : Window
     {
+        //
         // The Client ID is used by the application to uniquely identify itself to Azure AD.
         // The Tenant is the name of the Azure AD tenant in which this application is registered.
         // The AAD Instance is the instance of Azure, for example public Azure or Azure China.
@@ -64,6 +66,7 @@ namespace TodoListClient
             _app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(Authority)
                 .WithDefaultRedirectUri()
+                .WithExperimentalFeatures()
                 .Build();
 
             TokenCacheHelper.EnableSerialization(_app.UserTokenCache);
@@ -84,11 +87,14 @@ namespace TodoListClient
                 return;
             }
 
+            HttpRequestMessage readRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(TodoListApiAddress));
+
             // Get an access token to call the To Do service.
             AuthenticationResult result = null;
             try
             {
                 result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+                    .WithProofOfPosession(readRequest)
                     .ExecuteAsync()
                     .ConfigureAwait(false);
 
@@ -123,7 +129,7 @@ namespace TodoListClient
             }
 
             // Once the token has been returned by MSAL, add it to the http authorization header, before making the call to access the To Do list service.
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("PoP", result.AccessToken);
 
             // Call the To Do list service.
             HttpResponseMessage response = await _httpClient.GetAsync(TodoListApiAddress);
@@ -141,14 +147,7 @@ namespace TodoListClient
             }
             else
             {
-                if (response.StatusCode == System.Net.HttpStatusCode.Forbidden && response.Headers.WwwAuthenticate.Any())
-                {
-                    await HandleChallengeFromWebApi(response, result.Account);
-                }
-                else
-                {
-                    await DisplayErrorMessage(response);
-                }
+                await DisplayErrorMessage(response);
             }
         }
 
@@ -168,75 +167,10 @@ namespace TodoListClient
             }
         }
 
-        /// <summary>
-        /// When the Web API needs consent, it can sent a 403 with information in the WWW-Authenticate header in 
-        /// order to challenge the user
-        /// </summary>
-        /// <param name="response">HttpResonse received from the service</param>
-        /// <returns></returns>
-        private async Task HandleChallengeFromWebApi(HttpResponseMessage response, IAccount account)
-        {
-            AuthenticationHeaderValue bearer = response.Headers.WwwAuthenticate.First(v => v.Scheme == "Bearer");
-            IEnumerable<string> parameters = bearer.Parameter.Split(',').Select(v => v.Trim()).ToList();
-            string clientId = GetParameter(parameters, "clientId");
-            string claims = GetParameter(parameters, "claims");
-            string[] scopes = GetParameter(parameters, "scopes")?.Split(',');
-            string proposedAction = GetParameter(parameters, "proposedAction");
-
-            string loginHint = account?.Username;
-            string domainHint = IsConsumerAccount(account) ? "consumers" : "organizations";
-            string extraQueryParameters = $"claims={claims}&domainHint={domainHint}";
-
-            if (proposedAction == "forceRefresh")
-            {
-                // Removes the account, but then re-signs-in
-                await _app.RemoveAsync(account);
-                await _app.AcquireTokenInteractive(scopes)
-                    .WithPrompt(Prompt.Consent)
-                    .WithLoginHint(loginHint)
-                    .WithExtraQueryParameters(extraQueryParameters)
-                    .WithAuthority(_app.Authority)
-                    .ExecuteAsync()
-                    .ConfigureAwait(false);
-            }
-            else if (proposedAction == "consent")
-            {
-                IPublicClientApplication pca = PublicClientApplicationBuilder.Create(clientId)
-                    .WithDefaultRedirectUri()
-                    .Build();
-                await pca.AcquireTokenInteractive(scopes)
-                    .WithPrompt(Prompt.Consent)
-                    .WithLoginHint(loginHint)
-                    .WithExtraQueryParameters(extraQueryParameters)
-                    .WithAuthority(pca.Authority)
-                    .ExecuteAsync()
-                    .ConfigureAwait(false);
-            }
-        }
-
-        /// <summary>
-        /// Tells if the account is a consumer account
-        /// </summary>
-        /// <param name="account">Account</param>
-        /// <returns><c>true</c> if the application supports MSA+AAD and the home tenant id of the account is the MSA tenant. <c>false</c>
-        /// otherwise (in particular if the app is a single-tenant app, returning <c>false</c> enables MSA accounts which are guest
-        /// of a directory</returns>
-        private static bool IsConsumerAccount(IAccount account)
-        {
-            const string msaTenantId = "9188040d-6c67-4c5b-b112-36a304b66dad";
-            return (Tenant == "common" || Tenant == "consumers") && account?.HomeAccountId.TenantId == msaTenantId;
-        }
-
-        private static string GetParameter(IEnumerable<string> parameters, string parameterName)
-        {
-            int offset = parameterName.Length + 1;
-            return parameters.FirstOrDefault(p => p.StartsWith($"{parameterName}="))?.Substring(offset)?.Trim('"');
-        }
-
         private async void AddTodoItem(object sender, RoutedEventArgs e)
         {
             var accounts = (await _app.GetAccountsAsync()).ToList();
-
+         
             if (!accounts.Any())
             {
                 MessageBox.Show("Please sign in first");
@@ -248,13 +182,17 @@ namespace TodoListClient
                 return;
             }
 
+            HttpRequestMessage writeRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(TodoListApiAddress));
+
             // Get an access token to call the To Do service.
             AuthenticationResult result = null;
             try
             {
                 result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+                    .WithProofOfPosession(writeRequest)
                     .ExecuteAsync()
                     .ConfigureAwait(false);
+
                 Dispatcher.Invoke(() =>
                 {
                     SetUserName(result.Account);
@@ -286,9 +224,12 @@ namespace TodoListClient
                 return;
             }
 
+            //
             // Call the To Do service.
+            //
+
             // Once the token has been returned by MSAL, add it to the http authorization header, before making the call to access the To Do service.
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("PoP", result.AccessToken);
 
             // Forms encode Todo item, to POST to the todo list web api.
             TodoItem todoItem = new TodoItem() { Title = TodoText.Text };
@@ -348,50 +289,50 @@ namespace TodoListClient
             }
             catch (MsalUiRequiredException)
             {
-            try
-            {
-                // Force a sign-in (Prompt.SelectAccount), as the MSAL web browser might contain cookies for the current user
-                // and we don't necessarily want to re-sign-in the same user
-                var result = await _app.AcquireTokenInteractive(Scopes)
-                    .WithAccount(accounts.FirstOrDefault())
-                    .WithPrompt(Prompt.SelectAccount)
-                    .WithExtraScopesToConsent(new[] { "user.read" })
-                    .ExecuteAsync()
-                    .ConfigureAwait(false);
+                try
+                {
+                    // Force a sign-in (Prompt.SelectAccount), as the MSAL web browser might contain cookies for the current user
+                    // and we don't necessarily want to re-sign-in the same user
+                    var result = await _app.AcquireTokenInteractive(Scopes)
+                        .WithAccount(accounts.FirstOrDefault())
+                        .WithPrompt(Prompt.SelectAccount)
+                        .ExecuteAsync()
+                        .ConfigureAwait(false);
 
-                Dispatcher.Invoke(() =>
-                {
-                    SignInButton.Content = ClearCacheString;
-                    SetUserName(result.Account);
-                    GetTodoList();
-                }
-                );
-            }
-            catch (MsalException ex)
-            {
-                if (ex.ErrorCode == "access_denied")
-                {
-                    // The user canceled sign in, take no action.
-                }
-                else
-                {
-                    // An unexpected error occurred.
-                    string message = ex.Message;
-                    if (ex.InnerException != null)
+                    Dispatcher.Invoke(() =>
                     {
-                        message += "Error Code: " + ex.ErrorCode + "Inner Exception : " + ex.InnerException.Message;
+                        SignInButton.Content = ClearCacheString;
+                        SetUserName(result.Account);
+                        GetTodoList();
+                    }
+                    );
+                }
+                catch (MsalException ex)
+                {
+                    if (ex.ErrorCode == "access_denied")
+                    {
+                        // The user canceled sign in, take no action.
+                    }
+                    else
+                    {
+                        // An unexpected error occurred.
+                        string message = ex.Message;
+                        if (ex.InnerException != null)
+                        {
+                            message += "Error Code: " + ex.ErrorCode + "Inner Exception : " + ex.InnerException.Message;
+                        }
+
+                        MessageBox.Show(message);
                     }
 
-                    MessageBox.Show(message);
+                    Dispatcher.Invoke(() =>
+                    {
+                        UserName.Content = Properties.Resources.UserNotSignedIn;
+                    });
                 }
-
-                Dispatcher.Invoke(() =>
-                {
-                    UserName.Content = Properties.Resources.UserNotSignedIn;
-                });
             }
         }
-        }
+
         // Set user name to text box
         private void SetUserName(IAccount userInfo)
         {

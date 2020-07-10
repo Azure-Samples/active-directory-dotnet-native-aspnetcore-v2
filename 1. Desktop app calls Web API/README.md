@@ -6,6 +6,15 @@ level: 200
 client: .NET Desktop (WPF)
 service: ASP.NET Core Web API
 endpoint: Microsoft identity platform
+page_type: sample
+languages:
+  - csharp  
+products:
+  - azure
+  - azure-active-directory  
+  - dotnet
+  - office-ms-graph
+description: "Sign-in a user with the Microsoft Identity Platform in a WPF Desktop application and call an ASP.NET Core Web API"
 ---
 # Sign-in a user with the Microsoft Identity Platform in a WPF Desktop application and call an ASP.NET Core Web API
 
@@ -22,7 +31,7 @@ endpoint: Microsoft identity platform
   - [Pre-requisites](#pre-requisites)
   - [Step 1:  Clone or download this repository](#step-1-clone-or-download-this-repository)
   - [Step 2:  Register the sample application with your Azure Active Directory tenant](#step-2-register-the-sample-application-with-your-azure-active-directory-tenant)
-  - [Step 4: Run the sample](#step-4-run-the-sample)
+  - [Step 3: Run the sample](#step-3-run-the-sample)
 - [Choosing which scopes to expose](#choosing-which-scopes-to-expose)
 - [Community Help and Support](#community-help-and-support)
 - [Contributing](#contributing)
@@ -37,6 +46,7 @@ An on-demand video was created for the Build 2018 event, featuring this scenario
 ### Overview
 
 This sample presents an ASP.NET core Web API, protected by Azure AD OAuth Bearer Authorization. The Web API is called by a .NET Desktop WPF application.
+
 The .Net application uses the Microsoft Authentication Library [MSAL.NET](https://aka.ms/msal-net) to obtain a JWT [Access Token](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) through the [OAuth 2.0](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The access token is sent to the ASP.NET Core Web API, which authorizes the user using the ASP.NET JWT Bearer Authentication middleware.
 
  This sub-folder contains a Visual Studio solution made of two applications: the desktop application (TodoListClient), and the Web API (TodoListService).
@@ -80,13 +90,13 @@ cd "1. Desktop app calls Web API"
 
 or download and extract the repository .zip file.
 
-> Given that the name of the sample is quiet long, and so are the names of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
+> Given that the name of the sample is quite long, and so are the names of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
 ### Step 2:  Register the sample application with your Azure Active Directory tenant
 
 There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
 
-- either follow the steps [Step 2: Register the sample with your Azure Active Directory tenant](#step-2-register-the-sample-with-your-azure-active-directory-tenant) and [Step 3:  Configure the sample to use your Azure AD tenant](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
+- either follow the steps below for manual registration
 - or use PowerShell scripts that:
   - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you. Note that this works for Visual Studio only.
   - modify the Visual Studio projects' configuration files.
@@ -129,7 +139,6 @@ As a first step you'll need to:
 
 #### Register the service app (TodoListService (active-directory-dotnet-native-aspnetcore-v2))
 
-
 1. Navigate to the Microsoft identity platform for developers [App registrations](https://go.microsoft.com/fwlink/?linkid=2083908) page.
 1. Select **New registration**.
 1. In the **Register an application page** that appears, enter your application's registration information:
@@ -138,7 +147,7 @@ As a first step you'll need to:
 1. Select **Register** to create the application.
 1. In the app's registration screen, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
 1. Select **Save** to save your changes.
-1. In the app's registration screen, click on the **Expose an API** blade to the left to open the page where you can declare the parameters to expose this app as an API for which client applications can obtain [access tokens](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) for.
+1. In the app's registration screen, select the **Expose an API** blade to the left to open the page where you can declare the parameters to expose this app as an API for which client applications can obtain [access tokens](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) for.
 The first thing that we need to do is to declare the unique [resource](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow) URI that the clients will be using to obtain access tokens for this API. To declare an resource URI, follow the following steps:
    - Click `Set` next to the **Application ID URI** to generate a URI that is unique for this app.
    - For this sample, accept the proposed Application ID URI (api://{clientId}) by selecting **Save**.
@@ -153,7 +162,7 @@ The first thing that we need to do is to declare the unique [resource](https://d
         - Keep **State** as **Enabled**
         - Click on the **Add scope** button on the bottom to save this scope.
 
-##### Configure the  service app (TodoListService (active-directory-dotnet-native-aspnetcore-v2)) to use your app registration
+#### Configure the  service app (TodoListService (active-directory-dotnet-native-aspnetcore-v2)) to use your app registration
 
 Open the project in your IDE (like Visual Studio) to configure the code.
 >In the steps below, "ClientID" is the same as "Application ID" or "AppId".						   					
@@ -183,17 +192,17 @@ Open the project in your IDE (like Visual Studio) to configure the code.
    - In the **Delegated permissions** section, select the **access_as_user** in the list. Use the search box if necessary.
    - Click on the **Add permissions** button at the bottom.
 
-##### Configure the  client app (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) to use your app registration
+#### Configure the  client app (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) to use your app registration
 
 Open the project in your IDE (like Visual Studio) to configure the code.
->In the steps below, "ClientID" is the same as "Application ID" or "AppId".																																						  
+>In the steps below, "ClientID" is the same as "Application ID" or "AppId".												  
 1. Open the `TodoListClient\App.Config` file
 1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
 1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListClient (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Azure portal.
 1. Find the app key `todo:TodoListScope` and replace the existing value with Scope.
 1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService (active-directory-dotnet-native-aspnetcore-v2) project (by default `https://localhost:44351/`).
    
-### Step 4: Run the sample
+### Step 3: Run the sample
 
 Clean the solution, rebuild the solution, and run it. You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
 
@@ -204,7 +213,7 @@ When you start the Web API from Visual Studio, depending on the browser you use,
 
 This behavior is expected as the browser is not authenticated. The WPF application will be authenticated, so it will be able to access the Web API.
 
-Explore the sample by signing in into the TodoList client, adding items to the To Do list, removing the user account (clearing the cache), and starting again.  As explained, if you stop the application without removing the user account, the next time you run the application, you won't be prompted to sign in again. That is because the sample implements a persistent cache for MSAL, and remembers the tokens from the previous run.
+Explore the sample by signing in into the TodoList client, adding items to the To Do list, removing the user account (clearing the cache), and starting again. As explained, if you stop the application without removing the user account, the next time you run the application, you won't be prompted to sign in again. That is because the sample implements a persistent cache for MSAL, and remembers the tokens from the previous run.
 
 NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` sample. Each time you run the TodoListService API, your To-Do list will get emptied.
 
@@ -342,7 +351,7 @@ You can also expose app-only permissions if parts of your API needs to be access
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`msal` `dotnet`].
+Make sure that your questions or comments are tagged with [`azure-active-directory` `msal` `dotnet`].
 
 If you find a bug in the sample, please raise the issue on [GitHub Issues](../../../issues).
 
