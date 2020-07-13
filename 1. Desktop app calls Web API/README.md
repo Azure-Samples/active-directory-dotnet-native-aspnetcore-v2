@@ -298,10 +298,10 @@ Replace:
 With:
 
 ```CSharp
-services.AddProtectedWebApi(Configuration);
+services.AddMicrosoftWebApiAuthentication(Configuration);
 ```
 
-The method `AddProtectedWebApi` in Microsoft.Identity.Web ensures that:
+The method `AddMicrosoftWebApiAuthentication` in Microsoft.Identity.Web ensures that:
 
 - the tokens are validated with Microsoft Identity Platform 
 - the valid audiences are both the ClientID of our Web API (default value of `options.Audience` with the ASP.NET Core template) and api://{ClientID}
@@ -323,12 +323,15 @@ If you are not using Visual Studio, edit the `TodoListService\Properties\launchs
 
 ## Choosing which scopes to expose
 
-This sample exposes a delegated permission (access_as_user) that will be presented in the access token claim. The method `AddProtectedWebApi` does not validate the scope, but Microsoft.Identity.Web has a HttpContext extension method, `VerifyUserHasAnyAcceptedScope`, where you can validate the scope as below:
+This sample exposes a delegated permission (access_as_user) that will be presented in the access token claim. The method `AddMicrosoftWebApiAuthentication` does not validate the scope, but Microsoft.Identity.Web has a HttpContext extension method, `VerifyUserHasAnyAcceptedScope`, where you can validate the scope, from a controller action, as below:
 
 ```csharp
-HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+public IEnumerable<TodoItem> Get()
+{
+ HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+ // process the action
+}
 ```
-
 ### For delegated permissions how to access scopes
 
 If a token has delegated permission scopes, they will be in the `scp` or `http://schemas.microsoft.com/identity/claims/scope` claim.

@@ -304,12 +304,12 @@ Update `Startup.cs` file:
   by
 
   ```csharp
-  services.AddProtectedWebApi(Configuration)
-          .AddProtectedApiCallsWebApis(Configuration)
+  services.AddMicrosoftWebApiAuthentication(Configuration)
+          .AddMicrosoftWebApiCallsWebApi(Configuration)
           .AddInMemoryTokenCaches();
   ```
 
-  `AddProtectedWebApi` does the following:
+  `AddMicrosoftWebApiAuthentication` does the following:
   - add the **JwtBearerAuthenticationScheme** (Note the replacement of BearerAuthenticationScheme by JwtBearerAuthenticationScheme)
   - set the authority to be the Microsoft identity platform identity
   - set the audiences to be validated
@@ -322,7 +322,7 @@ Update `Startup.cs` file:
 
   The implementations of these classes are in the [Microsoft.Identity.Web](https://github.com/AzureAD/microsoft-identity-web) library, and they are designed to be reusable in your applications (Web apps and Web apis).
 
-  `AddProtectedApiCallsWebApis` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and in this event, adds the user account into MSAL.NET's user token cache.
+  `AddMicrosoftWebApiCallsWebApi` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and in this event, adds the user account into MSAL.NET's user token cache.
 
   `AddInMemoryTokenCaches` adds an in memory token cache provider, which will cache the Access Tokens acquired for the downstream Web API.
 
@@ -363,7 +363,7 @@ This method:
         }
         catch (MsalUiRequiredException ex)
         {
-            tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(scopes, ex);
+            await tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
             return string.Empty;
         }
     }
@@ -375,7 +375,7 @@ This method:
 
 An interesting piece is how `MsalUiRequiredException` are handled. These exceptions are typically sent by Azure AD when there is a need for a user interaction. This can be the case when the user needs to re-sign-in, or needs to grant some additional consent, or to obtain additional claims. For instance, the user might need to do multi-factor authentication required specifically by a specific downstream API. When these exceptions happen, given that the Web API does not have any UI, it needs to challenge the client app passing all the required information, so this client app can handle the interaction with the user.
 
-This sample uses the `ReplyForbiddenWithWwwAuthenticateHeader` available on the `TokenAcquisition` service (part of Microsoft.Identity.Web library), which uses the HttpResponse to:
+This sample uses the `ReplyForbiddenWithWwwAuthenticateHeaderAsync` available on the `TokenAcquisition` service (part of Microsoft.Identity.Web library), which uses the HttpResponse to:
 
 - Send an HTTP 403 (Forbidden) to the client app
 - Set information in the www-Authenticate header of the HttpResponse with information that would enable a client to get more consent from the user that is:

@@ -26,7 +26,8 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddProtectedWebApi(options =>
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                     .AddMicrosoftWebApi(options =>
             {
                 Configuration.Bind("AzureAd", options);
                 options.Events = new JwtBearerEvents();
@@ -47,7 +48,7 @@ namespace TodoListService
             {
                 Configuration.Bind("AzureAd", options);
             })
-                .AddProtectedWebApiCallsProtectedWebApi(Configuration)
+                .AddMicrosoftWebApiCallsWebApi(Configuration)
                 .AddInMemoryTokenCaches();
 
             services.AddControllers();
