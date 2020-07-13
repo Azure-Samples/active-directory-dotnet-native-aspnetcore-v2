@@ -292,7 +292,7 @@ The change is to ensure that the Web API allows access to it's own client.
 public void ConfigureServices(IServiceCollection services)
 {      
     services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddMicrosoftWebApi(options => 
+                .AddMicrosoftWebApi(options =>
     {
         Configuration.Bind("AzureAd", options);
         options.Events = new JwtBearerEvents();
