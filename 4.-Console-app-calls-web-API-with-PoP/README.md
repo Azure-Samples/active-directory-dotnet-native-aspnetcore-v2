@@ -14,9 +14,9 @@ products:
   - azure-active-directory  
   - dotnet
   - office-ms-graph
-description: "Sign-in a user with the Microsoft Identity Platform in a WPF Desktop application and call an ASP.NET Core Web API using Proof of Possession token"
+description: "Sign-in a user with the Microsoft Identity Platform in a console application and call an ASP.NET Core Web API using Proof of Possession token"
 ---
-# Sign-in a user with the Microsoft Identity Platform in a WPF Desktop application and call an ASP.NET Core Web API using Proof of Possession token
+# Sign-in a user with the Microsoft Identity Platform in a console application and call an ASP.NET Core Web API using Proof of Possession token
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
@@ -45,7 +45,7 @@ or Microsoft personal accounts (formerly live account). The access token is prot
 
 ### Overview
 
-This sample presents an ASP.NET core Web API, protected by Azure AD [Proof of Possession (PoP)](https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/SignedHttpRequest-aka-PoP-(Proof-of-Possession)) Authorization. The Web API is called by a .NET Desktop WPF application.
+This sample presents an ASP.NET core Web API, protected by Azure AD [Proof of Possession (PoP)](https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/SignedHttpRequest-aka-PoP-(Proof-of-Possession)) Authorization. The Web API is called by a .NET console application.
 
 The .Net application uses the Microsoft Authentication Library [MSAL.NET](https://aka.ms/msal-net) to obtain a JWT [Access Token](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) through the [OAuth 2.0](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The access token is sent to the ASP.NET Core Web API, which authorizes the user using the ASP.NET JWT Bearer Authentication middleware.
 
@@ -57,13 +57,12 @@ The .Net application uses the Microsoft Authentication Library [MSAL.NET](https:
 
 The Web API (TodoListService) maintains an in-memory collection of to-do items for each authenticated user. Several applications signed-in under the same identity will share the same to-do list.
 
-The WPF application (TodoListClient) allows a user to:
+The desktop application (TodoListClient) allows a user to:
 
-- Sign-in. The first time a user signs in, a consent screen is presented where the user consents for the application accessing the TodoList Service on their behalf.
-- When the user has signed-in, the user is presented with a list of to-do items fetched from the Web API for this signed-in identity.
-- The user can add more to-do items by clicking on *Add item* button.
+- Enter an item. When the user enters the first item, sign-in screen is displayed. The first time a user signs in, a consent screen is presented where the user consents for the application accessing the TodoList Service on their behalf.
+- Each time, the user enters an item, a list of to-do items are fetched from the Web API for this signed-in identity.
 
-Next time a user runs the application, the user is signed-in with the same identity as the WPF application maintains a cache on disk. Users can clear the cache (which will have the effect of them signing out).
+Next time a user runs the application, the user is signed-in with the same identity as the console application maintains a cache on disk. Users can clear the cache (which will have the effect of them signing out).
 
 ![TodoList Client](./ReadmeFiles/todolist-client.png)
 
@@ -71,7 +70,7 @@ Next time a user runs the application, the user is signed-in with the same ident
 
 ### Pre-requisites
 
-- [Visual Studio 2019](https://aka.ms/vsdownload) or just the [.NET Core SDK](https://www.microsoft.com/net/learn/get-started)
+- This sample only works with .NET Framework (PoP is not yet implemented for .NET Core in MSAL.NET)
 - An Internet connection
 - A Windows machine (necessary if you want to run the app on Windows)
 - An OS X machine (necessary if you want to run the app on Mac)
@@ -211,7 +210,7 @@ When you start the Web API from Visual Studio, depending on the browser you use,
 - an empty web page (with Microsoft Edge)
 - or an error HTTP 401 (with Chrome)
 
-This behavior is expected as the browser is not authenticated. The WPF application will be authenticated, so it will be able to access the Web API.
+This behavior is expected as the browser is not authenticated. The console application will be authenticated, so it will be able to access the Web API.
 
 Explore the sample by signing in into the TodoList client, adding items to the To Do list, removing the user account (clearing the cache), and starting again. As explained, if you stop the application without removing the user account, the next time you run the application, you won't be prompted to sign in again. That is because the sample implements a persistent cache for MSAL, and remembers the tokens from the previous run.
 
@@ -219,7 +218,7 @@ NOTE: Remember, the To-Do list is stored in memory in this `TodoListService-v2` 
 
 ## How was the code created
 
-### Code for the WPF app
+### Code for the console app
 
 The focus of this tutorial is PoP (Proof of Possession).
 
@@ -235,58 +234,42 @@ With PoP, the programming model is a bit different from the way MSAL.NET usually
         .Build();
    ```
 
-- Create an `HttpRequestMessage` by passing the verb (for instance `HttpMethod.Get`) and the URL of the Web API to call.
+- Create an `HttpRequestMessage` by passing the verb (for instance `HttpMethod.Post`) and the URL of the Web API to call.
    ```csharp
-    HttpRequestMessage readRequest =
-      new HttpRequestMessage(HttpMethod.Get, new Uri(TodoListApiAddress));
+    HttpRequestMessage writeRequest =
+      new HttpRequestMessage(HttpMethod.Post, new Uri(TodoListApiAddress));
    ```
 
-- Call the `AcquireTokenSilent` and pass `readRequest` parameter to `WithProofOfPossesssion` method as shown below:
+- Call the `AcquireTokenSilent` or `AcquireTokenInteractive`, and pass `writeRequest` parameter to `WithProofOfPossesssion` method as shown below:
 
 ```csharp
-private async Task GetTodoList(bool isAppStarting)
-{
-    var accounts = (await _app.GetAccountsAsync()).ToList();
+    TodoItem todoItem = ReadItemFromConsole();
 
-    HttpRequestMessage readRequest = new HttpRequestMessage(HttpMethod.Get, new Uri(TodoListApiAddress));
-											  
-
-    AuthenticationResult result = null;
-								  
+    // Add Pop token to the HttpRequestMessage, attempting from the cache
+    // and otherwise interactively 
     try
     {
-																	  
-        result = await _app.AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
-            .WithProofOfPosession(readRequest)
-            .ExecuteAsync()
-            .ConfigureAwait(false);
-
-        Dispatcher.Invoke(
-            () =>
-            {
-                ...
-            });
+        var account = (await app.GetAccountsAsync()).FirstOrDefault();
+        result = await app.AcquireTokenSilent(Scopes, account)
+                            .WithProofOfPosession(writeRequest)
+                            .ExecuteAsync();   
     }
     catch (MsalUiRequiredException)
     {
-        ...
-    }
-    catch (MsalException ex)
-    {
-       ...
+        result = await app.AcquireTokenInteractive(Scopes)
+                                .WithProofOfPosession(writeRequest)
+                                .ExecuteAsync();
     }
 
-    // Once the token has been returned by MSAL, add it to the http authorization header, before making the call to access the To Do list service.
-    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("PoP", result.AccessToken);
-
-    // Call the To Do list service.
-    HttpResponseMessage response = await _httpClient.GetAsync(TodoListApiAddress);
-   ...
-}
-																  
-								   
-											 
-``` 
+    // Call the Web API
+    string json = JsonConvert.SerializeObject(todoItem);
+    StringContent content = new StringContent(json,
+                                              Encoding.UTF8,
+                                              "application/json");
+    writeRequest.Content = content;
+    await httpClient.SendAsync(writeRequest);
+			
+```
 
 ### Code for the Web API (TodoListService)
 
