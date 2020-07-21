@@ -125,7 +125,7 @@ Update `Startup.cs` file:
 - In the `ConfigureServices` method, replace:
 
   ```CSharp
-  services.AddProtectedWebApi(Configuration);
+  services.AddMicrosoftWebApiAuthentication(Configuration);
 																			   
    ```
 
