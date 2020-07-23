@@ -16,19 +16,16 @@ endpoint: Microsoft identity platform
 ### Table of content
 
 - [About this sample](#about-this-sample)
-    - [Scenario](#scenario)
-    - [Overview](#overview)
-    - [User experience when using this sample](#user-experience-when-using-this-sample)
+  - [Scenario](#scenario)
+  - [Overview](#overview)
+  - [User experience when using this sample](#user-experience-when-using-this-sample)
 - [How to run this sample](#how-to-run-this-sample)
-    - [Step 1:  In the downloaded folder](#step-1--in-the-downloaded-folder)
-    - [Step 2:  Register the sample application with your Azure Active Directory tenant](#step-2--register-the-sample-application-with-your-azure-active-directory-tenant)
-    - [Step 3:  Configure the sample to use your Azure AD tenant](#step-3--configure-the-sample-to-use-your-azure-ad-tenant)
-    - [Step 4: Run the sample](#step-4-run-the-sample)
-    - [Troubleshooting](#troubleshooting)
+  - [Step 1:  In the downloaded folder](#step-1-in-the-downloaded-folder)
+  - [Step 2:  Register the sample application with your Azure Active Directory tenant](#step-2-register-the-sample-application-with-your-azure-active-directory-tenant)
+  - [Step 3: Run the sample](#step-3-run-the-sample)
 - [How was the code created](#how-was-the-code-created)
 - [Choosing which scopes to expose](#choosing-which-scopes-to-expose)
 - [Next chapter of the tutorial: the Web API itself calls another downstream Web API](#next-chapter-of-the-tutorial-the-web-api-itself-calls-another-downstream-web-api)
-- [How to deploy this sample to Azure](#how-to-deploy-this-sample-to-azure)
 - [Community Help and Support](#community-help-and-support)
 - [Contributing](#contributing)
 - [More information](#more-information)
@@ -76,7 +73,7 @@ cd "1. Desktop app calls Web API"
 
 There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
 
-- either follow the steps [Step 2: Register the sample with your Azure Active Directory tenant](#step-2-register-the-sample-with-your-azure-active-directory-tenant) and [Step 3:  Configure the sample to use your Azure AD tenant](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
+- either follow the steps below for manual registration
 - or use PowerShell scripts that:
   - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you. Note that this works for Visual Studio only.
   - modify the Visual Studio projects' configuration files.
@@ -119,7 +116,6 @@ As a first step you'll need to:
 
 #### Register the service app (TodoListService (active-directory-dotnet-native-aspnetcore-v2))
 
-
 1. Navigate to the Microsoft identity platform for developers [App registrations](https://go.microsoft.com/fwlink/?linkid=2083908) page.
 1. Select **New registration**.
 1. In the **Register an application page** that appears, enter your application's registration information:
@@ -143,10 +139,10 @@ The first thing that we need to do is to declare the unique [resource](https://d
         - Keep **State** as **Enabled**
         - Click on the **Add scope** button on the bottom to save this scope.
 
-##### Configure the  service app (TodoListService (active-directory-dotnet-native-aspnetcore-v2)) to use your app registration
+#### Configure the  service app (TodoListService (active-directory-dotnet-native-aspnetcore-v2)) to use your app registration
 
 Open the project in your IDE (like Visual Studio) to configure the code.
->In the steps below, "ClientID" is the same as "Application ID" or "AppId".						   					
+>In the steps below, "ClientID" is the same as "Application ID" or "AppId".	
 
 1. Open the `TodoListService\appsettings.json` file
 2. Find the app key `Domain` and replace the existing value with your Azure AD tenant name.
@@ -165,7 +161,6 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 1. In the app's registration screen, select **Authentication** in the menu.
    - If you don't have a platform added, select **Add a platform** and select the **Public client (mobile & desktop)** option.
    - In the **Redirect URIs** | **Suggested Redirect URIs for public clients (mobile, desktop)** section, select **https://login.microsoftonline.com/common/oauth2/nativeclient**
-
 1. Select **Save** to save your changes.
 1. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the Apis that your application needs.
    - Click the **Add a permission** button and then,
@@ -174,17 +169,17 @@ Open the project in your IDE (like Visual Studio) to configure the code.
    - In the **Delegated permissions** section, select the **access_as_user** in the list. Use the search box if necessary.
    - Click on the **Add permissions** button at the bottom.
 
-##### Configure the  client app (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) to use your app registration
+#### Configure the  client app (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) to use your app registration
 
 Open the project in your IDE (like Visual Studio) to configure the code.
->In the steps below, "ClientID" is the same as "Application ID" or "AppId".																																						  
+>In the steps below, "ClientID" is the same as "Application ID" or "AppId".						  
 1. Open the `TodoListClient\App.Config` file
-1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
-1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListClient (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Azure portal.
-1. Find the app key `todo:TodoListScope` and replace the existing value with Scope.
-1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService (active-directory-dotnet-native-aspnetcore-v2) project (by default `https://localhost:44351/`).
+2. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
+3. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListClient (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Azure portal.
+4. Find the app key `todo:TodoListScope` and replace the existing value with Scope.
+5. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService (active-directory-dotnet-native-aspnetcore-v2) project (by default `https://localhost:44351/`).
 
-### Step 4: Run the sample
+### Step 3: Run the sample
 
 Clean the solution, rebuild the solution, and run it. You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
 
@@ -340,7 +335,7 @@ See [2. Web API now calls Microsoft Graph](../2.%20Web%20API%20now%20calls%20Mic
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`msal` `dotnet`].
+Make sure that your questions or comments are tagged with [`azure-active-directory` `msal` `dotnet`].
 
 To provide a recommendation, visit the following [User Voice page](https://feedback.azure.com/forums/169401-azure-active-directory).
 
