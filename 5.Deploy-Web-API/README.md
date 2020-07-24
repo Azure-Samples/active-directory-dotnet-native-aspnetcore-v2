@@ -89,7 +89,7 @@ Here we discuss some of the more important aspects of deploying multi-tenant app
     </PropertyGroup>
  ```
 
-> [!NOTE] Did the sample not work for you as expected? Did you encounter issues trying this sample? Then please reach out to us using the [GitHub Issues](../issues) page.
+> [!NOTE] Did the sample not work for you as expected? Did you encounter issues trying this sample? Then please reach out to us using the [GitHub Issues](../../../issues) page.
 
 ## More information
 
