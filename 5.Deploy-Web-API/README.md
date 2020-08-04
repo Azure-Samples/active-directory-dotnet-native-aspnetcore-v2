@@ -1,6 +1,5 @@
 ---
 page_type: sample
-author: Shama-K
 languages:
 - csharp
 products:
