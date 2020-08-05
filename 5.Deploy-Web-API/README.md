@@ -5,7 +5,6 @@ languages:
 products:
 - dotnet
 - azure-active-directory
-- microsoft-graph-api
 - azure-app-services
 - azure-storage
 description: "Deploying a protected ASP.NET Core web API and calls the API from Desktop application"

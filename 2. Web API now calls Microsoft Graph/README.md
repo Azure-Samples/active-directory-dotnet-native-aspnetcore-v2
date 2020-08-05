@@ -1,11 +1,4 @@
 ---
-services: active-directory
-platforms: dotnet
-author: jmprieur
-level: 300
-client: .NET Desktop (WPF)
-service: ASP.NET Core Web API, Microsoft Graph
-endpoint: Microsoft identity platform
 page_type: sample
 languages:
   - csharp  
@@ -13,7 +6,6 @@ products:
   - azure
   - azure-active-directory  
   - aspnet-core
-  - office-ms-graph
 description: "Sign a user into a Desktop application using Microsoft Identity Platform and call a protected ASP.NET Core Web API, which calls Microsoft Graph on-behalf of the user."
 ---
 # Sign a user into a Desktop application using Microsoft Identity Platform and call a protected ASP.NET Core Web API, which calls Microsoft Graph on-behalf of the user
