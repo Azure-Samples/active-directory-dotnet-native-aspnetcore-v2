@@ -1,11 +1,4 @@
 ---
-services: active-directory
-platforms: dotnet
-author: jmprieur
-level: 300
-client: .NET Desktop (WPF)
-service: ASP.NET Core Web API, Microsoft Graph
-endpoint: Microsoft identity platform
 page_type: sample
 languages:
   - csharp  
@@ -13,7 +6,6 @@ products:
   - azure
   - azure-active-directory  
   - dotnet
-  - office-ms-graph
 description: "This sample demonstrates a .NET Desktop (WPF) application calling a ASP.NET Core Web API that is secured using Azure Active Directory"
 ---
 

@@ -1,11 +1,4 @@
 ---
-services: active-directory
-platforms: dotnet
-author: jmprieur
-level: 200
-client: .NET Desktop (WPF)
-service: ASP.NET Core Web API
-endpoint: Microsoft identity platform
 page_type: sample
 languages:
   - csharp  
@@ -13,7 +6,6 @@ products:
   - azure
   - azure-active-directory  
   - dotnet
-  - office-ms-graph
 description: "Sign-in a user with the Microsoft Identity Platform in a WPF Desktop application and call an ASP.NET Core Web API"
 ---
 # Sign-in a user with the Microsoft Identity Platform in a WPF Desktop application and call an ASP.NET Core Web API
