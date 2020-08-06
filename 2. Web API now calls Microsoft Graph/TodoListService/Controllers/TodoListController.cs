@@ -97,9 +97,9 @@ namespace TodoListService.Controllers
                 dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
                 return me.UserPrincipalName;
             }
-            catch (MsalUiRequiredException ex)
+            catch (MicrosoftIdentityWebChallengeUserException ex)
             {
-                await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
+                await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex.MsalUiRequiredException);
                 return string.Empty;
             }
         }
