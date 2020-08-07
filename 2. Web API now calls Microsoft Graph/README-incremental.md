@@ -180,7 +180,7 @@ This method:
         }
         catch (MsalUiRequiredException ex)
         {
-            await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
+            await tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
             return string.Empty;
         }
     }
