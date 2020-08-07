@@ -178,6 +178,11 @@ This method:
             await tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex.MsalUiRequiredException);
             return string.Empty;
         }
+        catch (MsalUiRequiredException ex)
+        {
+            await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
+            return string.Empty;
+        }
     }
     ```
 
