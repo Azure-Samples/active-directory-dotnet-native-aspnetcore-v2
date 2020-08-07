@@ -169,9 +169,14 @@ This method:
         // we use MSAL.NET to get a token to call the API On Behalf Of the current user
         try
         {
-            string accessToken = await tokenAcquisition.GetAccessTokenOnBehalfOfUser(HttpContext, scopes);
+            string accessToken = await tokenAcquisition.GetAccessTokenForUserAsync(scopes);
             dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
             return me.userPrincipalName;
+        }
+        catch (MicrosoftIdentityWebChallengeUserException ex)
+        {
+            await tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex.MsalUiRequiredException);
+            return string.Empty;
         }
         catch (MsalUiRequiredException ex)
         {

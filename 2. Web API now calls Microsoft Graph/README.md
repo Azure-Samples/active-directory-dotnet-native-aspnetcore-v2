@@ -338,9 +338,14 @@ This method:
         // we use MSAL.NET to get a token to call the API On Behalf Of the current user
         try
         {
-            string accessToken = await tokenAcquisition.GetAccessTokenOnBehalfOfUser(HttpContext, scopes);
+            string accessToken = await tokenAcquisition.GetAccessTokenForUserAsync(scopes);
             dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
             return me.userPrincipalName;
+        }
+        catch (MicrosoftIdentityWebChallengeUserException ex)
+        {
+            await tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex.MsalUiRequiredException);
+            return string.Empty;
         }
         catch (MsalUiRequiredException ex)
         {
@@ -354,7 +359,7 @@ This method:
 
 #### On the Web API side
 
-An interesting piece is how `MsalUiRequiredException` are handled. These exceptions are typically sent by Azure AD when there is a need for a user interaction. This can be the case when the user needs to re-sign-in, or needs to grant some additional consent, or to obtain additional claims. For instance, the user might need to do multi-factor authentication required specifically by a specific downstream API. When these exceptions happen, given that the Web API does not have any UI, it needs to challenge the client app passing all the required information, so this client app can handle the interaction with the user.
+An interesting piece is how `MicrosoftIdentityWebChallengeUserException` are handled. These exceptions are typically sent by Azure AD when there is a need for a user interaction. This can be the case when the user needs to re-sign-in, or needs to grant some additional consent, or to obtain additional claims. For instance, the user might need to do multi-factor authentication required specifically by a specific downstream API. When these exceptions happen, given that the Web API does not have any UI, it needs to challenge the client app passing all the required information, so this client app can handle the interaction with the user.
 
 This sample uses the `ReplyForbiddenWithWwwAuthenticateHeaderAsync` available on the `TokenAcquisition` service (part of Microsoft.Identity.Web library), which uses the HttpResponse to:
 
