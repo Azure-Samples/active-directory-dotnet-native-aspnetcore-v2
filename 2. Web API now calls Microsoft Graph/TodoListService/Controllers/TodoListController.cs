@@ -102,6 +102,11 @@ namespace TodoListService.Controllers
                 await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex.MsalUiRequiredException);
                 return string.Empty;
             }
+            catch (MsalUiRequiredException ex)
+            {
+                await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
+                return string.Empty;
+            }
         }
 
         private static async Task<dynamic> CallGraphApiOnBehalfOfUser(string accessToken)
