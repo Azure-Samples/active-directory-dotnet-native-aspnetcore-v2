@@ -1,5 +1,6 @@
 ---
 page_type: sample
+urlFragment: 1-desktop-app-calls-web-api
 languages:
   - csharp  
 products:

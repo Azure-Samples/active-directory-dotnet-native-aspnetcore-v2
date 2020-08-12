@@ -1,5 +1,6 @@
 ---
 page_type: sample
+urlFragment: 2-web-api-now-calls-microsoft-graph
 languages:
   - csharp  
 products:
