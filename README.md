@@ -6,6 +6,7 @@ products:
   - azure
   - azure-active-directory
 page_type: sample
+urlFragment: active-directory-dotnet-native-aspnetcore-v2
 description: "Protect an ASP.NET Core Web API with the Microsoft identity platform."
 ---
 # Protecting an ASP.NET Core Web API using Microsoft identity platform

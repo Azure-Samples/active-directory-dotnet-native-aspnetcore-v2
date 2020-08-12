@@ -1,5 +1,6 @@
 ---
 page_type: sample
+urlFragment: 3-web-api-call-microsoft-graph-for-personal-accounts
 languages:
   - csharp  
 products:
