@@ -158,8 +158,8 @@ The code for the TodoListService starts in Startup.cs, where you will call `AddP
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddMicrosoftWebApiAuthentication(Configuration)
-            .AddMicrosoftWebApiCallsWebApi(Configuration)
+    services.AddMicrosoftIdentityWebApiAuthentication(Configuration)
+            .EnableTokenAcquisitionToCallDownstreamApi()
             .AddInMemoryTokenCaches();
     services.AddProofOfPosession(Configuration);
     services.AddControllers();

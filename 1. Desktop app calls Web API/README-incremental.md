@@ -284,10 +284,10 @@ Replace:
 With:
 
 ```CSharp
-services.AddMicrosoftWebApiAuthentication(Configuration);
+services.AddMicrosoftIdentityWebApiAuthentication(Configuration);
 ```
 
-The method `AddMicrosoftWebApiAuthentication` in Microsoft.Identity.Web ensures that:
+The method `AddMicrosoftIdentityWebApiAuthentication` in Microsoft.Identity.Web ensures that:
 
 - the tokens are validated with Microsoft Identity Platform 
 - the valid audiences are both the ClientID of our Web API (default value of `options.Audience` with the ASP.NET Core template) and api://{ClientID}

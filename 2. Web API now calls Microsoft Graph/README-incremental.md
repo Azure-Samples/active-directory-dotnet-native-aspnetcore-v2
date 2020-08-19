@@ -132,11 +132,12 @@ Update `Startup.cs` file:
   by
 
   ```csharp
-  services.AddMicrosoftWebApiAuthentication(Configuration)
-          .AddMicrosoftWebApiCallsWebApi(Configuration)
+  services.AddMicrosoftIdentityWebApiAuthentication(Configuration)
+          .EnableTokenAcquisitionToCallDownstreamApi()
           .AddInMemoryTokenCaches();
   ```
-  `AddMicrosoftWebApiAuthentication` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and in this event, adds the user account into MSAL.NET's user token cache.
+
+  `EnableTokenAcquisitionToCallDownstreamApi` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and in this event, adds the user account into MSAL.NET's user token cache.
 
   `AddInMemoryTokenCaches` adds an in memory token cache provider, which will cache the Access Tokens acquired for the downstream Web API.																			  
 #### Modify the TodoListController.cs file to add information on the todo item about its owner

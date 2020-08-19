@@ -286,12 +286,12 @@ Update `Startup.cs` file:
   by
 
   ```csharp
-  services.AddMicrosoftWebApiAuthentication(Configuration)
-          .AddMicrosoftWebApiCallsWebApi(Configuration)
+  services.AddMicrosoftIdentityWebApiAuthentication(Configuration)
+          .EnableTokenAcquisitionToCallDownstreamApi()
           .AddInMemoryTokenCaches();
   ```
 
-  `AddMicrosoftWebApiAuthentication` does the following:
+  `AddMicrosoftIdentityWebApiAuthentication` does the following:
   - add the **JwtBearerAuthenticationScheme** (Note the replacement of BearerAuthenticationScheme by JwtBearerAuthenticationScheme)
   - set the authority to be the Microsoft identity platform identity
   - set the audiences to be validated
@@ -304,7 +304,7 @@ Update `Startup.cs` file:
 
   The implementations of these classes are in the [Microsoft.Identity.Web](https://github.com/AzureAD/microsoft-identity-web) library, and they are designed to be reusable in your applications (Web apps and Web apis).
 
-  `AddMicrosoftWebApiCallsWebApi` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and in this event, adds the user account into MSAL.NET's user token cache.
+  `EnableTokenAcquisitionToCallDownstreamApi` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and in this event, adds the user account into MSAL.NET's user token cache.
 
   `AddInMemoryTokenCaches` adds an in memory token cache provider, which will cache the Access Tokens acquired for the downstream Web API.
 
