@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Identity.Web" Version="0.3.0-preview" />
-    <PackageReference Include="Microsoft.Graph" Version="3.8.0" />
   </ItemGroup>
 
 </Project>
