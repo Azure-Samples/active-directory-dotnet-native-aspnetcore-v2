@@ -5,23 +5,20 @@
 // In the first chapter this is just a protected API (ENABLE_OBO is not set)
 // In this chapter, the Web API calls a downstream API on behalf of the user (OBO)
 #define ENABLE_OBO
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Graph;
-using Microsoft.Identity.Client;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.Resource;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.Graph;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.Resource;
 using TodoListService.Models;
 
 namespace TodoListService.Controllers
@@ -30,12 +27,16 @@ namespace TodoListService.Controllers
     [Route("api/[controller]")]
     public class TodoListController : Controller
     {
-        public TodoListController(ITokenAcquisition tokenAcquisition)
+        public TodoListController(ITokenAcquisition tokenAcquisition, GraphServiceClient graphServiceClient, IOptions<MicrosoftGraphOptions> graphOptions)
         {
             _tokenAcquisition = tokenAcquisition;
+            _graphServiceClient = graphServiceClient;
+            _graphOptions = graphOptions;
         }
 
-        readonly ITokenAcquisition _tokenAcquisition;
+        private readonly ITokenAcquisition _tokenAcquisition;
+        private readonly GraphServiceClient _graphServiceClient;
+        private readonly IOptions<MicrosoftGraphOptions> _graphOptions;
 
         static readonly ConcurrentBag<TodoItem> TodoStore = new ConcurrentBag<TodoItem>();
 
@@ -56,18 +57,17 @@ namespace TodoListService.Controllers
 
         // POST api/values
         [HttpPost]
-        public async void Post([FromBody]TodoItem todo)
+        public async void Post([FromBody] TodoItem todo)
         {
             HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
             string owner = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string ownerName;
 #if ENABLE_OBO
             // This is a synchronous call, so that the clients know, when they call Get, that the 
             // call to the downstream API (Microsoft Graph) has completed.
             try
             {
-                ownerName = CallGraphApiOnBehalfOfUser().GetAwaiter().GetResult();
-                string title = string.IsNullOrWhiteSpace(ownerName) ? todo.Title : $"{todo.Title} ({ownerName})";
+                User user = _graphServiceClient.Me.Request().GetAsync().GetAwaiter().GetResult();
+                string title = string.IsNullOrWhiteSpace(user.UserPrincipalName) ? todo.Title : $"{todo.Title} ({user.UserPrincipalName})";
                 TodoStore.Add(new TodoItem { Owner = owner, Title = title });
             }
             catch (MsalException ex)
@@ -78,48 +78,19 @@ namespace TodoListService.Controllers
             }
             catch (Exception ex)
             {
-                HttpContext.Response.ContentType = "text/plain";
-                HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await HttpContext.Response.WriteAsync("An error occurred while calling the downstream API\n" + ex.Message);
+                if (ex.InnerException is MicrosoftIdentityWebChallengeUserException challengeException)
+                {
+                    await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(_graphOptions.Value.Scopes.Split(' '),
+                        challengeException.MsalUiRequiredException);
+                }
+                else
+                {
+                    HttpContext.Response.ContentType = "text/plain";
+                    HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    await HttpContext.Response.WriteAsync("An error occurred while calling the downstream API\n" + ex.Message);
+                }
             }
 #endif
-
-        }
-
-        public async Task<string> CallGraphApiOnBehalfOfUser()
-        {
-            string[] scopes = { "user.read" };
-
-            // we use MSAL.NET to get a token to call the API On Behalf Of the current user
-            try
-            {
-                string accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
-                dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
-                return me.UserPrincipalName;
-            }
-            catch (MicrosoftIdentityWebChallengeUserException ex)
-            {
-                await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex.MsalUiRequiredException);
-                return string.Empty;
-            }
-            catch (MsalUiRequiredException ex)
-            {
-                await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
-                return string.Empty;
-            }
-        }
-
-        private static async Task<dynamic> CallGraphApiOnBehalfOfUser(string accessToken)
-        {
-            // Call the Graph API and retrieve the user's profile.
-            GraphServiceClient graphServiceClient = new GraphServiceClient(new DelegateAuthenticationProvider((requestMessage) => {
-                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                return Task.FromResult(0);
-            }));
-
-            User graphUser = await graphServiceClient.Me.Request().GetAsync();
-            
-            return graphUser;
         }
     }
 }

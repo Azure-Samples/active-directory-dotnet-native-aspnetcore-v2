@@ -286,12 +286,12 @@ Update `Startup.cs` file:
   by
 
   ```csharp
-  services.AddMicrosoftWebApiAuthentication(Configuration)
-          .AddMicrosoftWebApiCallsWebApi(Configuration)
+  services.AddMicrosoftIdentityWebApiAuthentication(Configuration)
+          .EnableTokenAcquisitionToCallDownstreamApi()
           .AddInMemoryTokenCaches();
   ```
 
-  `AddMicrosoftWebApiAuthentication` does the following:
+  `AddMicrosoftIdentityWebApiAuthentication` does the following:
   - add the **JwtBearerAuthenticationScheme** (Note the replacement of BearerAuthenticationScheme by JwtBearerAuthenticationScheme)
   - set the authority to be the Microsoft identity platform identity
   - set the audiences to be validated
@@ -304,57 +304,33 @@ Update `Startup.cs` file:
 
   The implementations of these classes are in the [Microsoft.Identity.Web](https://github.com/AzureAD/microsoft-identity-web) library, and they are designed to be reusable in your applications (Web apps and Web apis).
 
-  `AddMicrosoftWebApiCallsWebApi` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and in this event, adds the user account into MSAL.NET's user token cache.
+  `EnableTokenAcquisitionToCallDownstreamApi` subscribes to the `OnTokenValidated` JwtBearerAuthentication event, and in this event, adds the user account into MSAL.NET's user token cache.
 
   `AddInMemoryTokenCaches` adds an in memory token cache provider, which will cache the Access Tokens acquired for the downstream Web API.
 
 ### Modify the TodoListController.cs file to add information on the todo item about its owner
 
-In the `TodoListController.cs` file, the Post() action was modified.
+In the `TodoListController.cs` file, the `Post` method is modified by replacing
 
 ```CSharp
 todoStore.Add(new TodoItem { Owner = owner, Title = Todo.Title });
 ```
 
-is replaced by:
+with
 
 ```CSharp
-ownerName = await CallGraphAPIOnBehalfOfUser();
-string title = string.IsNullOrWhiteSpace(ownerName) ? Todo.Title : $"{Todo.Title} ({ownerName})";
-todoStore.Add(new TodoItem { Owner = owner, Title = title });
+User user = _graphServiceClient.Me.Request().GetAsync().GetAwaiter().GetResult();
+string title = string.IsNullOrWhiteSpace(user.UserPrincipalName) ? todo.Title : $"{todo.Title} ({user.UserPrincipalName})";
+TodoStore.Add(new TodoItem { Owner = owner, Title = title });
 ```
 
-The work of calling the Microsoft Graph to get the owner name is done in `CallGraphAPIOnBehalfOfUser()`.
+The work of calling Microsoft Graph to get the owner name is done by `GraphServiceClient`, which is set up by Microsoft Identity Web.
 
-This method:
+`GraphServiceClient`
 
-- gets an Access Token for the Microsoft Graph on behalf of the user (leveraging the in memory token cache, which was added on the `Startup.cs`)
+- gets an access token for the Microsoft Graph on behalf of the user (leveraging the in-memory token cache, which was added in the `Startup.cs`), and
 - calls the Microsoft Graph `/me` endpoint to retrieve the name of the user.
 
-    ```CSharp
-    public async Task<string> CallGraphAPIOnBehalfOfUser()
-    {
-        string[] scopes = new string[] { "user.read" };
-
-        // we use MSAL.NET to get a token to call the API On Behalf Of the current user
-        try
-        {
-            string accessToken = await tokenAcquisition.GetAccessTokenForUserAsync(scopes);
-            dynamic me = await CallGraphApiOnBehalfOfUser(accessToken);
-            return me.userPrincipalName;
-        }
-        catch (MicrosoftIdentityWebChallengeUserException ex)
-        {
-            await tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex.MsalUiRequiredException);
-            return string.Empty;
-        }
-        catch (MsalUiRequiredException ex)
-        {
-            await tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(scopes, ex);
-            return string.Empty;
-        }
-    }
-    ```
 
 ### Handling required interactions with the user (dynamic consent, MFA, etc.)
 
