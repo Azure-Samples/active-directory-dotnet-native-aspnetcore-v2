@@ -1,0 +1,28 @@
+{
+    "Sample": {
+    "Title": "Protected ASP.NET Core Web API",
+    "Level": 200,
+    "Client": "ASP.NET Core 3.1"
+  },
+  "AppRegistrations": [
+    {
+      "x-ms-id": "active-directory-dotnet-native-aspnetcore-v2",
+      "x-ms-name": "dotnet-native-aspnetcore-v2",
+      "x-ms-version": "2.0",
+      "replyUrlsWithType": [
+      ],
+      "requiredResourceAccess": [        
+      ],
+      "codeConfigurations": [	
+        {
+		      "settingFile": "/webapi/appsettings.json",
+          "replaceTokens": {
+            "appId": "Enter_the_Application_Id_here",
+            "tenantId": "Enter_the_Tenant_Info_Here",
+            "authorityEndpointHost": "https://login.microsoftonline.com/"
+          }
+        }
+      ]	
+    }
+  ]
+}
