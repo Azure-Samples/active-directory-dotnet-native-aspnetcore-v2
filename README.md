@@ -68,6 +68,12 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 ## Other samples and documentation
 
+See also other samples where a client app calls your own web API:
+- [Sample: ASP.NET Core web app calling your own web API](https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/tree/master/4-WebApp-your-API)
+- [Sample: .NET Core Daemon application calling your own web API](https://github.com/Azure-Samples/active-directory-dotnetcore-daemon-v2/tree/master/2-Call-OwnApi)
+- [Sample: Angular application calling your own web API](https://github.com/Azure-Samples/ms-identity-javascript-angular-spa-aspnetcore-webapi)
+
+Then for other samples and docs:
 - Other samples for Microsoft identity platform are available from [https://aka.ms/aaddevsamplesv2](https://aka.ms/aaddevsamplesv2).
 - The conceptual documentation for MSAL.NET is available from [https://aka.ms/msalnet](https://aka.ms/msalnet).
 - The documentation for identity platform is available from [https://aka.ms/aadv2](https://aka.ms/aadv2).
