@@ -106,6 +106,8 @@ To achieve this, you need to add the **Application Id** of the client app, in th
 
 Clean the solution, rebuild the solution, and run it
 
+> [Consider taking a moment to share your experience with us.](https://forms.office.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR73pcsbpbxNJuZCMKN0lURpUNDVNMlg5UlVWVDlVNFhJMUZFRlNEMU5LRiQlQCN0PWcu)
+ 
 ### Alternative architecture
 
 This part of the sample uses different client ID for the client and the service. If both the client and the service are part of same application topology, you might want to use the same client ID in the Client and the Service. This approach is described in the third part of the tutorial [3.-Web-api-call-Microsoft-graph-for-personal-accounts](../3.-Web-api-call-Microsoft-graph-for-personal-accounts/README-incremental.md)
