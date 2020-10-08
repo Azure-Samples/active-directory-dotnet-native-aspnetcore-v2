@@ -99,6 +99,8 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 
 Clean the solution, rebuild the solution, and run it.
 
+> [Consider taking a moment to share your experience with us.](https://forms.office.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR73pcsbpbxNJuZCMKN0lURpUNDVNMlg5UlVWVDlVNFhJMUZFRlNEMU5LRiQlQCN0PWcu)
+
 ## How was the code created
 
 For details about the way the code to protect the Web API was created, see [How was the code created](../2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README.md#How-was-the-code-created) section, of the `README.md` file located in the sibling folder named **2. Web API now calls Microsoft Graph**.
