@@ -35,13 +35,12 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
-  
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Identity.Web" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.1.0" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.SignedHttpRequest" Version="6.7.1" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.7.1" />
