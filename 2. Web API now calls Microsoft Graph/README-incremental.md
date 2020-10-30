@@ -182,8 +182,8 @@ The code for `HandleChallengeFromWebApi` method is available from [TodoListClien
 
 In the next chapter, we will enhance this Web API to call another downstream Web API (Microsoft Graph) on behalf of the user signed in to the WPF application. 
 
-See [3.-Web-api-call-Microsoft-graph-for-personal-accounts](../3.-Web-api-call-Microsoft-graph-for-personal-accounts/README-Incremental.md)
-				   
+See [3.-Web-api-call-Microsoft-graph-for-personal-accounts](../3.-Web-api-call-Microsoft-graph-for-personal-accounts/README-incremental.md)
+
 ## How to deploy this sample to Azure
 
 See [Readme.md](../5.Deploy-Web-API/README.md) to deploy this sample to Azure.
