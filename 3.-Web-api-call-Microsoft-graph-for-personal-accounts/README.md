@@ -78,7 +78,7 @@ Next time a user runs the application, the user is signed-in with the same ident
 ## How to run this sample
 
 ### Pre-requisites
-																													   
+
 - [Visual Studio 2019](https://aka.ms/vsdownload) or just the [.NET Core SDK](https://www.microsoft.com/net/learn/get-started)
 - An Internet connection
 - A Windows machine (necessary if you want to run the app on Windows)
@@ -93,8 +93,9 @@ From your shell or command line:
 
 ```Shell
 git clone https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2.git
-cd "2. Web API now calls Microsoft Graph"										 
+cd "2. Web API now calls Microsoft Graph"
 ```
+
 or download and extract the repository .zip file.
 
 > Given that the name of the sample is quite long, and so are the names of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
@@ -128,17 +129,12 @@ As a first step you'll need to:
    - Type a key description (for instance `app secret`),
    - Select one of the available key durations (**In 1 year**, **In 2 years**, or **Never Expires**) as per your security concerns.
    - The generated key value will be displayed when you click the **Add** button. Copy the generated value for use in the steps later.
-   - You'll need this key later in your code's configuration files. This key value will not be displayed again, and is not retrievable by any other means, so make sure to note it from the Azure portal before navigating to any other screen or blade.																 
+   - You'll need this key later in your code's configuration files. This key value will not be displayed again, and is not retrievable by any other means, so make sure to note it from the Azure portal before navigating to any other screen or blade.
 1. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the APIs that your application needs.
    - Click the **Add a permission** button and then:
    - Ensure that the **Microsoft APIs** tab is selected.
    - In the *Commonly used Microsoft APIs* section, click on **Microsoft Graph**
    - In the **Delegated permissions** section, select the **User.Read** in the list. Use the search box if necessary.
-   - Click on the **Add permissions** button at the bottom.
-   - Click the **Add a permission** button and then:
-   - Ensure that the **My APIs** tab is selected.
-   - In the list of APIs, select the API `TodoListClient-and-Service`.
-   - In the **Delegated permissions** section, select the **access_as_user** in the list. Use the search box if necessary.
    - Click on the **Add permissions** button at the bottom.
 1. In the app's registration screen, select the **Expose an API** blade to the left to open the page where you can declare the parameters to expose this app as an API for which client applications can obtain [access tokens](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) for.
 The first thing that we need to do is to declare the unique [resource](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow) URI that the clients will be using to obtain access tokens for this API. To declare an resource URI, follow the following steps:
@@ -184,11 +180,12 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 #### Configure the  client app (TodoListClient-and-Service) to use your app registration
 
 Open the project in your IDE (like Visual Studio) to configure the code.
+
 1. In the *TodoListClient* project, open `App.config`.
 2. Find the app key `ida:ClientId` and replace the value with the ApplicationID (Client ID) for the *TodoListClient-and-Service* app copied from the app registration page.
 3. and replace the value with the scope of the TodoListClient-and-Service application copied from the app registration in the **Expose an API** tab, i.e `api://{clientId}/access_as_user`.
 4. [Optional] If you changed the default URL for your service application, find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
-																																					
+
 ### Step 3: Run the sample
 
 Clean the solution, rebuild the solution, and run it. You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
@@ -275,6 +272,7 @@ public class MainWindow
  }
 }
 ```
+
 See [WithExtraScopeToConsent](https://docs.microsoft.com/azure/active-directory/develop/scenario-desktop-acquire-token#withextrascopetoconsent) for more details.
 
 ### Changes to the service side (TodoListService)

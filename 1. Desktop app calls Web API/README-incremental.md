@@ -331,7 +331,7 @@ You can also expose app-only permissions if parts of your API needs to be access
 
 In the next chapter, we will enhance this Web API to call another downstream Web API (Microsoft Graph) on behalf of the user signed in to the WPF application. 
 
-See [2. Web API now calls Microsoft Graph](../2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README-Incremental.md)
+See [2. Web API now calls Microsoft Graph](../2.%20Web%20API%20now%20calls%20Microsoft%20Graph/README-incremental.md)
 
 ## Community Help and Support
 
