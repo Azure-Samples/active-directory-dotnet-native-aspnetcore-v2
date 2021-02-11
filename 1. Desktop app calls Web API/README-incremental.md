@@ -311,12 +311,12 @@ If you are not using Visual Studio, edit the `TodoListService\Properties\launchs
 
 ## Choosing which scopes to expose
 
-This sample exposes a delegated permission (access_as_user) that will be presented in the access token claim. The method `AddMicrosoftWebApiAuthentication` does not validate the scope, but Microsoft.Identity.Web has a HttpContext extension method, `VerifyUserHasAnyAcceptedScope`, where you can validate the scope from a controller action, as below:
+This sample exposes a delegated permission (access_as_user) that will be presented in the access token claim. The attribute `[RequiredScope("access_as_user")]` on the controller or controller action, takes care of validating that this is the case:
 
 ```csharp
+[RequiredScope("access_as_user")]
 public IEnumerable<TodoItem> Get()
 {
- HttpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
  // process the action
 }
 ```
