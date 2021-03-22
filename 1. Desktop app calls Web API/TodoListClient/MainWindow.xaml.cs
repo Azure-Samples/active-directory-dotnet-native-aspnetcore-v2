@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.Desktop;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Configuration;
@@ -65,6 +66,7 @@ namespace TodoListClient
             _app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(Authority)
                 .WithDefaultRedirectUri()
+                .WithDesktopFeatures()
                 .Build();
 
             TokenCacheHelper.EnableSerialization(_app.UserTokenCache);
@@ -288,6 +290,7 @@ namespace TodoListClient
                     var result = await _app.AcquireTokenInteractive(Scopes)
                         .WithAccount(accounts.FirstOrDefault())
                         .WithPrompt(Prompt.SelectAccount)
+                        .WithUseEmbeddedWebView(true)
                         .ExecuteAsync()
                         .ConfigureAwait(false);
 
