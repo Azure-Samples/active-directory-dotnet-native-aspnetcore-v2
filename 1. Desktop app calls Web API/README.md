@@ -66,9 +66,7 @@ Next time a user runs the application, the user is signed-in with the same ident
 
 - [Visual Studio 2019](https://aka.ms/vsdownload) or just the [.NET Core SDK](https://www.microsoft.com/net/learn/get-started)
 - An Internet connection
-- A Windows machine (necessary if you want to run the app on Windows)
-- An OS X machine (necessary if you want to run the app on Mac)
-- A Linux machine (necessary if you want to run the app on Linux)
+- A Windows machine, since WPF is a Windows-only technology
 - An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/documentation/articles/active-directory-howto-tenant/)
 - A user account in your Azure AD tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
 
@@ -176,7 +174,7 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 1. In the app's registration screen, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
 1. In the app's registration screen, select **Authentication** in the menu.
    - If you don't have a platform added, select **Add a platform** and select the **Public client (mobile & desktop)** option.
-   - In the **Redirect URIs** | **Suggested Redirect URIs for public clients (mobile, desktop)** section, select **https://login.microsoftonline.com/common/oauth2/nativeclient**
+   - In the **Redirect URIs** | **Suggested Redirect URIs for public clients (mobile, desktop)** section, add **http://localhost**
 1. Select **Save** to save your changes.
 1. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the APIs that your application needs.
    - Click the **Add a permission** button and then,

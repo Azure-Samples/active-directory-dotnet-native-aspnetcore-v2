@@ -283,7 +283,7 @@ Function ConfigureApplications
    Write-Host "Creating the AAD application (TodoListClient (active-directory-dotnet-native-aspnetcore-v2))"
    # create the application 
    $clientAadApplication = New-AzureADApplication -DisplayName "TodoListClient (active-directory-dotnet-native-aspnetcore-v2)" `
-                                                  -ReplyUrls "https://login.microsoftonline.com/common/oauth2/nativeclient" `
+                                                  -ReplyUrls "http://localhost", "https://login.microsoftonline.com/common/oauth2/nativeclient" `
                                                   -AvailableToOtherTenants $True `
                                                   -PublicClient $True
 
