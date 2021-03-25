@@ -60,8 +60,18 @@ Function Cleanup
     Write-Host "Cleaning-up applications from tenant '$tenantName'"
 
     Write-Host "Removing 'service' (TodoListService (active-directory-dotnet-native-aspnetcore-v2)) if needed"
-    Get-AzureADApplication -Filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
-    $apps = Get-AzureADApplication -Filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'"
+    
+    # Handle exception if application can not be removed using Remove-AzureADApplication
+    try
+    {
+    	Get-AzureADApplication -Filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
+    }
+    catch
+    {
+	    Write-Host "Unable to remove the 'service' (TodoListService (active-directory-dotnet-native-aspnetcore-v2)). Try deleting manually." -ForegroundColor White -BackgroundColor Red
+    }
+
+    $apps = Get-AzureADApplication -Filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'" 
     if ($apps)
     {
         Remove-AzureADApplication -ObjectId $apps.ObjectId
@@ -76,7 +86,17 @@ Function Cleanup
     Get-AzureADServicePrincipal -filter "DisplayName eq 'TodoListService (active-directory-dotnet-native-aspnetcore-v2)'" | ForEach-Object {Remove-AzureADServicePrincipal -ObjectId $_.Id -Confirm:$false}
     
     Write-Host "Removing 'client' (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)) if needed"
-    Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient (active-directory-dotnet-native-aspnetcore-v2)'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
+    
+    # Handle exception if application can not be removed using Remove-AzureADApplication
+    try
+    {
+        Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient (active-directory-dotnet-native-aspnetcore-v2)'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
+    }
+    catch
+    {
+	    Write-Host "Unable to remove the 'client' (TodoListClient (active-directory-dotnet-native-aspnetcore-v2)). Try deleting manually." -ForegroundColor White -BackgroundColor Red	
+    }
+
     $apps = Get-AzureADApplication -Filter "DisplayName eq 'TodoListClient (active-directory-dotnet-native-aspnetcore-v2)'"
     if ($apps)
     {
