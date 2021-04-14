@@ -7,7 +7,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.Identity.Client" Version="4.28.0" />	  
+	  <PackageReference Include="Microsoft.Identity.Client" Version="4.28.1" />
+	  <PackageReference Include="Microsoft.Identity.Client.Desktop" Version="4.28.1" />
 	  <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
 	</ItemGroup>
 
