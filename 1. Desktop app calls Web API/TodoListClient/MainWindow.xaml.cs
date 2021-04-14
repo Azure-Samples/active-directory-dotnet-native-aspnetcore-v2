@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Desktop;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Configuration;
@@ -65,8 +64,7 @@ namespace TodoListClient
             InitializeComponent();
             _app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(Authority)
-                .WithDefaultRedirectUri()
-                .WithDesktopFeatures()
+                .WithRedirectUri("http://localhost") // needed only for the system browser
                 .Build();
 
             TokenCacheHelper.EnableSerialization(_app.UserTokenCache);
@@ -254,13 +252,13 @@ namespace TodoListClient
             {
                 TodoList.ItemsSource = string.Empty;
 
-                // clear the cache
+                // Clears the library cache. Does not affect the browser cookies.
                 while (accounts.Any())
                 {
                     await _app.RemoveAsync(accounts.First());
                     accounts = (await _app.GetAccountsAsync()).ToList();
                 }
-                // Also clear cookies from the browser control.
+
                 SignInButton.Content = SignInString;
                 UserName.Content = Properties.Resources.UserNotSignedIn;
                 return;
@@ -287,12 +285,19 @@ namespace TodoListClient
             {
                     // Force a sign-in (Prompt.SelectAccount), as the MSAL web browser might contain cookies for the current user
                     // and we don't necessarily want to re-sign-in the same user
-                    var result = await _app.AcquireTokenInteractive(Scopes)
+                    var builder = _app.AcquireTokenInteractive(Scopes)
                         .WithAccount(accounts.FirstOrDefault())
-                        .WithPrompt(Prompt.SelectAccount)
-                        .WithUseEmbeddedWebView(true)
-                        .ExecuteAsync()
-                        .ConfigureAwait(false);
+                        .WithPrompt(Prompt.SelectAccount);
+
+                    if (!_app.IsEmbeddedWebViewAvailable())
+                    {
+                        // You app should install the embedded browser WebView2 https://aka.ms/msal-net-webview2
+                        // but if for some reason this is not possible, you can fall back to the system browser 
+                        // in this case, the redirect uri needs to be set to "http://localhost"
+                        builder = builder.WithUseEmbeddedWebView(false);
+                    }
+
+                    var result = await builder.ExecuteAsync().ConfigureAwait(false);
 
                     Dispatcher.Invoke(() =>
                     {
