@@ -74,7 +74,7 @@ namespace TodoListService.Controllers
             {
                 if (ex.InnerException is MicrosoftIdentityWebChallengeUserException challengeException)
                 {
-                    await _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeaderAsync(_graphOptions.Value.Scopes.Split(' '),
+                    _tokenAcquisition.ReplyForbiddenWithWwwAuthenticateHeader(_graphOptions.Value.Scopes.Split(' '),
                         challengeException.MsalUiRequiredException);
                 }
                 else
