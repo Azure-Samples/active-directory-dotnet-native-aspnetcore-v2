@@ -19,7 +19,7 @@
         </Grid.Resources>
         <StackPanel Grid.Row="0" Margin="5" VerticalAlignment="Top" Height="351">
             <Grid HorizontalAlignment="Left" Width="346">
-                <Label HorizontalAlignment="Left" Content="Not Signed" Margin="0" x:Name="UserName" Width="261" Height="30"/>
+                <Label HorizontalAlignment="Left" Content="Cache Cleared. Sign In" Margin="0" x:Name="UserName" Width="261" Height="30"/>
                 <Button HorizontalAlignment="Right" Content="Sign In" Margin="0" Click="SignIn" x:Name="SignInButton" Width="80" Height="30">
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
