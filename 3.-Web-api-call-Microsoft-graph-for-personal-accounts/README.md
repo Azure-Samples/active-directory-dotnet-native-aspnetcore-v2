@@ -279,36 +279,15 @@ See [WithExtraScopeToConsent](https://docs.microsoft.com/azure/active-directory/
 
 #### Startup.cs
 
-The change is to ensure that the Web API allows access to it's own client.
+The change is to ensure that the web API allows access to it's own client.
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {      
     services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddMicrosoftWebApi(options =>
-    {
-        Configuration.Bind("AzureAd", options);
-        options.Events = new JwtBearerEvents();
-        options.Events.OnTokenValidated = async context =>
-        {
-            // This check is required to ensure that the Web API only accepts token from it's own client.
-            if (context.Principal.Claims.Any(x => (x.Type == "azp" || x.Type == "appid") && x.Value != Configuration["AzureAd:ClientId"]))
-            {
-                throw new UnauthorizedAccessException("Client is not authorized to access the resource.");
-            }
-            else
-            {
-                throw new UnauthorizedAccessException("Application ID claim does not exist for the client.");
-            }
-        };
-    }, 
-    options =>
-    {
-        Configuration.Bind("AzureAd", options);
-    })
-        .AddMicrosoftWebApiCallsWebApi(Configuration)
-        .AddInMemoryTokenCaches();
-
+                .AddMicrosoftIdentityWebApi(Configuration, "AzureAd")
+                  .EnableTokenAcquisitionToCallDownstreamApi();
+                  .AddInMemoryTokenCaches();
    ...
 }
 ```
