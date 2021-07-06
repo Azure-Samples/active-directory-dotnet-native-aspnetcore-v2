@@ -175,13 +175,11 @@ namespace TodoListClient
         /// <returns></returns>
         private async Task HandleChallengeFromWebApi(HttpResponseMessage response, IAccount account)
         {
-            AuthenticationHeaderValue bearer = response.Headers.WwwAuthenticate.First(v => v.Scheme == "Bearer");
-            IEnumerable<string> parameters = bearer.Parameter.Split(',').Select(v => v.Trim()).ToList();
-            string clientId = GetParameter(parameters, "clientId");
-            string claims = GetParameter(parameters, "claims");
-            string[] scopes = GetParameter(parameters, "scopes")?.Split(',');
-            string proposedAction = GetParameter(parameters, "proposedAction");
-            string consentUri = GetParameter(parameters, "consentUri");
+            WwwAuthenticateParameters wwwAuthenticateParameters = WwwAuthenticateParameters.ExtractWwwAuthenticateParametersFromHeaders(response.Headers);
+            string claims = wwwAuthenticateParameters.Claims;
+            string[] scopes = wwwAuthenticateParameters.Scopes;
+            string proposedAction = wwwAuthenticateParameters.RawParameters["proposedaction"];
+            string consentUri = wwwAuthenticateParameters.RawParameters["consenturi"];
 
             string loginHint = account?.Username;
             string domainHint = IsConsumerAccount(account) ? "consumers" : "organizations";
