@@ -221,11 +221,6 @@ namespace TodoListClient
             return (Tenant == "common" || Tenant == "consumers") && account?.HomeAccountId.TenantId == msaTenantId;
         }
 
-        private static string GetParameter(IEnumerable<string> parameters, string parameterName)
-        {
-            int offset = parameterName.Length + 1;
-            return parameters.FirstOrDefault(p => p.StartsWith($"{parameterName}="))?.Substring(offset)?.Trim('"');
-        }
 
         private async void AddTodoItem(object sender, RoutedEventArgs e)
         {
