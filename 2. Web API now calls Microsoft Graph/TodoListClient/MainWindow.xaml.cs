@@ -175,13 +175,11 @@ namespace TodoListClient
         /// <returns></returns>
         private async Task HandleChallengeFromWebApi(HttpResponseMessage response, IAccount account)
         {
-            AuthenticationHeaderValue bearer = response.Headers.WwwAuthenticate.First(v => v.Scheme == "Bearer");
-            IEnumerable<string> parameters = bearer.Parameter.Split(',').Select(v => v.Trim()).ToList();
-            string clientId = GetParameter(parameters, "clientId");
-            string claims = GetParameter(parameters, "claims");
-            string[] scopes = GetParameter(parameters, "scopes")?.Split(',');
-            string proposedAction = GetParameter(parameters, "proposedAction");
-            string consentUri = GetParameter(parameters, "consentUri");
+            WwwAuthenticateParameters wwwAuthenticateParameters = WwwAuthenticateParameters.CreateFromResponseHeaders(response.Headers);
+            string claims = wwwAuthenticateParameters.Claims;
+            IEnumerable<string> scopes = wwwAuthenticateParameters.Scopes;
+            string proposedAction = wwwAuthenticateParameters["proposedAction"];
+            string consentUri = wwwAuthenticateParameters["consentUri"];
 
             string loginHint = account?.Username;
             string domainHint = IsConsumerAccount(account) ? "consumers" : "organizations";
@@ -223,11 +221,6 @@ namespace TodoListClient
             return (Tenant == "common" || Tenant == "consumers") && account?.HomeAccountId.TenantId == msaTenantId;
         }
 
-        private static string GetParameter(IEnumerable<string> parameters, string parameterName)
-        {
-            int offset = parameterName.Length + 1;
-            return parameters.FirstOrDefault(p => p.StartsWith($"{parameterName}="))?.Substring(offset)?.Trim('"');
-        }
 
         private async void AddTodoItem(object sender, RoutedEventArgs e)
         {
