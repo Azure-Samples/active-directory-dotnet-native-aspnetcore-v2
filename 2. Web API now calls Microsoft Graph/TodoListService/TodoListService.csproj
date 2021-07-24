@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UserSecretsId>aspnet-TodoListService-03230DB1-5145-408C-A48B-BE3DAFC56C30</UserSecretsId>
+    <UserSecretsId>aspnet-TodoListService-03230DB1-5145-408C-A48B-BE3DAFC56C31</UserSecretsId>
     <WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
   </PropertyGroup>
 
@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Identity.Web" Version="1.14.1" />
-    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.14.1" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.15.0" />
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.15.0" />
   </ItemGroup>
 
 </Project>
