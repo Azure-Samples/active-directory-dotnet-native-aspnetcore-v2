@@ -106,6 +106,7 @@ namespace TodoListClient
                     MessageBox.Show("Please sign in to view your To-Do list");
                     SignInButton.Content = SignInString;
                 }
+                return;
             }
             catch (MsalException ex)
             {
