@@ -64,7 +64,7 @@ namespace TodoListClient
             InitializeComponent();
             _app = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(Authority)
-                .WithRedirectUri("http://localhost") // needed only for the system browser
+                .WithDefaultRedirectUri()
                 .Build();
 
             TokenCacheHelper.EnableSerialization(_app.UserTokenCache);
