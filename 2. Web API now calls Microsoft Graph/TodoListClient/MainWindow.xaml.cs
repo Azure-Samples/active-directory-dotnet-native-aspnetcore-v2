@@ -178,7 +178,6 @@ namespace TodoListClient
         {
             WwwAuthenticateParameters wwwAuthenticateParameters = WwwAuthenticateParameters.CreateFromResponseHeaders(response.Headers);
             string claims = wwwAuthenticateParameters.Claims;
-            IEnumerable<string> scopes = wwwAuthenticateParameters.Scopes;
             string proposedAction = wwwAuthenticateParameters["proposedAction"];
             string consentUri = wwwAuthenticateParameters["consentUri"];
 
@@ -190,7 +189,7 @@ namespace TodoListClient
             {
                 // Removes the account, but then re-signs-in
                 await _app.RemoveAsync(account);
-                await _app.AcquireTokenInteractive(scopes)
+                await _app.AcquireTokenInteractive(new string[] { "user.read" })
                     .WithPrompt(Prompt.Consent)
                     .WithLoginHint(loginHint)
                     .WithExtraQueryParameters(extraQueryParameters)
