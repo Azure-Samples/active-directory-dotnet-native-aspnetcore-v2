@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.Extensions.Msal;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Configuration;
@@ -65,7 +66,15 @@ namespace TodoListClient
                 .WithDefaultRedirectUri()
                 .Build();
 
-            TokenCacheHelper.EnableSerialization(_app.UserTokenCache);
+            // Add token cache serialization
+            var storageProperties =
+                new StorageCreationPropertiesBuilder(
+                    "ClientConsoleApp",
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
+                .Build();
+            var cacheHelper = MsalCacheHelper.CreateAsync(storageProperties).GetAwaiter().GetResult();
+            cacheHelper.RegisterCache(_app.UserTokenCache);
+
             GetTodoList();
         }
 
