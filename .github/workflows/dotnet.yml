@@ -20,5 +20,7 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.x
+    - name: Restore
+      run: dotnet restore buildAllSlns.proj
     - name: Build
       run: dotnet msbuild buildAllSlns.proj
