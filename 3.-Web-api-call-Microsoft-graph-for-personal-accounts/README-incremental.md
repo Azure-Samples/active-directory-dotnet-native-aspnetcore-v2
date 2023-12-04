@@ -21,8 +21,8 @@ endpoint: Microsoft identity platform
   - [User experience when using this sample](#user-experience-when-using-this-sample)
 - [How to run this sample](#how-to-run-this-sample)
   - [Step 1: In the downloaded folder](#step-1-in-the-downloaded-folder)
-  - [Step 2: Update the Registration for the sample with your Azure Active Directory tenant](#step-2-update-the-registration-for-the-sample-with-your-azure-active-directory-tenant)
-  - [Step 3:  Configure the sample to use your Azure AD tenant](#step-3-configure-the-sample-to-use-your-azure-ad-tenant)
+  - [Step 2: Update the Registration for the sample with your Microsoft Entra tenant](#step-2-update-the-registration-for-the-sample-with-your-azure-active-directory-tenant)
+  - [Step 3:  Configure the sample to use your Microsoft Entra tenant](#step-3-configure-the-sample-to-use-your-azure-ad-tenant)
   - [Step 4: Run the sample](#step-4-run-the-sample)
 - [How was the code created](#how-was-the-code-created)
 - [How to deploy this sample to Azure](#how-to-deploy-this-sample-to-azure)
@@ -61,9 +61,9 @@ From your shell or command line:
 cd "2. Web API now calls Microsoft Graph"
 ```
 
-### Step 2: Update the Registration for the sample with your Azure Active Directory tenant
+### Step 2: Update the Registration for the sample with your Microsoft Entra tenant
 
-There are two projects in this sample. But because we would be using a close knit topology, where both apps will share the same app id. To achieve that the following steps are needed to bundle together into one app registration in your Azure AD tenant. To do this follow the steps below:
+There are two projects in this sample. But because we would be using a close knit topology, where both apps will share the same app id. To achieve that the following steps are needed to bundle together into one app registration in your Microsoft Entra tenant. To do this follow the steps below:
 
 #### Update Registration for the service app (TodoListService) 
 
@@ -74,10 +74,10 @@ There are two projects in this sample. But because we would be using a close kni
    - Click **Configure**.
 1. Select the **Manifest** section and:
    - in the manifest, search for **"signInAudience"** and it's value should be **"AzureADandPersonalMicrosoftAccount"**
-   - search for **"accessTokenAcceptedVersion"**, and see that its value is **2**. This property lets Azure AD know that the Web API accepts v2.0 tokens
+   - search for **"accessTokenAcceptedVersion"**, and see that its value is **2**. This property lets Microsoft Entra ID know that the Web API accepts v2.0 tokens
    - Select **Save**.
 
-### Step 3:  Configure the sample to use your Azure AD tenant
+### Step 3:  Configure the sample to use your Microsoft Entra tenant
 
 Configure the sample to enable users to sign-in with Microsoft personal accounts.
 This constrain is ensured by updating `ida:Tenant` in `TodoListClient\App.Config` and `TenantId` in `TodoListService\appsettings.json` with the value `common`.
@@ -86,7 +86,7 @@ This constrain is ensured by updating `ida:Tenant` in `TodoListClient\App.Config
 
 1. Open the solution in Visual Studio.
 1. In the *TodoListService* project, open the `appsettings.json` file.
-1. Find the `ClientSecret` property and replace the existing value with the key you saved during the creation of the `TodoListClient-and-Service` app, in the Azure portal.
+1. Find the `ClientSecret` property and replace the existing value with the key you saved during the creation of the `TodoListClient-and-Service` app, in the Microsoft admin center.
 
 #### Configure the TodoListClient C# project
 
@@ -179,7 +179,7 @@ See [Readme.md](../5.Deploy-Web-API/README.md) to deploy this sample to Azure.
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`azure-active-directory` `msal` `dotnet`].
+Make sure that your questions or comments are tagged with [`microsoft-entra-id` `msal` `dotnet`].
 
 If you find a bug in the sample, please raise the issue on [GitHub Issues](../../../issues).
 
@@ -205,9 +205,9 @@ For more information, visit the following links:
   - [Acquiring tokens with authorization codes on web apps](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-with-authorization-codes-on-web-apps)
   - [Customizing Token cache serialization](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/token-cache-serialization)
 
-- Articles about the Azure AD V2 endpoint [http://aka.ms/aaddevv2](http://aka.ms/aaddevv2), with a focus on:
-  - [Azure Active Directory v2.0 and OAuth 2.0 On-Behalf-Of flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols-oauth-on-behalf-of)
+- Articles about the Microsoft Entra ID V2 endpoint [http://aka.ms/aaddevv2](http://aka.ms/aaddevv2), with a focus on:
+  - [Microsoft Entra ID v2.0 and OAuth 2.0 On-Behalf-Of flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols-oauth-on-behalf-of)
 
 - [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-2.1&tabs=visual-studio%2Caspnetcore2x)
   - [AuthenticationBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationbuilder?view=aspnetcore-2.0)
-  - [Azure Active Directory with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.1)
+  - [Microsoft Entra ID with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.1)

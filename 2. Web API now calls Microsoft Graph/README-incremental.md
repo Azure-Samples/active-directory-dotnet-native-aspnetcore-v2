@@ -9,7 +9,7 @@ endpoint: Microsoft identity platform
 ---
 # Sign a user into a Desktop application using Microsoft Identity Platform and call a protected ASP.NET Core Web API, which calls Microsoft Graph on-behalf of the user
 
-[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
+[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/aad%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
 ## About this sample
 
@@ -21,7 +21,7 @@ endpoint: Microsoft identity platform
   - [User experience when using this sample](#user-experience-when-using-this-sample)
 - [How to run this sample](#how-to-run-this-sample)
   - [Step 1: In the downloaded folder](#step-1-in-the-downloaded-folder)
-  - [Step 2:  Update the Registration for the sample with your Azure Active Directory tenant](#step-2-update-the-registration-for-the-sample-with-your-azure-active-directory-tenant)
+  - [Step 2:  Update the Registration for the sample with your Microsoft Entra tenant](#step-2-update-the-registration-for-the-sample-with-your-azure-active-directory-tenant)
   - [Step 3: Run the sample](#step-3-run-the-sample)
   - [Alternative architecture](#alternative-architecture)
 - [How was the code created](#how-was-the-code-created)
@@ -60,7 +60,7 @@ From your shell or command line:
 cd "2. Web API now calls Microsoft Graph"
 ```
 
-### Step 2:  Update the Registration for the sample with your Azure Active Directory tenant
+### Step 2:  Update the Registration for the sample with your Microsoft Entra tenant
 
 #### Update Registration for the service app (TodoListService (active-directory-dotnet-native-aspnetcore-v2))
 
@@ -70,7 +70,7 @@ cd "2. Web API now calls Microsoft Graph"
    - Type a key description (for instance `app secret`),
    - Select one of the available key durations (**In 1 year**, **In 2 years**, or **Never Expires**) as per your security concerns.
    - The generated key value will be displayed when you click the **Add** button. Copy the generated value for use in the steps later.
-   - You'll need this key later in your code's configuration files. This key value will not be displayed again, and is not retrievable by any other means, so make sure to note it from the Azure portal before navigating to any other screen or blade.		 
+   - You'll need this key later in your code's configuration files. This key value will not be displayed again, and is not retrievable by any other means, so make sure to note it from the Microsoft admin center before navigating to any other screen or blade.		 
 4. In the app's registration screen, click on the **API permissions** blade in the left to open the page where we add access to the APIs that your application needs.
    - Click the **Add a permission** button and then,
    - Ensure that the **Microsoft APIs** tab is selected.
@@ -80,17 +80,17 @@ cd "2. Web API now calls Microsoft Graph"
 																																						
 #### Configure the  service app (TodoListService (active-directory-dotnet-native-aspnetcore-v2)) to use your app registration
 
-1. Find the app key `ClientSecret` and replace the existing value with the key you saved during the creation of the `TodoListService (active-directory-dotnet-native-aspnetcore-v2))` app, in the Azure portal.
+1. Find the app key `ClientSecret` and replace the existing value with the key you saved during the creation of the `TodoListService (active-directory-dotnet-native-aspnetcore-v2))` app, in the Microsoft admin center.
 
 #### Configure Known Client Applications for service (TodoListService (active-directory-dotnet-native-aspnetcore-v2))
 
 For a middle-tier Web API `TodoListService (active-directory-dotnet-native-aspnetcore-v2))` to be able to call a downstream Web API, the middle tier app needs to be granted the required permissions as well.
-However, since the middle tier cannot interact with the signed-in user, it needs to be explicitly bound to the client app in its Azure AD registration.
+However, since the middle tier cannot interact with the signed-in user, it needs to be explicitly bound to the client app in its Microsoft Entra ID registration.
 This binding merges the permissions required by both the client and the middle tier Web API and presents it to the end user in a single consent dialog. The user then consent to this combined set of permissions.
 
 To achieve this, you need to add the **Application Id** of the client app, in the Manifest of the Web API in the `knownClientApplications` property. Here's how:																				
 
-1. In the [Azure portal](https://portal.azure.com), navigate to your `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` app registration, and select **Manifest** section.
+1. In the [Microsoft admin center](https://portal.azure.com), navigate to your `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` app registration, and select **Manifest** section.
 1. In the manifest editor, change the `"knownClientApplications": []` line so that the array contains 
    the Client ID of the client application (`TodoListClient ((active-directory-dotnet-native-aspnetcore-v2)`) as an element of the array.
 
@@ -192,7 +192,7 @@ See [Readme.md](../5.Deploy-Web-API/README.md) to deploy this sample to Azure.
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`azure-active-directory` `msal` `dotnet`].
+Make sure that your questions or comments are tagged with [`microsoft-entra-id` `msal` `dotnet`].
 
 If you find a bug in the sample, please raise the issue on [GitHub Issues](../../../issues).
 
@@ -226,4 +226,4 @@ For more information, visit the following links:
 
 - [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-2.2&tabs=visual-studio%2Caspnetcore2x)
   - [AuthenticationBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationbuilder?view=aspnetcore-2.0)
-  - [Azure Active Directory with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.2)
+  - [Microsoft Entra ID with ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.2)
