@@ -5,7 +5,7 @@ languages:
   - csharp  
 products:
   - azure
-  - azure-active-directory  
+  - microsoft-entra-id  
   - dotnet
 description: "Sign-in a user with the Microsoft Identity Platform in a console application and call an ASP.NET Core web API using Proof of Possession token"
 ---
