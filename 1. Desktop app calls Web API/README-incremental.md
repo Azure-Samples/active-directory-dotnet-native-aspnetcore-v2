@@ -337,7 +337,7 @@ See [2. Web API now calls Microsoft Graph](../2.%20Web%20API%20now%20calls%20Mic
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`microsoft-entra-id` `msal` `dotnet`].
+Make sure that your questions or comments are tagged with [`azure-active-directory` `msal` `dotnet`].
 
 To provide a recommendation, visit the following [User Voice page](https://feedback.azure.com/forums/169401-azure-active-directory).
 
