@@ -359,4 +359,4 @@ For more information, visit the following links:
 
 - To learn more about ASP.NET Core Web APIs: see [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/aspnet/core/security/authentication/identity?view=aspnetcore-2.1&tabs=visual-studio%2Caspnetcore2x) and also:
   - [AuthenticationBuilder](https://docs.microsoft.com/dotnet/api/microsoft.aspnetcore.authentication.authenticationbuilder?view=aspnetcore-2.0)
-  - [Microsoft Entra ID with ASP.NET Core](https://docs.microsoft.com/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.1)
+  - [Microsoft Entra ID with ASP.NET Core](https://docs.microsoft.com/aspnet/core/security/authentication/azure-active-directory)
