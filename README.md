@@ -4,7 +4,6 @@ languages:
 products:
   - aspnet
   - azure
-  - microsoft-entra-id
 page_type: sample
 urlFragment: active-directory-dotnet-native-aspnetcore-v2
 description: "Protect an ASP.NET Core Web API with the Microsoft identity platform."
