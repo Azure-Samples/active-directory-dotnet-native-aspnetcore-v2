@@ -5,7 +5,6 @@ languages:
 - csharp
 products:
 - dotnet
-- microsoft-entra-id
 - azure-app-service
 - azure-storage
 description: "Deploying a protected ASP.NET Core web API and calls the API from Desktop application"
