@@ -4,8 +4,7 @@ urlFragment: 1-desktop-app-calls-web-api
 languages:
   - csharp  
 products:
-  - azure
-  - microsoft-entra-id  
+  - azure 
   - dotnet
 description: "Sign-in a user with the Microsoft Identity Platform in a WPF Desktop application and call an ASP.NET Core Web API"
 ---
