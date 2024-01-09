@@ -4,8 +4,7 @@ urlFragment: 2-web-api-now-calls-microsoft-graph
 languages:
   - csharp  
 products:
-  - azure
-  - microsoft-entra-id  
+  - azure 
   - aspnet-core
 description: "Sign a user into a Desktop application using Microsoft Identity Platform and call a protected ASP.NET Core Web API, which calls Microsoft Graph on-behalf of the user."
 ---
