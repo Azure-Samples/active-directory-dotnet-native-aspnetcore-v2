@@ -5,7 +5,6 @@ languages:
   - csharp  
 products:
   - azure
-  - microsoft-entra-id  
   - dotnet
 description: "This sample demonstrates a .NET Desktop (WPF) application calling a ASP.NET Core Web API that is secured using Microsoft Entra ID"
 ---
