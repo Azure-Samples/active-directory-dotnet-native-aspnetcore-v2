@@ -4,14 +4,13 @@ urlFragment: 1-desktop-app-calls-web-api
 languages:
   - csharp  
 products:
-  - azure
-  - azure-active-directory  
+  - azure 
   - dotnet
 description: "Sign-in a user with the Microsoft Identity Platform in a WPF Desktop application and call an ASP.NET Core Web API"
 ---
 # Sign-in a user with the Microsoft Identity Platform in a WPF Desktop application and call an ASP.NET Core Web API
 
-[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
+[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/aad%20Samples/.NET%20client%20samples/active-directory-dotnet-native-aspnetcore-v2)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=516)
 
 ## About this sample
 
@@ -23,7 +22,7 @@ description: "Sign-in a user with the Microsoft Identity Platform in a WPF Deskt
 - [How to run this sample](#how-to-run-this-sample)
   - [Pre-requisites](#pre-requisites)
   - [Step 1:  Clone or download this repository](#step-1-clone-or-download-this-repository)
-  - [Step 2:  Register the sample application with your Azure Active Directory tenant](#step-2-register-the-sample-application-with-your-azure-active-directory-tenant)
+  - [Step 2:  Register the sample application with your Microsoft Entra tenant](#step-2-register-the-sample-application-with-your-azure-active-directory-tenant)
   - [Step 3: Run the sample](#step-3-run-the-sample)
 - [Choosing which scopes to expose](#choosing-which-scopes-to-expose)
 - [Community Help and Support](#community-help-and-support)
@@ -32,13 +31,13 @@ description: "Sign-in a user with the Microsoft Identity Platform in a WPF Deskt
 
 ### Scenario
 
-In this sample, we would protect an ASP.Net Core Web API using the Microsoft Identity Platform. The Web API will be protected using Azure Active Directory OAuth Bearer Authorization.
+In this sample, we would protect an ASP.Net Core Web API using the Microsoft Identity Platform. The Web API will be protected using Microsoft Entra ID OAuth Bearer Authorization.
 
 An on-demand video was created for the Build 2018 event, featuring this scenario and a previous version of this sample. See the video [Building Web API Solutions with Authentication](https://channel9.msdn.com/Events/Build/2018/THR5000), and the associated [PowerPoint deck](http://video.ch9.ms/sessions/c1f9c808-82bc-480a-a930-b340097f6cc1/BuildWebAPISolutionswithAuthentication.pptx)
 
 ### Overview
 
-This sample presents an ASP.NET core Web API, protected by Azure AD OAuth Bearer Authorization. The Web API is called by a .NET Desktop WPF application.
+This sample presents an ASP.NET core Web API, protected by Microsoft Entra ID OAuth Bearer Authorization. The Web API is called by a .NET Desktop WPF application.
 
 The .Net application uses the Microsoft Authentication Library [MSAL.NET](https://aka.ms/msal-net) to obtain a JWT [Access Token](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) through the [OAuth 2.0](https://docs.microsoft.com/azure/active-directory/develop/active-directory-protocols-oauth-code) protocol. The access token is sent to the ASP.NET Core Web API, which authorizes the user using the ASP.NET JWT Bearer Authentication middleware.
 
@@ -67,8 +66,8 @@ Next time a user runs the application, the user is signed-in with the same ident
 - [Visual Studio 2019](https://aka.ms/vsdownload) or just the [.NET Core SDK](https://www.microsoft.com/net/learn/get-started)
 - An Internet connection
 - A Windows machine, since WPF is a Windows-only technology
-- An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/documentation/articles/active-directory-howto-tenant/)
-- A user account in your Azure AD tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
+- a Microsoft Entra tenant. For more information on how to get a Microsoft Entra tenant, see [How to get a Microsoft Entra tenant](https://azure.microsoft.com/documentation/articles/active-directory-howto-tenant/)
+- A user account in your Microsoft Entra tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Microsoft Entra admin center](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
 
 ### Step 1:  Clone or download this repository
 
@@ -83,13 +82,13 @@ or download and extract the repository .zip file.
 
 > Given that the name of the sample is quite long, and so are the names of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
-### Step 2:  Register the sample application with your Azure Active Directory tenant
+### Step 2:  Register the sample application with your Microsoft Entra tenant
 
-There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
+There are two projects in this sample. Each needs to be separately registered in your Microsoft Entra tenant. To register these projects, you can:
 
 - either follow the steps below for manual registration
 - or use PowerShell scripts that:
-  - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you. Note that this works for Visual Studio only.
+  - **automatically** creates the Microsoft Entra applications and related objects (passwords, permissions, dependencies) for you. Note that this works for Visual Studio only.
   - modify the Visual Studio projects' configuration files.
 
 <details>
@@ -103,7 +102,7 @@ There are two projects in this sample. Each needs to be separately registered in
    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
    ```
 
-1. Run the script to create your Azure AD application and configure the code of the sample application accordingly.
+1. Run the script to create your Microsoft Entra application and configure the code of the sample application accordingly.
 1. In PowerShell run:
 
    ```PowerShell
@@ -120,13 +119,13 @@ There are two projects in this sample. Each needs to be separately registered in
 
 Follow the steps below to manually walk through the steps to register and configure the applications.												  
 																
-#### Choose the Azure AD tenant where you want to create your applications
+#### Choose the Microsoft Entra tenant where you want to create your applications
 
 As a first step you'll need to:
 
-1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
-1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory**.
-   Change your portal session to the desired Azure AD tenant.
+1. Sign in to the [Microsoft Entra admin center](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
+1. If your account is present in more than one Microsoft Entra tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory**.
+   Change your portal session to the desired Microsoft Entra tenant.
 
 #### Register the service app (TodoListService (active-directory-dotnet-native-aspnetcore-v2))
 
@@ -159,9 +158,9 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 >In the steps below, "ClientID" is the same as "Application ID" or "AppId".						   					
 
 1. Open the `TodoListService\appsettings.json` file
-1. Find the app key `Domain` and replace the existing value with your Azure AD tenant name.
-1. Find the app key `TenantId` and replace the existing value with your Azure AD tenant ID.
-1. Find the app key `ClientId` and replace the existing value with the application ID (clientId) of the `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Azure portal.
+1. Find the app key `Domain` and replace the existing value with your Microsoft Entra tenant name.
+1. Find the app key `TenantId` and replace the existing value with your Microsoft Entra tenant ID.
+1. Find the app key `ClientId` and replace the existing value with the application ID (clientId) of the `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Microsoft Entra admin center.
 
 #### Register the client app (TodoListClient (active-directory-dotnet-native-aspnetcore-v2))
 
@@ -188,8 +187,8 @@ Open the project in your IDE (like Visual Studio) to configure the code.
 Open the project in your IDE (like Visual Studio) to configure the code.
 >In the steps below, "ClientID" is the same as "Application ID" or "AppId".												  
 1. Open the `TodoListClient\App.Config` file
-1. Find the app key `ida:Tenant` and replace the existing value with your Azure AD tenant name.
-1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListClient (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Azure portal.
+1. Find the app key `ida:Tenant` and replace the existing value with your Microsoft Entra tenant name.
+1. Find the app key `ida:ClientId` and replace the existing value with the application ID (clientId) of the `TodoListClient (active-directory-dotnet-native-aspnetcore-v2)` application copied from the Microsoft Entra admin center.
 1. Find the app key `todo:TodoListScope` and replace the existing value with Scope.
 1. Find the app key `todo:TodoListBaseAddress` and replace the existing value with the base address of the TodoListService (active-directory-dotnet-native-aspnetcore-v2) project (by default `https://localhost:44351/`).
    
@@ -318,7 +317,7 @@ If you're using Visual Studio 2019:
 1. Edit the TodoListService's properties (right click on `TodoListService.csproj`, and choose **Properties**)
 1. In the Debug tab:
     1. Check the **Launch browser** field to `https://localhost:44351/api/todolist`
-    1. Change the **App URL** field to be `https://localhost:44351` as this URL is the URL registered in the Azure AD application representing the Web API.
+    1. Change the **App URL** field to be `https://localhost:44351` as this URL is the URL registered in the Microsoft Entra application representing the Web API.
     1. Check the **Enable SSL** field
 
 If you are not using Visual Studio, edit the `TodoListService\Properties\launchsettings.json` file.
@@ -344,7 +343,7 @@ You can also expose app-only permissions if parts of your API needs to be access
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`azure-active-directory` `msal` `dotnet`].
+Make sure that your questions or comments are tagged with [`microsoft-entra-id` `msal` `dotnet`].
 
 If you find a bug in the sample, please raise the issue on [GitHub Issues](../../../issues).
 
@@ -368,4 +367,4 @@ For more information, visit the following links:
 
 - To learn more about ASP.NET Core Web APIs: see [Introduction to Identity on ASP.NET Core](https://docs.microsoft.com/aspnet/core/security/authentication/identity?view=aspnetcore-2.1&tabs=visual-studio%2Caspnetcore2x) and also:
   - [AuthenticationBuilder](https://docs.microsoft.com/dotnet/api/microsoft.aspnetcore.authentication.authenticationbuilder?view=aspnetcore-2.0)
-  - [Azure Active Directory with ASP.NET Core](https://docs.microsoft.com/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.1)
+  - [Microsoft Entra ID with ASP.NET Core](https://docs.microsoft.com/aspnet/core/security/authentication/azure-active-directory/?view=aspnetcore-2.1)
