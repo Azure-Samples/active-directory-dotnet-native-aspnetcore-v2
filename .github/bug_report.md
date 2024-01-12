@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**Which version of Microsoft.IdentityModel are you using?**
+**Which version of Microsoft.Identity.Web or MSAL.NET are you using?**
 Note that to get help, you need to run the latest version.
 <!-- E.g. Microsoft.Identity.Web 2.16.1 -->
 
