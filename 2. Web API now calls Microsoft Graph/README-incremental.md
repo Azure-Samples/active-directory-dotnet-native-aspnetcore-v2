@@ -90,7 +90,7 @@ This binding merges the permissions required by both the client and the middle t
 
 To achieve this, you need to add the **Application Id** of the client app, in the Manifest of the Web API in the `knownClientApplications` property. Here's how:																				
 
-1. In the [Microsoft Entra admin center](https://portal.azure.com), navigate to your `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` app registration, and select **Manifest** section.
+1. In the [Microsoft Entra admin center](https://entra.microsoft.com), navigate to your `TodoListService (active-directory-dotnet-native-aspnetcore-v2)` app registration, and select **Manifest** section.
 1. In the manifest editor, change the `"knownClientApplications": []` line so that the array contains 
    the Client ID of the client application (`TodoListClient ((active-directory-dotnet-native-aspnetcore-v2)`) as an element of the array.
 
