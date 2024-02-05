@@ -5,7 +5,6 @@ languages:
 - csharp
 products:
 - dotnet
-- azure-active-directory
 - azure-app-service
 - azure-storage
 description: "Deploying a protected ASP.NET Core web API and calls the API from Desktop application"
@@ -22,7 +21,7 @@ In this guide, we will deploy our project component, **TodoListService** to **Az
 - [Deployment](#deployment)
   - [Publish the Web API](#publish-the-web-api)
   - [Configure the Web API](#configure-the-web-api)
-  - [Disabling Azure AD authentication](#disabling-azure-ad-authentication)
+  - [Disabling Microsoft Entra authentication](#disabling-azure-ad-authentication)
   - [Modify app.config](#modify-appconfig)
 - [Discussion](#discussion)
 - [Known Issues](#known-issues)
@@ -59,7 +58,7 @@ On the **App Services** portal, click on the **Configuration** blade and set the
 
 ![config](./ReadmeFiles/AppService-Config.png)
 
-### Disabling Azure AD authentication
+### Disabling Microsoft Entra authentication
 
 Still on the **App Services** portal, click on the **Authentication/Authorization** blade. There, make sure that the **App Services Authentication** is switched off (and nothing else is checked), as we are using our own authentication logic.  
 
@@ -95,9 +94,9 @@ Here we discuss some of the more important aspects of deploying multi-tenant app
 ## More information
 
 - [Quickstart: Create an ASP.NET Core web app in Azure](https://docs.microsoft.com/azure/app-service/app-service-web-get-started-dotnet)
-- [Tutorial: Authenticate and authorize users end-to-end in Azure App Service](https://docs.microsoft.com/azure/app-service/app-service-web-tutorial-auth-aad)
+- [Tutorial: Authenticate and authorize users end-to-end in Azure App Service](https://docs.microsoft.com/azure/app-service/app-service-web-tutorial-auth-Microsoft Entra ID)
 - [Authentication and authorization in Azure App Service and Azure Functions](https://docs.microsoft.com/azure/app-service/overview-authentication-authorization)
-- [Configure your App Service or Azure Functions app to use Azure AD login](https://docs.microsoft.com/azure/app-service/configure-authentication-provider-aad)
+- [Configure your App Service or Azure Functions app to use Microsoft Entra login](https://docs.microsoft.com/azure/app-service/configure-authentication-provider-Microsoft Entra ID)
 
 ## Code of Conduct
 
