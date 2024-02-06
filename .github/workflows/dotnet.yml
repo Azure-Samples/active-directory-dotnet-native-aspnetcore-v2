@@ -23,4 +23,4 @@ jobs:
     - name: Restore
       run: dotnet restore buildAllSlns.proj
     - name: Build
-      run: dotnet msbuild buildAllSlns.proj
+      run: msbuild buildAllSlns.proj
