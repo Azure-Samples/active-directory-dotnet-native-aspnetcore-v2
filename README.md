@@ -2,7 +2,7 @@
 languages:
   - csharp
 products:
-  - aspnet
+  - aspnet-core
   - azure
 page_type: sample
 urlFragment: active-directory-dotnet-native-aspnetcore-v2
